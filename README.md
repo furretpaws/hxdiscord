@@ -5,6 +5,8 @@ hxdiscord is a Discord API Wrapper for Haxe.
 
 `haxelib git hxdiscord https://github.com/FurretDev/hxdiscord.git`
 
+`haxelib install hxdiscord 0.0.1`
+
 ## About
 
 hxdiscord is a Discord Library for Haxe. It's still in development (I don't recommend you to use this library as of right now, because it's kinda unstable).
