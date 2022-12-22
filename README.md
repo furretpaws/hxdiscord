@@ -26,11 +26,12 @@ import hxdiscord.types.*;
 
 class Main
 {
-    var Bot:DiscordClient;
+    static var Bot:DiscordClient;
     static function main()
     {
-        Bot = new DiscordClient("bot token here", false); //true or false, enables or disables debug mode.
+        Bot = new DiscordClient("MTA1MzA2OTUyOTA4Njk1MTUwNA.GBsam2.ybuSBhKaHJvFBSQfN1JbGJLaWbZAQyw-1bm7DA", false); //true or false, enables or disables debug mode.
         Bot.onReady = onReady;
+        Bot.onMessageCreate = onMessageCreate;
     }
 
     public static function onReady()
@@ -40,9 +41,9 @@ class Main
 
     public static function onMessageCreate(m:Message)
     {
-        if (message.content == "hi")
+        if (m.content == "hi")
         {
-            message.reply("Hello!", true); //true or false, the bot will mention the user
+            m.reply("Hello!", true); //true or false, the bot will mention the user
         }
     }
 }
