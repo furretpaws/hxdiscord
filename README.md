@@ -29,7 +29,7 @@ class Main
     static var Bot:DiscordClient;
     static function main()
     {
-        Bot = new DiscordClient("MTA1MzA2OTUyOTA4Njk1MTUwNA.GBsam2.ybuSBhKaHJvFBSQfN1JbGJLaWbZAQyw-1bm7DA", false); //true or false, enables or disables debug mode.
+        Bot = new DiscordClient("bot token here", false); //true or false, enables or disables debug mode.
         Bot.onReady = onReady;
         Bot.onMessageCreate = onMessageCreate;
     }
