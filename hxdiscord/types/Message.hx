@@ -13,8 +13,7 @@ class Message
     public var pinned:Bool;
     public var id:String;
     public var channel_id:String;
-    public var authorUsername:String;
-    public var authorId:String;
+    public var author:User;
     public var content:String;
     public var mention_everyone:Bool;
 

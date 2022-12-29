@@ -3,7 +3,7 @@ package hxdiscord.types.structTypes;
 typedef MessageS = {
     var id:String;
     var channel_id:String;
-    @:optional var author:UserS;
+    @:optional var author:User;
     @:optional var content:String;
     @:optional var timestamp:String;
     @:optional var edited_timestamp:String;

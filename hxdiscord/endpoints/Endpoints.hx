@@ -2,6 +2,9 @@ package hxdiscord.endpoints;
 
 import hxdiscord.utils.Https;
 import hxdiscord.DiscordClient;
+import haxe.Http;
+import haxe.io.BytesOutput;
+import haxe.Json;
 
 class Endpoints
 {
@@ -81,6 +84,77 @@ class Endpoints
 		r.request(true);
     }
 
+    public static function getGlobalApplicationCommands()
+    {
+        var r = new haxe.Http("https://discord.com/api/v10/applications/" + DiscordClient.accountId + "/commands");
+
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+		r.onData = function(data:String)
+		{
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+		}
+
+		r.onError = function(error)
+		{
+			trace("An error has occurred: " + error);
+		}
+
+		r.request();
+
+        return r.responseData;
+    }
+    public static function createGlobalApplicationCommand(data:Any, overwrite:Bool)
+    {
+        var r:haxe.Http;
+
+        r = new haxe.Http("https://discord.com/api/v10/applications/"+DiscordClient.accountId+"/commands");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.setPostData(haxe.Json.stringify(data));
+        r.onData = function(_data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(_data);
+            }
+        }
+        r.onError = function(error)
+        {
+            throw("An error has occurred: " + error);
+        }
+        r.request(true);
+    }
+
+    public static function bulkOverwriteGlobalApplicationCommands(data:Any)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/applications/"+DiscordClient.accountId+"/commands");
+		var responseBytes = new BytesOutput();
+    
+		req.setPostData(Json.stringify(data)); 
+		req.addHeader("Content-type", "application/json");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+    
+    	req.onError = function(error:String) {
+            var response = responseBytes.getBytes();
+			throw error;
+		};
+		
+		req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+		};
+    
+		req.customRequest(true, responseBytes, "PUT");
+		var response = responseBytes.getBytes();
+    	return Json.parse(response.toString());
+    }
+
     public static function sendInteractionCallback(content:String, interactionID:String, interactionToken:String, type:Int, ?ephemeral:Bool)
     {
         var url:String = "https://discord.com/api/v10/interactions/" + interactionID + "/" + interactionToken + "/callback";
@@ -109,9 +183,9 @@ class Endpoints
             r.setPostData(haxe.Json.stringify({
                 "type": 4,
                 "data": {
-                    "content": content
-                },
-                "flags": 64
+                    "content": content,
+                    "flags": 64
+                }
             }));
         }
 
@@ -129,5 +203,37 @@ class Endpoints
 		}
 
 		r.request(true);
+    }
+
+    public static function sendDataToInteraction(data:Dynamic, interactionID:String, interactionToken:String, type:Int)
+    {
+        var url:String = "https://discord.com/api/v10/interactions/" + interactionID + "/" + interactionToken + "/callback";
+        if (DiscordClient.debug)
+        {
+            trace(url);
+        }
+        var r = new haxe.Http(url);
+    
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        
+        var data = null;
+    
+        r.setPostData(haxe.Json.stringify(data));
+    
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+        }
+    
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+        }
+    
+        r.request(true);
     }
 }

@@ -1,20 +1,21 @@
 package hxdiscord.types;
 
 import hxdiscord.DiscordClient;
+import hxdiscord.types.structTypes.UserS;
 
 class User
 {
     var discordClient:DiscordClient;
-    public var id:Int;
-    public var tag:String;
+    
     public var username:String;
+    public var public_flags:Int;
+    public var id:String;
     public var discriminator:String;
+    public var avatar_decoration:Dynamic;
     public var avatar:String;
-    public var avatarUrl:String;
-    public var bot:Bool;
-    public var mfa_enabled:Bool;
-    public var verified:Bool;
-    public var email:String;
-    public var flags:Int;
-    public var premium_type:Int;
+
+    public function new (bot:DiscordClient)
+    {
+        
+    }
 }

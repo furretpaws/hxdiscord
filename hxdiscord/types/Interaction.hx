@@ -35,6 +35,7 @@ class Interaction
         type = ins.type;
         token = ins.token;
         data = this.options[0];
+        trace(this.options);
     }
 
     public function reply(content:String, ?ephemeral:Bool = false)
@@ -42,5 +43,24 @@ class Interaction
         /*trace(intId);
         trace(token);*/
         Endpoints.sendInteractionCallback(content, intId, token, type, true);
+    }
+
+    public function replyData(data:Dynamic)
+    {
+        Endpoints.sendDataToInteraction(data, intId, token, type);
+    }
+
+    public function getValue(optionName:String)
+    {
+        var daThing:Dynamic = optionName;
+
+        for (int in this.options)
+        {
+            if (int.name == optionName)
+            {
+                daThing = int.value;
+            }
+        }
+        return daThing;
     }
 }

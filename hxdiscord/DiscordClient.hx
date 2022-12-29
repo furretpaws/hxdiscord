@@ -20,7 +20,7 @@ class DiscordClient
     public var verified:Bool = false;
     public var username:String = "";
     public var mfa_enabled = false;
-    public var accountId:String = "";
+    public static var accountId:String = "";
     public var flags:Int = 0;
     public var email:Dynamic;
     public var discriminator:String = "";
@@ -114,13 +114,13 @@ class DiscordClient
                     trace(content);
                     trace(author + ": " + content);
                 }*/
-                onMessageCreate(nMessage(d));
+                onMessageCreate(nMessage(d, d));
         }
     }
 
     public function setInteractionCommands(j:Dynamic)
     {
-        Https.sendPostData("https://discord.com/api/v10/applications/" + accountId +"/commands", j);
+        Endpoints.bulkOverwriteGlobalApplicationCommands(j);
     }
 
     public function getValue(array:Array<Dynamic>, thingToSearch:Dynamic)
@@ -138,6 +138,14 @@ class DiscordClient
 
     public function nInteraction(ins:InteractionS, d:Dynamic)
     {
+        /*var daUser = new User(this);
+        daUser.username = d.interaction.user.username;
+        daUser.public_flags = d.interaction.user.public_flags;
+        daUser.id = d.interaction.user.id;
+        daUser.discriminator = d.interaction.user.discriminator;
+        daUser.avatar_decoration = d.interaction.user.discriminator;
+        daUser.avatar = d.interaction.user.avatar;*/
+
         ins.options = d.data.options; //i have to manually adjust it :sob:
         ins.name = d.data.name;
         ins.intId = d.id;
@@ -150,9 +158,18 @@ class DiscordClient
         return interaction;
     }
 
-    public function nMessage(ms:MessageS) {
+    public function nMessage(ms:MessageS, d:Dynamic) {
+        var daUser = new User(this);
+        daUser.username = d.author.username;
+        daUser.public_flags = d.author.public_flags;
+        daUser.id = d.author.id;
+        daUser.discriminator = d.author.discriminator;
+        daUser.avatar_decoration = d.author.discriminator;
+        daUser.avatar = d.author.avatar;
+
         var id = ms.id;
         var message = new Message(ms, this);
+        message.author = daUser;
         return message;
     }
 
