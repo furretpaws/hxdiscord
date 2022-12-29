@@ -17,6 +17,7 @@ class DiscordClient
     var heartbeatTimer:Timer;
     var receivedHelloOC:Bool = false;
 
+    public var readySent:Bool = false;
     public var verified:Bool = false;
     public var username:String = "";
     public var mfa_enabled = false;
@@ -50,6 +51,7 @@ class DiscordClient
 
             ws = new WebSocketConnection(url);
             ws.onMessage = this.wsm;
+            ws.onClose = this.connect;
         } catch (err) {
             throw(err);
         }
@@ -103,7 +105,11 @@ class DiscordClient
                 username = d.user.username;
                 flags = d.user.flags;
                 bot = d.user.bot;
-                onReady();
+                if (!readySent)
+                {
+                    onReady();
+                    readySent = true;
+                }
             case 'INTERACTION_CREATE':
                 onInteractionCreate(nInteraction(d, d));
             case 'MESSAGE_CREATE':

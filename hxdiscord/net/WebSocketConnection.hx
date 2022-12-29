@@ -25,8 +25,7 @@ class WebSocketConnection {
         haxe.MainLoop.addThread(create);
     }
 
-    function create() { 
-        trace("starting");
+    function create() {
         ws = WebSocket.create(host, [], null, false);
         ws.onopen = function() {
             ready = true;
@@ -104,7 +103,6 @@ class WebSocketConnection {
 
     private function _onClose() {
         ready = false;
-        trace("died");
         onClose();
     }
 

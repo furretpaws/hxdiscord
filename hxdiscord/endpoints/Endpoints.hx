@@ -21,7 +21,7 @@ class Endpoints
         return Https.sendRequest(_url, _version, _endpointPath, _args, token);
     }
 
-    public static function sendMessage(content:String, reply:Bool, channelId:String, ?refMessageID:String)
+    /*public static function sendMessage(content:String, reply:Bool, channelId:String, ?refMessageID:String)
     {
         var r = new haxe.Http("https://discord.com/api/v10/channels/" + channelId + "/messages");
 
@@ -54,6 +54,68 @@ class Endpoints
 		r.onError = function(error)
 		{
 			trace("An error has occurred: " + error);
+            trace(r.responseData);
+		}
+
+		r.request(true);
+    }*/
+
+    public static function sendMessage(channel_id:String, message:hxdiscord.types.Typedefs.MessageCreate, id:String, reply:Bool)
+    {
+        var r = new haxe.Http("https://discord.com/api/v10/channels/" + channel_id + "/messages");
+
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        if (reply)
+        {
+            message.message_reference = {
+                message_id: id
+            };
+        }
+        r.setPostData(haxe.Json.stringify(message));
+        trace(haxe.Json.stringify(message));
+
+		r.onData = function(data:String)
+		{
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+		}
+
+		r.onError = function(error)
+		{
+			trace("An error has occurred: " + error);
+            trace(r.responseData);
+		}
+
+		r.request(true);
+    }
+
+    public static function sendMessageToChannelID(channelID:String, data:Dynamic)
+    {
+        var r = new haxe.Http("https://discord.com/api/v9/channels/" + channelID + "/messages");
+
+        trace(channelID);
+        trace(data);
+
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        r.setPostData(haxe.Json.stringify(data));
+
+		r.onData = function(data:String)
+		{
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+		}
+
+		r.onError = function(error)
+		{
+			trace("An error has occurred: " + error);
+            trace(r.responseData);
 		}
 
 		r.request(true);
@@ -139,6 +201,7 @@ class Endpoints
         req.addHeader("Authorization", "Bot " + DiscordClient.token);
     
     	req.onError = function(error:String) {
+            trace(req.responseData);
             var response = responseBytes.getBytes();
 			throw error;
 		};

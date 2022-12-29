@@ -4,8 +4,8 @@
     "license": "GPL",
     "tags": ["Discord", "Haxe"],
     "description": "Discord.hx is an API wrapper for Haxe!",
-    "version": "0.0.1",
-    "releasenote": "In development i guess?",
+    "version": "0.0.2",
+    "releasenote": "Bug fixes",
     "contributors": ["Furret"],
     "dependencies": {
       "haxe-ws": "1.0.5"

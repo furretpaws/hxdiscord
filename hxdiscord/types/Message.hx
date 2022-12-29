@@ -2,6 +2,7 @@ package hxdiscord.types;
 
 import hxdiscord.DiscordClient;
 import hxdiscord.types.structTypes.*;
+import hxdiscord.types.Typedefs;
 import hxdiscord.endpoints.Endpoints;
 
 class Message
@@ -15,6 +16,7 @@ class Message
     public var channel_id:String;
     public var author:User;
     public var content:String;
+    public var embed:Embed;
     public var mention_everyone:Bool;
 
     var client:DiscordClient;
@@ -25,7 +27,7 @@ class Message
         //trace(ms.username);
         type = ms.type;
         tts = ms.tts;
-        timestamp = ms.timestamp;
+        timestamp = ms.timestamp; 
         //referenced_message = ms.referenced_message;
         pinned = ms.pinned;
         id = ms.id;
@@ -35,16 +37,9 @@ class Message
         mention_everyone = ms.mention_everyone;
     }
 
-    public function reply(content:String, ?ping:Bool)
+    public function reply(mc:hxdiscord.types.Typedefs.MessageCreate, ?ping:Bool)
     {
-        if (ping!=null)
-        {
-            Endpoints.sendMessage(content, ping, channel_id, id);
-        }
-        else
-        {
-            Endpoints.sendMessage(content, false, channel_id, id);
-        }
+        Endpoints.sendMessage(channel_id, mc, id, ping);
     }
 
     public function replyData(data:Dynamic) //this will save a lot of time honestly
