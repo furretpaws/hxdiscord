@@ -39,6 +39,16 @@ class Interaction
         if (this.options != null)
         {
             data = this.options[0];
+            trace(data);
+        }
+        else
+        {
+            data = {
+                type: 3,
+                name: "no_options",
+                value: "no_options"
+            };
+            trace(data);
         }
     }
 
@@ -54,14 +64,21 @@ class Interaction
 
     public function getValue(optionName:String)
     {
-        var daThing:Dynamic = optionName;
+        var daThing:Dynamic = "optionName";
 
-        for (int in this.options)
+        if (this.options != null)
         {
-            if (int.name == optionName)
+            for (int in this.options)
             {
-                daThing = int.value;
+                if (int.name == optionName)
+                {
+                    daThing = int.value;
+                }
             }
+        }
+        else
+        {
+            daThing = "No value found";
         }
         return daThing;
     }
