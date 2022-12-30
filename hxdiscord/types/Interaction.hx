@@ -36,7 +36,6 @@ class Interaction
         options = ins.options;
         type = ins.type;
         token = ins.token;
-        trace(this.options);
         if (this.options != null)
         {
             data = this.options[0];
