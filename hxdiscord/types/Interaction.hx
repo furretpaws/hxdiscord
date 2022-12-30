@@ -39,7 +39,6 @@ class Interaction
         if (this.options != null)
         {
             data = this.options[0];
-            trace(data);
         }
         else
         {
@@ -48,7 +47,6 @@ class Interaction
                 name: "no_options",
                 value: "no_options"
             };
-            trace(data);
         }
     }
 
