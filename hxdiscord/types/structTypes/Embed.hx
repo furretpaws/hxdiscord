@@ -41,6 +41,7 @@ typedef EmbedAuthor = {
 
 typedef EmbedField = {
     var name:String;
+    @:optional var url:String;
     var value:String;
     @:optional @:native("inline") var _inline:Bool;
 }

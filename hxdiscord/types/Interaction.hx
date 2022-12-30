@@ -36,7 +36,11 @@ class Interaction
         options = ins.options;
         type = ins.type;
         token = ins.token;
-        data = this.options[0];
+        trace(this.options);
+        if (this.options != null)
+        {
+            data = this.options[0];
+        }
     }
 
     public function reply(ic:hxdiscord.types.Typedefs.InteractionCallback, ?ephemeral:Bool)
