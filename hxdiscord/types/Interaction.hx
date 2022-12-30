@@ -14,6 +14,7 @@ class Interaction
     public var avatar:String;
     public var channel_id:String;
     public var name:String;
+    public var member:hxdiscord.types.structTypes.InteractionS.Member;
     public var intId:String;
     public var options:Array<Dynamic>;
     public var data:Dynamic;
@@ -27,6 +28,7 @@ class Interaction
         id = ins.id;
         discriminator = ins.discriminator;
         avatar_decoration = ins.avatar_decoration;
+        member = ins.member;
         avatar = ins.avatar;
         channel_id = ins.channel_id;
         name = ins.name;
@@ -38,11 +40,9 @@ class Interaction
         trace(this.options);
     }
 
-    public function reply(content:String, ?ephemeral:Bool = false)
+    public function reply(ic:hxdiscord.types.Typedefs.InteractionCallback, ?ephemeral:Bool)
     {
-        /*trace(intId);
-        trace(token);*/
-        Endpoints.sendInteractionCallback(content, intId, token, type, true);
+        Endpoints.sendInteractionCallback(ic, intId, token, type, ephemeral);
     }
 
     public function replyData(data:Dynamic)

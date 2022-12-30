@@ -218,7 +218,7 @@ class Endpoints
     	return Json.parse(response.toString());
     }
 
-    public static function sendInteractionCallback(content:String, interactionID:String, interactionToken:String, type:Int, ?ephemeral:Bool)
+    public static function sendInteractionCallback(ic:hxdiscord.types.Typedefs.InteractionCallback, interactionID:String, interactionToken:String, type:Int, ?ephemeral:Bool)
     {
         var url:String = "https://discord.com/api/v10/interactions/" + interactionID + "/" + interactionToken + "/callback";
         if (DiscordClient.debug)
@@ -232,40 +232,34 @@ class Endpoints
         
         var data = null;
 
-        if (!ephemeral)
+        if (ephemeral)
         {
-            r.setPostData(haxe.Json.stringify({
-                "type": 4,
-                "data": {
-                    "content": content
-                }
-            }));
-        }
-        else 
-        {
-            r.setPostData(haxe.Json.stringify({
-                "type": 4,
-                "data": {
-                    "content": content,
-                    "flags": 64
-                }
-            }));
+            ic.flags = 64;
         }
 
-		r.onData = function(data:String)
-		{
+        r.setPostData(haxe.Json.stringify({
+            "type": 4,
+            "data": ic
+        }));
+        trace(haxe.Json.stringify({
+            "type": 4,
+            "data": ic
+        }));
+
+        r.onData = function(data:String)
+        {
             if (DiscordClient.debug)
             {
                 trace(data);
             }
-		}
+        }
 
-		r.onError = function(error)
-		{
-			trace("An error has occurred: " + error);
-		}
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+        }
 
-		r.request(true);
+        r.request(true);
     }
 
     public static function sendDataToInteraction(data:Dynamic, interactionID:String, interactionToken:String, type:Int)
