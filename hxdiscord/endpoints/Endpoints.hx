@@ -73,7 +73,10 @@ class Endpoints
             };
         }
         r.setPostData(haxe.Json.stringify(message));
-        trace(haxe.Json.stringify(message));
+        if (DiscordClient.debug)
+        {
+            trace(haxe.Json.stringify(message));
+        }
 
 		r.onData = function(data:String)
 		{
@@ -96,8 +99,11 @@ class Endpoints
     {
         var r = new haxe.Http("https://discord.com/api/v9/channels/" + channelID + "/messages");
 
-        trace(channelID);
-        trace(data);
+        if (DiscordClient.debug)
+        {
+            trace(channelID);
+            trace(data);
+        }
 
         r.addHeader("Content-Type", "application/json");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -241,10 +247,6 @@ class Endpoints
             "type": 4,
             "data": ic
         }));
-        trace(haxe.Json.stringify({
-            "type": 4,
-            "data": ic
-        }));
 
         r.onData = function(data:String)
         {
@@ -256,7 +258,7 @@ class Endpoints
 
         r.onError = function(error)
         {
-            trace("An error has occurred: " + error);
+            //trace("An error has occurred: " + error);
         }
 
         r.request(true);
