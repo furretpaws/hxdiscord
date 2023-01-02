@@ -15,6 +15,7 @@ class DiscordClient
     public static var debug:Bool;
     var ws:WebSocketConnection;
     var heartbeatTimer:Timer;
+    public static var status:String = "online";
     var receivedHelloOC:Bool = false;
 
     public var readySent:Bool = false;
@@ -140,6 +141,114 @@ class DiscordClient
             }
         }
         return daThing;
+    }
+
+    public function guildRequestMembers(guild_id:String, ?query:String = "", ?limit:Int = 0, ?presences:Bool = null, ?user_ids:haxe.extern.EitherType<Array<String>, String> = null, ?nonce:String = null)
+    {
+        var data = {
+            op: 8,
+            d: {
+                guild_id: guild_id,
+                query: query,
+                limit: limit,
+                presences: presences,
+                user_ids: user_ids,
+                nonce: nonce
+            }
+        }
+    }
+
+    public function changeStatus(status:String, ?type:String, ?presence:String, ?afk:Bool = false)
+    {
+        var availableStatus:Array<String> = ["online", "dnd", "idle", "invisible", "offline"];
+        if (status != "online" && status != "dnd" && status != "idle" && status != "invisible" && status != "offline")
+        {
+            throw("Invalid status: " + status);
+        }
+        
+        var data = null;
+        if (type != null && type != null)
+        {
+            var numericType:Int = 0;
+
+            switch(type.toLowerCase())
+            {
+                case "game":
+                    numericType = 0;
+                case "streaming":
+                    numericType = 1;
+                case "listening":
+                    numericType = 2;
+                case "watching":
+                    numericType = 3;
+                case "custom":
+                    numericType = 4;
+                case "competing":
+                    numericType = 5;
+            }
+
+            data = {
+                op: 3,
+                d: {
+                    since: null,
+                    activities: [
+                        {
+                            name: presence,
+                            type: numericType
+                        }
+                    ],
+                    status: status,
+                    afk: afk
+                }
+            }
+        }
+
+        status = status.toLowerCase();
+
+        ws.sendJson(data);
+    }
+
+    public function changePresence(type:String, status:String)
+    {
+        if (type != "game" && type != "streaming" && type != "listening" && type != "watching" && type != "custom" && type != "competing")
+        {
+            throw("Invalid type: " + type + " / The only types that exists are: game, streaming, watching, custom, competing");
+        }
+
+        var numericType:Int = 0;
+
+        switch(type.toLowerCase())
+        {
+            case "game":
+                numericType = 0;
+            case "streaming":
+                numericType = 1;
+            case "listening":
+                numericType = 2;
+            case "watching":
+                numericType = 3;
+            case "custom":
+                numericType = 4;
+            case "competing":
+                numericType = 5;
+        }
+
+        var data = {
+            op: 3,
+            d: {
+                since: null,
+                activities: [
+                    {
+                        name: status,
+                        type: numericType
+                    }
+                ],
+                status: null,
+                afk: false
+            }
+        };
+
+        ws.sendJson(data);
     }
 
     public function nInteraction(ins:InteractionS, d:Dynamic)

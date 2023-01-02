@@ -207,9 +207,7 @@ class Endpoints
         req.addHeader("Authorization", "Bot " + DiscordClient.token);
     
     	req.onError = function(error:String) {
-            trace(req.responseData);
-            var response = responseBytes.getBytes();
-			throw error;
+            trace("An error has occurred: " + error);
 		};
 		
 		req.onStatus = function(status:Int) {
