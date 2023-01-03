@@ -13,7 +13,24 @@ typedef InteractionS = {
     var intId:String;
     var options:Array<Dynamic>;
     var type:Int;
+    var data:InteractionData;
     var token:String;
+}
+
+typedef InteractionResolvedData = {
+    @:optional var users:Array<User>;
+    @:optional var members:Dynamic;
+    @:optional var roles:Dynamic;
+    @:optional var channels:Dynamic;
+    @:optional var messages:Dynamic;
+    @:optional var attachments:Array<Attachment>;
+}
+
+typedef InteractionData = {
+    var id:String;
+    var name:String;
+    var type:Int;
+    var resolved:InteractionResolvedData;
 }
 
 typedef User = {

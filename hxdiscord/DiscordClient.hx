@@ -112,7 +112,7 @@ class DiscordClient
                     readySent = true;
                 }
             case 'INTERACTION_CREATE':
-                onInteractionCreate(nInteraction(d, d));
+                onInteractionCreate(nInteraction(d, d, haxe.Json.parse(msg)));
             case 'MESSAGE_CREATE':
                 /*var author = d.author.username;
                 var content = d.content;
@@ -251,7 +251,7 @@ class DiscordClient
         ws.sendJson(data);
     }
 
-    public function nInteraction(ins:InteractionS, d:Dynamic)
+    public function nInteraction(ins:InteractionS, d:Dynamic, pj:Dynamic)
     {
         /*var daUser = new User(this);
         daUser.username = d.interaction.user.username;
@@ -269,7 +269,7 @@ class DiscordClient
         {
             trace(d.token);
         }
-        var interaction = new Interaction(ins, this);
+        var interaction = new Interaction(ins, this, pj);
         return interaction;
     }
 

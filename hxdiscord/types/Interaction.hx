@@ -17,11 +17,12 @@ class Interaction
     public var member:hxdiscord.types.structTypes.InteractionS.Member;
     public var intId:String;
     public var options:Array<Dynamic>;
-    public var data:Dynamic;
+    public var dataOptions:Dynamic;
     public var type:Int;
     public var token:String;
+    public var data:hxdiscord.types.structTypes.InteractionS.InteractionData;
 
-    public function new(ins:InteractionS, _client:DiscordClient)
+    public function new(ins:InteractionS, _client:DiscordClient, parsedJSON:Dynamic)
     {
         username = ins.username;
         public_flags = ins.public_flags;
@@ -36,13 +37,15 @@ class Interaction
         options = ins.options;
         type = ins.type;
         token = ins.token;
+        data = ins.data;
+
         if (this.options != null)
         {
-            data = this.options[0];
+            dataOptions = this.options[0];
         }
         else
         {
-            data = {
+            dataOptions = {
                 type: 3,
                 name: "no_options",
                 value: "no_options"
