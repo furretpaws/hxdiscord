@@ -45,7 +45,7 @@ class Main
     {
         if (m.content == "hi")
         {
-            m.reply("Hello!", true); //true or false, the bot will mention the user
+            m.reply({content:"Hello!"}, true); //true or false, the bot will mention the user
         }
     }
 }
