@@ -63,7 +63,7 @@ class Interaction
         Endpoints.sendDataToInteraction(data, intId, token, type);
     }
 
-    public function getValue(optionName:String)
+    public function getValue(optionName:String):Dynamic
     {
         var daThing:Dynamic = "optionName";
 

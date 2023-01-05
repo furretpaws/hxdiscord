@@ -15,7 +15,7 @@ class DiscordClient
     public static var debug:Bool;
     var ws:WebSocketConnection;
     var heartbeatTimer:Timer;
-    public static var status:String = "online";
+    public var status:String = "online";
     var receivedHelloOC:Bool = false;
 
     public var readySent:Bool = false;
@@ -28,6 +28,8 @@ class DiscordClient
     public var discriminator:String = "";
     public var bot:Bool = false;
     public var avatar:Dynamic;
+
+    public var presence:String = "";
 
     public function new (_token:String, _debug:Bool = false)
     {
@@ -204,6 +206,8 @@ class DiscordClient
         }
 
         status = status.toLowerCase();
+        this.status = status.toLowerCase();
+        this.presence = presence;
 
         ws.sendJson(data);
     }
