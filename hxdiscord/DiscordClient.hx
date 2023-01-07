@@ -30,6 +30,8 @@ class DiscordClient
     public var avatar:Dynamic;
 
     public var presence:String = "";
+    public var presenceType:Int = 99;
+    public var afk:Bool = false;
 
     public function new (_token:String, _debug:Bool = false)
     {
@@ -55,6 +57,30 @@ class DiscordClient
             ws = new WebSocketConnection(url);
             ws.onMessage = this.wsm;
             ws.onClose = this.connect;
+            var numericType = presenceType;
+            var data = null;
+            if (presenceType == 99)
+            {
+                //do nothing
+            }
+            else
+            {
+                data = {
+                    op: 3,
+                    d: {
+                        since: null,
+                        activities: [
+                            {
+                                name: presence,
+                                type: numericType
+                            }
+                        ],
+                        status: status,
+                        afk: afk
+                    }
+                }
+                ws.sendJson(data);
+            }
         } catch (err) {
             throw(err);
         }
@@ -169,10 +195,9 @@ class DiscordClient
         }
         
         var data = null;
+        var numericType:Int = 0;
         if (type != null && type != null)
         {
-            var numericType:Int = 0;
-
             switch(type.toLowerCase())
             {
                 case "game":
@@ -208,6 +233,8 @@ class DiscordClient
         status = status.toLowerCase();
         this.status = status.toLowerCase();
         this.presence = presence;
+        this.presenceType = numericType;
+        this.afk = afk;
 
         ws.sendJson(data);
     }
