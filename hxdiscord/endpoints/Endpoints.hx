@@ -138,7 +138,7 @@ Content-Type: application/json;';
         var r = new haxe.Http("https://discord.com/api/v10/channels/" + channel_id + "/messages");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + "MTA0NzI3NzU2Nzc1NDg5OTUyOA.GmYQqo.2QoZZxOYZ3rec80lEGhb29aUcQ1o63Ln0KoUaM");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
         r.addHeader("Content-Type", "multipart/form-data; boundary=boundary");
 
         r.setPostData(body);
