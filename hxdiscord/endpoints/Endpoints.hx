@@ -6,6 +6,8 @@ import haxe.Http;
 import haxe.io.BytesOutput;
 import haxe.Json;
 
+using StringTools;
+
 class Endpoints
 {
     public static var url:String = "https://discord.com/api/";
@@ -62,37 +64,97 @@ class Endpoints
 
     public static function sendMessage(channel_id:String, message:hxdiscord.types.Typedefs.MessageCreate, id:String, reply:Bool)
     {
+        //USING MULTIPART BECAUSE YES.
+        if (reply)
+         {
+             message.message_reference = {
+                 message_id: id
+             };
+         }
+        var attachments:Bool = false;
+        if (message.attachments == null)
+            attachments = false;
+        else
+            attachments = true;
+
+        var body:String = '--boundary
+Content-Disposition: form-data; name="payload_json";
+Content-Type: application/json;';
+        body += "\n\n";
+        //quick check
+        var jsonCheck:Dynamic = haxe.Json.parse(haxe.Json.stringify(message));
+        if (jsonCheck.attachments != null)
+        {
+            trace("attachments found?");
+            var filename:String = "";
+            var thing = "";
+            var returnJson:Dynamic = haxe.Json.parse(haxe.Json.stringify(message));
+            for (i in 0...jsonCheck.attachments.length)
+            {
+                thing = jsonCheck.attachments[i].filename.toString();
+                var split = thing.split("/");
+                trace(split[split.length-1]);
+                returnJson.attachments[i].filename = split[split.length-1];
+            }
+            body += haxe.Json.stringify(returnJson) + "\n";
+        }
+        else
+        {
+            body += haxe.Json.stringify(message) + "\n";
+        }
+        if (!attachments)
+        {
+            body += '--boundary--';
+        }
+        else if (attachments)
+        {
+            var json = haxe.Json.parse(haxe.Json.stringify(message));
+            for (i in 0...message.attachments.length)
+            {
+                var filename:String = "";
+                var thing = "";
+                thing = json.attachments[i].filename.toString();
+                if (thing.contains("/"))
+                {
+                    trace("This file appears to be placed in another folder. Removing shit");
+                    var split = thing.split("/");
+                    trace(split[split.length-1]);
+                    filename = split[split.length-1];
+                }
+                else
+                {
+                    filename = thing;
+                }
+                body += '--boundary\n';
+                body += 'Content-Disposition: form-data; name="files[' + i + ']"; filename="' + filename + '"' + "\n";
+                body += 'Content-Type: text/plain';
+                body += '\n\n';
+                body += sys.io.File.getBytes(json.attachments[i].filename.toString()).toString() + "\n";
+            }
+            body += '--boundary--';
+        }
+        trace(body);
+
         var r = new haxe.Http("https://discord.com/api/v10/channels/" + channel_id + "/messages");
 
-        r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
-        if (reply)
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", "Bot " + "MTA0NzI3NzU2Nzc1NDg5OTUyOA.GmYQqo.2QoZZxOYZ3rec80lEGhb29aUcQ1o63Ln0KoUaM");
+        r.addHeader("Content-Type", "multipart/form-data; boundary=boundary");
+
+        r.setPostData(body);
+
+        r.onData = function(data:String)
         {
-            message.message_reference = {
-                message_id: id
-            };
-        }
-        r.setPostData(haxe.Json.stringify(message));
-        if (DiscordClient.debug)
-        {
-            trace(haxe.Json.stringify(message));
+            trace(data);
         }
 
-		r.onData = function(data:String)
-		{
-            if (DiscordClient.debug)
-            {
-                trace(data);
-            }
-		}
-
-		r.onError = function(error)
-		{
-			trace("An error has occurred: " + error);
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
             trace(r.responseData);
-		}
+        }
 
-		r.request(true);
+        r.request(true);
     }
 
     public static function sendMessageToChannelID(channelID:String, data:Dynamic)

@@ -9,6 +9,7 @@ typedef MessageCreate = {
     @:optional var tts:Bool;
     @:optional var file:String;
     @:optional var message_reference:Any;
+    @:optional var attachments:Array<Dynamic>;
 }
 
 typedef ComponentArray = {
