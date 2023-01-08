@@ -59,28 +59,6 @@ class DiscordClient
             ws.onClose = this.connect;
             var numericType = presenceType;
             var data = null;
-            if (presenceType == 99)
-            {
-                //do nothing
-            }
-            else
-            {
-                data = {
-                    op: 3,
-                    d: {
-                        since: null,
-                        activities: [
-                            {
-                                name: presence,
-                                type: numericType
-                            }
-                        ],
-                        status: status,
-                        afk: afk
-                    }
-                }
-                ws.sendJson(data);
-            }
         } catch (err) {
             throw(err);
         }
@@ -121,6 +99,29 @@ class DiscordClient
                 }
             }
             ws.sendJson(idPayload);
+            //alright, i fixed this
+            if (presenceType == 99)
+            {
+                //do nothing
+            }
+            else
+            {
+                data = {
+                    op: 3,
+                    d: {
+                        since: null,
+                        activities: [
+                            {
+                                name: presence,
+                                type: numericType
+                            }
+                        ],
+                        status: status,
+                        afk: afk
+                    }
+                }
+                ws.sendJson(data);
+            }
         }
 
         switch (t) {
