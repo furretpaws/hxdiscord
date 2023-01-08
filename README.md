@@ -9,7 +9,7 @@ hxdiscord is a Discord API Wrapper for Haxe.
 
 ## About
 
-hxdiscord is a Discord Library for Haxe. It's still in development (I don't recommend you to use this library as of right now, because it's kinda unstable).
+hxdiscord is a Discord Library for Haxe. It's still in development.
 
 
 Some targets might not work, I haven't tested any. C++ will work.
