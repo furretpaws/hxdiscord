@@ -73,6 +73,29 @@ class Endpoints
         return user;
     }
 
+    public static function deleteMessage(channel_id:String, m_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+m_id);
+		var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+		req.addHeader("Content-type", "application/json");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+    
+    	req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+		};
+		
+		req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+		};
+    
+		req.customRequest(true, responseBytes, "DELETE");
+    }
+
     public static function sendMessage(channel_id:String, message:hxdiscord.types.Typedefs.MessageCreate, id:String, reply:Bool)
     {
         //USING MULTIPART BECAUSE YES.

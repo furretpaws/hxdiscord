@@ -14,6 +14,8 @@ typedef MessageS = {
     @:optional var member:GuildMember;
     var guild_id:String;
     @:optional var attachments:Array<Attachment>;
+    @:optional var referenced_message:MessageS;
+    @:optional var message_reference:MessageReference;
     /*@:optional var embeds:Array<Embed>;
     @:optional var reactions:Array<Reaction>;*/
     @:optional var nonce:String;
@@ -22,4 +24,11 @@ typedef MessageS = {
     @:optional var type:Int;
     /*@:optional var activity:MessageActivity;
     @:optional var application:MessageApplication;*/
+}
+
+typedef MessageReference = {
+    @:optional var message_id:String;
+    @:optional var channel_id:String;
+    @:optional var guild_id:String;
+    @:optional var fail_if_not_exists:Bool;
 }
