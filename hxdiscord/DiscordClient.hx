@@ -106,7 +106,7 @@ class DiscordClient
             }
             else
             {
-                data = {
+                var data = {
                     op: 3,
                     d: {
                         since: null,
