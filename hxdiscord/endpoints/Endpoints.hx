@@ -34,7 +34,6 @@ class Endpoints
 
 		r.onData = function(data:String)
 		{
-            trace(data);
             user = new hxdiscord.types.User(null, haxe.Json.parse(data));
 		}
 
@@ -59,7 +58,6 @@ class Endpoints
 
         r.onData = function(data:String)
         {
-            trace(data);
             user = new hxdiscord.types.User(null, haxe.Json.parse(data));
         }
 
@@ -71,6 +69,36 @@ class Endpoints
         r.request();
 
         return user;
+    }
+
+    public static function getRoles(guild_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v10/guilds/"+guild_id+"/roles");
+        trace("https://discord.com/api/v10/guilds/"+guild_id+"/roles/");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", "Bot " + "MTA0NzI3NzU2Nzc1NDg5OTUyOA.GU64Dp.FD66A7eWRCBUKD-oZRSy-IVVT-vDTugDXLt6vM");
+
+        var response:String = "";
+
+
+		r.onData = function(data:String)
+		{
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+            response = data;
+		}
+
+		r.onError = function(error)
+		{
+			trace("An error has occurred: " + error);
+		}
+
+		r.request();
+
+        return response;
     }
 
     public static function deleteMessage(channel_id:String, m_id:String)
@@ -278,6 +306,84 @@ Content-Type: application/json;';
 
         return guild;
     }
+    
+    public static function createGuildBan(id:String, guild_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/bans/"+id);
+		var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+		req.addHeader("Content-type", "application/json");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        req.setPostData(haxe.Json.stringify({
+            delete_message_days: 0,
+            delete_message_seconds: 0
+        }));
+    
+    	req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+		};
+		
+		req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+		};
+    
+		req.customRequest(true, responseBytes, "PUT");
+		var response = responseBytes.getBytes();
+    }
+
+    public static function removeGuildBan(id:String, guild_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/bans/"+id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(true, responseBytes, "DELETE");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function removeGuildMember(id:String, guild_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/"+id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(true, responseBytes, "DELETE");
+        var response = responseBytes.getBytes();
+    }
+
     //interactions
 
     public static function getGlobalApplicationCommands()

@@ -33,10 +33,26 @@ class DiscordClient
     public var presenceType:Int = 99;
     public var afk:Bool = false;
 
-    public function new (_token:String, _debug:Bool = false)
+    public var intentsNumber:Int = 0;
+
+    public function new (_token:String, intents:Array<Int>, ?_debug:Bool = false)
     {
         token = _token;
-        debug = _debug;
+        if (debug != null)
+            debug = _debug;
+        else
+            debug = false;
+
+        if (intents == null || intents == [])
+        {
+            throw("The Discord client requires valid intents");
+        }
+        else
+        {
+            for (intent in intents) {
+                intentsNumber |= intent;
+            }
+        }
 
         connect();
     }
@@ -88,7 +104,7 @@ class DiscordClient
                 op:2,
                 d: {
                     token: token,
-                    intents: 131071,
+                    intents: intentsNumber,
                     properties: {
                         os: 'customOS',
                         browser: 'hxdiscord',

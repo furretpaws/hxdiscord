@@ -53,4 +53,63 @@ class Message
     {
         Endpoints.sendDataToMessageAPI(data, channel_id);
     }
+
+    public function hasPermission(permissionToLookFor:String):Bool
+    {
+        var hasPermission = false;
+        if (guildmember == null)
+        {
+            //do nothing
+        }
+        else
+        {
+            var guild = hxdiscord.endpoints.Endpoints.getGuild(guild_id);
+            var owner = hxdiscord.endpoints.Endpoints.getUser(guild.owner_id);
+
+            if (author.id == owner.id)
+            {
+                hasPermission = true;
+            }
+            else
+            {
+                var r = new haxe.Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/" + author.id);
+
+                r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+                r.addHeader("Authorization", "Bot " + "MTA0NzI3NzU2Nzc1NDg5OTUyOA.GU64Dp.FD66A7eWRCBUKD-oZRSy-IVVT-vDTugDXLt6vM");
+
+
+		        r.onData = function(dataG:String)
+		        {
+                    var data = Endpoints.getRoles(guild_id);
+                    var json:Dynamic = haxe.Json.parse(dataG);
+
+                    var roles:Array<String> = json.roles;
+
+                    var jsonRole:Dynamic = haxe.Json.parse(data);
+                    for (i in 0...jsonRole.length)
+                    {
+                        for (x in 0...roles.length)
+                        {
+                            if (jsonRole[i].id == roles[x])
+                            {
+                                var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(jsonRole[i].permissions)));
+                                if (array.contains(permissionToLookFor))
+                                {
+                                    hasPermission = true;
+                                }
+                            }
+                        }
+                    }
+		        }
+
+		        r.onError = function(error)
+		        {
+		        	trace("An error has occurred: " + error);
+		        }
+
+		        r.request();
+            }
+        }
+        return hasPermission;
+    }
 }
