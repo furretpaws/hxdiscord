@@ -57,8 +57,6 @@ class DiscordClient
             ws = new WebSocketConnection(url);
             ws.onMessage = this.wsm;
             ws.onClose = this.connect;
-            var numericType = presenceType;
-            var data = null;
         } catch (err) {
             throw(err);
         }
@@ -106,6 +104,7 @@ class DiscordClient
             }
             else
             {
+                var numericType = presenceType;
                 var data = {
                     op: 3,
                     d: {
