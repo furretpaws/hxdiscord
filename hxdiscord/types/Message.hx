@@ -73,7 +73,7 @@ class Message
             else
             {
                 var r = new haxe.Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/" + author.id);
-
+                //LLL
                 r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
                 r.addHeader("Authorization", "Bot " + DiscordClient.token);
 
