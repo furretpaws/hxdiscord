@@ -13,8 +13,6 @@ class Endpoints
     public static var url:String = "https://discord.com/api/";
     public static var version:String = "v10";
 
-    public var getUser:String = "/users/";
-
     public var getGateway:String = "/gateway";
     public static var getGatewayBot:String = "/gateway/bot";
 
@@ -23,44 +21,57 @@ class Endpoints
         return Https.sendRequest(_url, _version, _endpointPath, _args, token);
     }
 
-    /*public static function sendMessage(content:String, reply:Bool, channelId:String, ?refMessageID:String)
-    {
-        var r = new haxe.Http("https://discord.com/api/v10/channels/" + channelId + "/messages");
+    //users
 
-        r.addHeader("Content-Type", "application/json");
+    public static function getCurrentUser()
+    {
+        var r = new haxe.Http("https://discord.com/api/v10/users/@me");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
-        if (!reply)
-        {
-            r.setPostData(haxe.Json.stringify({
-                "content": content
-            }));
-        }
-        else
-        {
-            r.setPostData(haxe.Json.stringify({
-                "content": content,
-                message_reference: {
-                    message_id: refMessageID,
-                }
-            }));
-        }
+
+        var user:hxdiscord.types.User = null;
 
 		r.onData = function(data:String)
 		{
-            if (DiscordClient.debug)
-            {
-                trace(data);
-            }
+            trace(data);
+            user = new hxdiscord.types.User(null, haxe.Json.parse(data));
 		}
 
 		r.onError = function(error)
 		{
 			trace("An error has occurred: " + error);
-            trace(r.responseData);
 		}
 
-		r.request(true);
-    }*/
+		r.request();
+
+        return user;
+    }
+
+    public static function getUser(id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v10/users/" + id);
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        var user:hxdiscord.types.User = null;
+
+        r.onData = function(data:String)
+        {
+            trace(data);
+            user = new hxdiscord.types.User(null, haxe.Json.parse(data));
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+        }
+
+        r.request();
+
+        return user;
+    }
 
     public static function sendMessage(channel_id:String, message:hxdiscord.types.Typedefs.MessageCreate, id:String, reply:Bool)
     {
@@ -127,7 +138,7 @@ Content-Type: application/json;';
                 }
                 body += '--boundary\n';
                 body += 'Content-Disposition: form-data; name="files[' + i + ']"; filename="' + filename + '"' + "\n";
-                body += 'Content-Type: ' + hxdiscord.util.MimeResolver.getMimeType(filename);
+                body += 'Content-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(filename);
                 body += '\n\n';
                 body += sys.io.File.getBytes(json.attachments[i].filename.toString()).toString() + "\n";
             }
@@ -217,6 +228,34 @@ Content-Type: application/json;';
 
 		r.request(true);
     }
+
+    //guilds
+
+    public static function getGuild(guild_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v10/guilds/" + guild_id + "?with_counts=true");
+
+        var guild:hxdiscord.types.Guild = null;
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+		r.onData = function(data:String)
+		{
+            var d = haxe.Json.parse(data);
+            guild = new hxdiscord.types.Guild(d);
+		}
+
+		r.onError = function(error)
+		{
+			trace("An error has occurred: " + error);
+		}
+
+		r.request();
+
+        return guild;
+    }
+    //interactions
 
     public static function getGlobalApplicationCommands()
     {
@@ -343,7 +382,7 @@ Content-Type: application/json;';
             {
                 body += "\n--boundary";
                 body += '\nContent-Disposition: form-data; name="files[' + i + ']"; filename="' + getJson.attachments[i].filename + '"';
-                body += '\nContent-Type: ' + hxdiscord.util.MimeResolver.getMimeType(getJson.attachments[i].filename);
+                body += '\nContent-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(getJson.attachments[i].filename);
                 body += '\n\n';
                 body += sys.io.File.getBytes(getJson.attachments[i].filename.toString()).toString();
             }

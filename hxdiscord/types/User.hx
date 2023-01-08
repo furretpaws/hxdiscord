@@ -5,17 +5,41 @@ import hxdiscord.types.structTypes.UserS;
 
 class User
 {
-    var discordClient:DiscordClient;
-    
+    public var id:String;
     public var username:String;
     public var public_flags:Int;
-    public var id:String;
     public var discriminator:String;
-    public var avatar_decoration:Dynamic;
+    public var avatar_decoration:String;
     public var avatar:String;
+    public var banner:String;
+    public var bot:Bool;
+    public var system:Bool;
+    public var mfa_enabled:Bool;
+    public var accent_color:Int;
+    public var locale:String;
+    public var verified:Bool;
+    public var email:String;
+    public var flags:Int;
+    public var premium_type:Int;
 
-    public function new (bot:DiscordClient)
+    public function new (?client:hxdiscord.DiscordClient, us:UserS)
     {
-        
+        id = us.id;
+        username = us.username;
+        public_flags = us.public_flags;
+        discriminator = us.discriminator;
+        avatar_decoration = us.avatar_decoration;
+        avatar = us.avatar;
+        banner = us.banner;
+        bot = us.bot;
+        system = us.system;
+        mfa_enabled = us.mfa_enabled;
+        accent_color = us.accent_color;
+        locale = us.locale;
+        verified = us.verified;
+        email = us.email;
+        flags = us.flags;
+        premium_type = us.premium_type;
+        public_flags = us.public_flags;
     }
 }

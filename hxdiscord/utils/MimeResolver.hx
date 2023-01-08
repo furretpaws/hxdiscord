@@ -1,4 +1,4 @@
-package hxdiscord.util;
+package hxdiscord.utils;
 
 class MimeResolver {
     public static function getMimeType(file:String)

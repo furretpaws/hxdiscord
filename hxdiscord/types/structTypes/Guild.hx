@@ -1,0 +1,45 @@
+package hxdiscord.types.structTypes;
+
+typedef Guild = {
+    var id:String;
+    var name:String;
+    @:optional var icon:String;
+    @:optional var icon_hash:String;
+    @:optional var splash:String;
+    @:optional var discovery_splash:String;
+    @:optional var owner:Bool;
+    var owner_id:String;
+    @:optional var permissions:String;
+    @:optional var region:String;
+    @:optional var afk_channel_id:String;
+    @:optional var afk_timeout:String;
+    @:optional var widget_enabled:Bool;
+    @:optional var widget_channel_id:String;
+    var verification_level:Int;
+    var default_message_notifications:Int;
+    var explicit_content_filter:Int;
+    var roles:Array<Role>;
+    var emojis:Array<Emoji>;
+    var features:Array<String>;
+    var mfa_level:Int;
+    @:optional var application_id:String;
+    @:optional var system_channel_id:String;
+    @:optional var system_channel_flags:Int;
+    @:optional var rules_channel_id:String;
+    @:optional var max_presences:Int;
+    @:optional var max_members:Int;
+    @:optional var vanity_url_code:String;
+    @:optional var description:String;
+    @:optional var banner:String;
+    var premium_tier:Int;
+    @:optional var premium_subscription_count:Int;
+    var preferred_locale:String;
+    @:optional var public_updates_channel_id:String;
+    @:optional var max_video_channel_users:Int;
+    @:optional var approximate_member_count:Int;
+    @:optional var approximate_presence_count:Int;
+    @:optional var welcome_screen:WelcomeScreen;
+    var nsfw_level:Int;
+    @:optional var stickers:Array<Sticker>;
+    var premium_progress_bar_enabled:Bool;
+}

@@ -11,8 +11,10 @@ typedef MessageS = {
     @:optional var mention_everyone:Bool;
     @:optional var mentions:Array<UserS>;
     @:optional var mention_roles:Array<String>;
-    /*@:optional var attachments:Array<Attachment>;
-    @:optional var embeds:Array<Embed>;
+    @:optional var member:GuildMember;
+    var guild_id:String;
+    @:optional var attachments:Array<Attachment>;
+    /*@:optional var embeds:Array<Embed>;
     @:optional var reactions:Array<Reaction>;*/
     @:optional var nonce:String;
     @:optional var pinned:Bool;

@@ -1,0 +1,92 @@
+package hxdiscord.types;
+
+import hxdiscord.types.structTypes.*;
+
+class Guild {
+    public var id:String;
+    public var name:String;
+    public var icon:String;
+    public var icon_hash:String;
+    public var splash:String;
+    public var discovery_splash:String;
+    public var owner:Bool;
+    public var owner_id:String;
+    public var permissions:String;
+    public var region:String;
+    public var afk_channel_id:String;
+    public var afk_timeout:String;
+    public var widget_enabled:Bool;
+    public var widget_channel_id:String;
+    public var verification_level:Int;
+    public var default_message_notifications:Int;
+    public var explicit_content_filter:Int;
+    public var roles:Array<Role>;
+    public var emojis:Array<Emoji>;
+    public var features:Array<String>;
+    public var mfa_level:Int;
+    public var application_id:String;
+    public var system_channel_id:String;
+    public var system_channel_flags:Int;
+    public var rules_channel_id:String;
+    public var max_presences:Int;
+    public var max_members:Int;
+    public var vanity_url_code:String;
+    public var description:String;
+    public var banner:String;
+    public var premium_tier:Int;
+    public var premium_subscription_count:Int;
+    public var preferred_locale:String;
+    public var public_updates_channel_id:String;
+    public var max_video_channel_users:Int;
+    public var approximate_member_count:Int;
+    public var approximate_presence_count:Int;
+    public var welcome_screen:WelcomeScreen;
+    public var nsfw_level:Int;
+    public var stickers:Array<Sticker>;
+    public var premium_progress_bar_enabled:Bool;
+
+    public function new(gs:hxdiscord.types.structTypes.Guild)
+    {
+        id = gs.id;
+        name = gs.name;
+        icon = gs.icon;
+        icon_hash = gs.icon_hash;
+        splash = gs.splash;
+        discovery_splash = gs.discovery_splash;
+        owner = gs.owner;
+        owner_id = gs.owner_id;
+        permissions = gs.permissions;
+        region = gs.region;
+        afk_channel_id = gs.afk_channel_id;
+        afk_timeout = gs.afk_timeout;
+        widget_enabled = gs.widget_enabled;
+        widget_channel_id = gs.widget_channel_id;
+        verification_level = gs.verification_level;
+        default_message_notifications = gs.default_message_notifications;
+        explicit_content_filter = gs.explicit_content_filter;
+        roles = gs.roles;
+        emojis = gs.emojis;
+        features = gs.features;
+        mfa_level = gs.mfa_level;
+        application_id = gs.application_id;
+        system_channel_id = gs.system_channel_id;
+        system_channel_flags = gs.system_channel_flags;
+        rules_channel_id = gs.rules_channel_id;
+        max_presences = gs.max_presences;
+        max_members = gs.max_members;
+        vanity_url_code = gs.vanity_url_code;
+        description = gs.description;
+        banner = gs.banner;
+        premium_tier = gs.premium_tier;
+        premium_subscription_count = gs.premium_subscription_count;
+        preferred_locale = gs.preferred_locale;
+        public_updates_channel_id = gs.public_updates_channel_id;
+        max_video_channel_users = gs.max_video_channel_users;
+        approximate_member_count = gs.approximate_member_count;
+        approximate_presence_count = gs.approximate_presence_count;
+        welcome_screen = gs.welcome_screen;
+        nsfw_level = gs.nsfw_level;
+        stickers = gs.stickers;
+        premium_progress_bar_enabled = gs.premium_progress_bar_enabled;
+    }
+}

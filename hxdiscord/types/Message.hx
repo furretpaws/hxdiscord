@@ -15,6 +15,8 @@ class Message
     public var id:String;
     public var channel_id:String;
     public var author:User;
+    public var guildmember:GuildMember;
+    public var guild_id:String;
     public var content:String;
     public var embed:Embed;
     public var mention_everyone:Bool;
@@ -35,6 +37,8 @@ class Message
         //authorUsername = ms.username;
         content = ms.content;
         mention_everyone = ms.mention_everyone;
+        guildmember = ms.member;
+        guild_id = ms.guild_id;
     }
 
     public function reply(mc:hxdiscord.types.Typedefs.MessageCreate, ?ping:Bool)

@@ -305,7 +305,7 @@ class DiscordClient
     }
 
     public function nMessage(ms:MessageS, d:Dynamic) {
-        var daUser = new User(this);
+        var daUser = new User(this, d);
         daUser.username = d.author.username;
         daUser.public_flags = d.author.public_flags;
         daUser.id = d.author.id;
