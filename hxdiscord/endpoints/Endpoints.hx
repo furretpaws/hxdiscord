@@ -307,13 +307,17 @@ Content-Type: application/json;';
         return guild;
     }
     
-    public static function createGuildBan(id:String, guild_id:String)
+    public static function createGuildBan(id:String, guild_id:String, ?reason:String)
     {
         var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/bans/"+id);
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
 		req.addHeader("Content-type", "application/json");
+        if (reason != null)
+        {
+            req.addHeader("X-Audit-Log-Reason", reason);
+        }
         req.addHeader("Authorization", "Bot " + DiscordClient.token);
 
         req.setPostData(haxe.Json.stringify({
@@ -360,13 +364,17 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
-    public static function removeGuildMember(id:String, guild_id:String)
+    public static function removeGuildMember(id:String, guild_id:String, ?reason:String)
     {
         var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/"+id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        if (reason != null)
+        {
+            req.addHeader("X-Audit-Log-Reason", reason);
+        }
 
     
         req.onError = function(error:String) {
