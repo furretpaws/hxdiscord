@@ -9,6 +9,10 @@ import hxdiscord.types.structTypes.*;
 import hxdiscord.utils.Https;
 import haxe.Timer;
 
+/**
+    This is the so-called "heart" of the application you're building. This will be used to handle events from Discord.
+**/
+
 class DiscordClient
 {
     public static var token:String = "";
@@ -35,6 +39,13 @@ class DiscordClient
 
     public var intentsNumber:Int = 0;
 
+    /**
+        Constructor. This will start a new hxdiscord instance.
+        @param _token You're token (I'm not sure if user tokens work.)
+        @param intents Array of intents.
+        @param _debug Debug mode. This will print every single websocket incomming message from the Discord Gateway.
+    **/
+
     public function new (_token:String, intents:Array<Int>, ?_debug:Bool)
     {
         token = _token;
@@ -54,8 +65,10 @@ class DiscordClient
         connect();
     }
 
+    @:dox(hide)
     public function tick() {}
 
+    @:dox(hide)
     function connect()
     {
         try {
@@ -73,6 +86,7 @@ class DiscordClient
         }
     }
 
+    @:dox(hide)
     function wsm(msg){
         if (debug)
         {
@@ -164,10 +178,21 @@ class DiscordClient
         }
     }
 
+    /**
+        Register slash commands.
+        @param j JSON data (See Discord API documentation if you need help)
+    **/
+
     public function setInteractionCommands(j:Dynamic)
     {
         Endpoints.bulkOverwriteGlobalApplicationCommands(j);
     }
+
+    /**
+        Get value from an array.
+        @param array The array
+        @param thingToSearch As the name says, the thing you want to search.
+    **/
 
     public function getValue(array:Array<Dynamic>, thingToSearch:Dynamic)
     {
@@ -175,6 +200,16 @@ class DiscordClient
             return thingToSearch;
         return null;
     }
+
+    /**
+        Request guild members
+        @param guild_id The ID of the guild you want to index.
+        @param query String that username starts with, or an empty string to return all members
+        @param limit Maximum number of members
+        @param presences Used to specify if we want the presences of the matched members
+        @param user_ids Used to specify which users you wish to fetch. (String or array of strings)
+        @param nonce Nonce to identify the Guild Members Chunk response.
+    **/
 
     public function guildRequestMembers(guild_id:String, ?query:String = "", ?limit:Int = 0, ?presences:Bool = null, ?user_ids:haxe.extern.EitherType<Array<String>, String> = null, ?nonce:String = null)
     {
@@ -190,6 +225,14 @@ class DiscordClient
             }
         }
     }
+
+    /**
+        Change the status of the client.
+        @param status The status. ("online", "dnd", "idle", "invisible", "offline")
+        @param type Type of status ("game", "streaming", "listening", "watching", "custom", "competing")
+        @param presence Custom presence. (Example: Playing <your presence>, Watching <your presence>)
+        @param afk Whether if the bot is AFK or not.
+    **/
 
     public function changeStatus(status:String, ?type:String, ?presence:String, ?afk:Bool = false)
     {
@@ -244,6 +287,12 @@ class DiscordClient
         ws.sendJson(data);
     }
 
+    /**
+        Change the presence.
+        @param type The presence type ("game", "streaming", "listening", "watching", "custom", "competing")
+        @param status The presence status
+    **/
+
     public function changePresence(type:String, status:String)
     {
         if (type != "game" && type != "streaming" && type != "listening" && type != "watching" && type != "custom" && type != "competing")
@@ -287,6 +336,7 @@ class DiscordClient
         ws.sendJson(data);
     }
 
+    @:dox(hide)
     public function nInteraction(ins:InteractionS, d:Dynamic, pj:Dynamic)
     {
         /*var daUser = new User(this);
@@ -309,6 +359,7 @@ class DiscordClient
         return interaction;
     }
 
+    @:dox(hide)
     public function nMessage(ms:MessageS, d:Dynamic) {
         var daUser = new User(this, d);
         daUser.username = d.author.username;
@@ -324,15 +375,27 @@ class DiscordClient
         return message;
     }
 
+    /**
+        Event hook for incoming messages
+    **/
+
     dynamic public function onInteractionCreate(i:Interaction)
     {
 
     }
 
+    /**
+        Event hook for the "READY" event
+    **/
+
     dynamic public function onReady()
     {
 
     }
+
+    /**
+        Event hook for incoming messages
+    **/
 
     dynamic public function onMessageCreate(m:Message)
     {

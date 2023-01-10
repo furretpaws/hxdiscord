@@ -1,5 +1,6 @@
 package haxe.net.impl;
 
+#if flash
 import flash.net.SecureSocket;
 import haxe.io.Bytes;
 import flash.utils.ByteArray;
@@ -57,3 +58,4 @@ class SocketFlash extends Socket2 {
         impl.flush();
     }
 }
+#end

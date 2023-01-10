@@ -77,7 +77,7 @@ class Endpoints
         trace("https://discord.com/api/v10/guilds/"+guild_id+"/roles/");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + "MTA0NzI3NzU2Nzc1NDg5OTUyOA.GU64Dp.FD66A7eWRCBUKD-oZRSy-IVVT-vDTugDXLt6vM");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token); //WHY DO I KEEP ADDING MY TOKEN TO THE SOURCE? :SOB:
 
         var response:String = "";
 
