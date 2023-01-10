@@ -44,7 +44,7 @@ class SocketFlash extends Socket2 {
         this.impl.connect(host, port);
     }
 
-    override public function close() {
+    override public inline function close() {
         impl.close();
     }
 
