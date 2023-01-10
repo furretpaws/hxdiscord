@@ -43,7 +43,7 @@ class SocketSys extends Socket2 {
 		return this;
     }
 	
-	public static function create(host:String, port:Int, secure:Bool, debug:Bool = false) {
+	public static inline function create(host:String, port:Int, secure:Bool, debug:Bool = false) {
 		return new SocketSys(host, port, debug).initialize(secure);
 	}
 	
