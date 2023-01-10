@@ -46,7 +46,7 @@ class Socket2 {
     }
 	
 	#if sys
-	static public function createFromExistingSocket(socket:sys.net.Socket, debug:Bool = false) {
+	static public inline function createFromExistingSocket(socket:sys.net.Socket, debug:Bool = false) {
 		return haxe.net.impl.SocketSys.createFromExistingSocket(socket, debug);
 	}
 	#end

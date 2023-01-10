@@ -18,7 +18,7 @@ class WebSocketServer {
 		_listenSocket.listen(maxConnections);
 	}
 	
-	public static function create(host:String, port:Int, maxConnections:Int, isDebug:Bool) {
+	public static inline function create(host:String, port:Int, maxConnections:Int, isDebug:Bool) {
 		return new WebSocketServer(host, port, maxConnections, isDebug);
 	}
 	
