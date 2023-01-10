@@ -68,7 +68,7 @@ class WebSocketGeneric extends WebSocket {
         };
     }
     
-    public static function create(uri:String, protocols:Array<String> = null, origin:String = null, key:String = "wskey", debug:Bool) {
+    public static inline function create(uri:String, protocols:Array<String> = null, origin:String = null, key:String = "wskey", debug:Bool) {
         return new WebSocketGeneric().initialize(uri, protocols, origin, key, debug);
     }
     
@@ -229,11 +229,11 @@ class WebSocketGeneric extends WebSocket {
         }
     }
 
-    private function ping() {
+    private inline  function ping() {
         sendFrame(Bytes.alloc(0), Opcode.Ping);
     }
     
-    private function isHttpHeaderRead():Bool return httpHeader.substr( -4) == "\r\n\r\n";
+    private inline function isHttpHeaderRead():Bool return httpHeader.substr( -4) == "\r\n\r\n";
     
     private function readHttpHeader():Bool {
         while (!isHttpHeaderRead() && socketData.available > 0) {
@@ -337,7 +337,7 @@ class WebSocketGeneric extends WebSocket {
 		}
     }
 
-    private function sendFrame(data:Bytes, type:Opcode) {
+    private inline function sendFrame(data:Bytes, type:Opcode) {
         writeBytes(prepareFrame(data, type, true));
     }
     
@@ -353,17 +353,17 @@ class WebSocketGeneric extends WebSocket {
         }
     }
 
-    override public function sendString(message:String) {
+    override public inline function sendString(message:String) {
         if (readyState != Open) throw('websocket not open');
         sendFrame(Utf8Encoder.encode(message), Opcode.Text);
     }
 
-    override public function sendBytes(message:Bytes) {
+    override public inline function sendBytes(message:Bytes) {
         if (readyState != Open) throw('websocket not open');
         sendFrame(message, Opcode.Binary);
     }
 
-    static private function generateMask() {
+    static private inline function generateMask() {
         var maskData = Bytes.alloc(4);
         maskData.set(0, Std.random(256));
         maskData.set(1, Std.random(256));
