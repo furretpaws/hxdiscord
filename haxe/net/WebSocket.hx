@@ -35,7 +35,7 @@ class WebSocket {
 	 * @param	alredyRecieved - data already read from socket, it should be no more then full http header
 	 * @param	debug - debug messages?
 	 */
-	static public function createFromAcceptedSocket(socket:Socket2, alreadyRecieved:String = '', debug:Bool = false):WebSocket {
+	static inline public function createFromAcceptedSocket(socket:Socket2, alreadyRecieved:String = '', debug:Bool = false):WebSocket {
 		return haxe.net.impl.WebSocketGeneric.createFromAcceptedSocket(socket, alreadyRecieved, debug);
 	}
 	#end
@@ -57,11 +57,11 @@ class WebSocket {
     public function sendBytes(message:Bytes) {
     }
 	
-	public function close() {
-	}
+    public function close() {
+    }
 	
-	public var readyState(get, never):ReadyState;
-	function get_readyState():ReadyState throw 'Not implemented';
+     public var readyState(get, never):ReadyState;
+         function get_readyState():ReadyState throw 'Not implemented';
 
     public dynamic function onopen():Void {
     }
