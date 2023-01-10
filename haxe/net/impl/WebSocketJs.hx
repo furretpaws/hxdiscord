@@ -46,15 +46,15 @@ class WebSocketJs extends WebSocket {
         };
     }
 
-    override public function sendString(message:String) {
+    override public inline function sendString(message:String) {
         this.impl.send(message);
     }
 
-    override public function sendBytes(message:Bytes) {
+    override public inline function sendBytes(message:Bytes) {
         this.impl.send(message.getData());
     }
 	
-	override public function close() {
+	override public inline function close() {
 		this.impl.close();
 	}
 	
