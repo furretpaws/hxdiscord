@@ -85,15 +85,15 @@ class WebSocketConnection {
         #end
     }
 
-    public function close(){
+    public inline function close(){
         ws.close();
     }
     
-    public function sendJson(d:Dynamic) {
+    public inline function sendJson(d:Dynamic) {
         this.send(Json.stringify(d));
     }
     
-    public function send(m:String) {
+    public inline function send(m:String) {
         if(!ready)
             queue.push(m);
         else
