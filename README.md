@@ -20,7 +20,7 @@ This library is incomplete and many things are missing. As of right now. Message
 
 ## Example
 
-Here's an example of the hxdiscord library.
+Here's an example of a Discord Bot, using the hxdiscord library.
 
 ```haxe
 import hxdiscord.DiscordClient;
