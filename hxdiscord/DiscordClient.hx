@@ -35,13 +35,10 @@ class DiscordClient
 
     public var intentsNumber:Int = 0;
 
-    public function new (_token:String, intents:Array<Int>, ?_debug:Bool = false)
+    public function new (_token:String, intents:Array<Int>, ?_debug:Bool)
     {
         token = _token;
-        if (debug != null)
-            debug = _debug;
-        else
-            debug = false;
+        debug = _debug;
 
         if (intents == null || intents == [])
         {
@@ -66,9 +63,7 @@ class DiscordClient
                 trace("Connecting");
 
             var json = haxe.Json.parse(Endpoints.getEndpointData(token, Endpoints.url, Endpoints.version, Endpoints.getGatewayBot));
-            Gateway.GATEWAY_URL = json.url + "/?v=10&encoding=json";
-
-            var url = Gateway.GATEWAY_URL;
+            var url = Gateway.GATEWAY_URL = json.url + "/?v=10&encoding=json";
 
             ws = new WebSocketConnection(url);
             ws.onMessage = this.wsm;
@@ -176,15 +171,9 @@ class DiscordClient
 
     public function getValue(array:Array<Dynamic>, thingToSearch:Dynamic)
     {
-        var daThing:Dynamic = null;
-        for (i in 0...array.length)
-        {
-            if (array[i] == thingToSearch)
-            {
-                daThing = thingToSearch;
-            }
-        }
-        return daThing;
+        if (array.contains(thingToSearch)
+            return thingToSearch;
+        return null;
     }
 
     public function guildRequestMembers(guild_id:String, ?query:String = "", ?limit:Int = 0, ?presences:Bool = null, ?user_ids:haxe.extern.EitherType<Array<String>, String> = null, ?nonce:String = null)
