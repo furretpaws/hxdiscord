@@ -171,7 +171,7 @@ class DiscordClient
 
     public function getValue(array:Array<Dynamic>, thingToSearch:Dynamic)
     {
-        if (array.contains(thingToSearch)
+        if (array.contains(thingToSearch))
             return thingToSearch;
         return null;
     }
