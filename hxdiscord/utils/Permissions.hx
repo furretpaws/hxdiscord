@@ -65,34 +65,34 @@ class Permissions {
     }
 }
 
-class Permission {
-    public static inline final CREATE_INSTANT_INVITE:String = "CREATE_INSTANT_INVITE";
-    public static inline final KICK_MEMBERS:String = "KICK_MEMBERS";
-    public static inline final BAN_MEMBERS:String = "BAN_MEMBERS";
-    public static inline final ADMINISTRATOR:String = "ADMINISTRATOR";
-    public static inline final MANAGE_CHANNELS:String = "MANAGE_CHANNEL";
-    public static inline final MANAGE_GUILD:String = "MANAGE_GUILD";
-    public static inline final ADD_REACTIONS:String = "ADD_REACTIONS";
-    public static inline final VIEW_AUDIT_LOG:String = "VIEW_AUDIT_LOG";
-    public static inline final VIEW_CHANNEL:String = "VIEW_CHANNEL";
-    public static inline final SEND_MESSAGES:String = "SEND_MESSAGES";
-    public static inline final SEND_TTS_MESSAGES:String = "SEND_TTS_MESSAGES";
-    public static inline final MANAGE_MESSAGES:String = "MANAGE_MESSAGES";
-    public static inline final EMBED_LINKS:String = "EMBED_LINKS";
-    public static inline final ATTACH_FILES:String = "ATTACH_FILES";
-    public static inline final READ_MESSAGE_HISTORY:String = "READ_MESSAGE_HISTORY";
-    public static inline final MENTION_EVERYONE:String = "MENTION_EVERYONE";
-    public static inline final USE_EXTERNAL_EMOJIS:String = "USE_EXTERNAL_EMOJIS";
-    public static inline final CONNECT:String = "CONNECT";
-    public static inline final SPEAK:String = "SPEAK";
-    public static inline final MUTE_MEMBERS:String  = "MUTE_MEMBERS";
-    public static inline final DEAFEN_MEMBERS:String = "DEAFEN_MEMBERS";
-    public static inline final MOVE_MEMBERS:String = "MOVE_MEMBERS";
-    public static inline final USE_VAD:String = "USE_VAD";
-    public static inline final PRIORITY_SPEAKER:String = "PRIORITY_SPEAKER";
-    public static inline final CHANGE_NICKNAME:String = "CHANGE_NICKNAME";
-    public static inline final MANAGE_NICKNAMES:String = "MANAGE_NICKNAMES";
-    public static inline final MANAGE_ROLES:String = "MANAGE_ROLES";
-    public static inline final MANAGE_WEBHOOKS:String = "MANAGE_WEBHOOKS";
-    public static inline final MANAGE_EMOJIS:String = "MANAGE_EMOJIS";
+enum abstract Permission(String) from String to String {
+    final CREATE_INSTANT_INVITE:String = "CREATE_INSTANT_INVITE";
+    final KICK_MEMBERS:String = "KICK_MEMBERS";
+    final BAN_MEMBERS:String = "BAN_MEMBERS";
+    final ADMINISTRATOR:String = "ADMINISTRATOR";
+    final MANAGE_CHANNELS:String = "MANAGE_CHANNEL";
+    final MANAGE_GUILD:String = "MANAGE_GUILD";
+    final ADD_REACTIONS:String = "ADD_REACTIONS";
+    final VIEW_AUDIT_LOG:String = "VIEW_AUDIT_LOG";
+    final VIEW_CHANNEL:String = "VIEW_CHANNEL";
+    final SEND_MESSAGES:String = "SEND_MESSAGES";
+    final SEND_TTS_MESSAGES:String = "SEND_TTS_MESSAGES";
+    final MANAGE_MESSAGES:String = "MANAGE_MESSAGES";
+    final EMBED_LINKS:String = "EMBED_LINKS";
+    final ATTACH_FILES:String = "ATTACH_FILES";
+    final READ_MESSAGE_HISTORY:String = "READ_MESSAGE_HISTORY";
+    final MENTION_EVERYONE:String = "MENTION_EVERYONE";
+    final USE_EXTERNAL_EMOJIS:String = "USE_EXTERNAL_EMOJIS";
+    final CONNECT:String = "CONNECT";
+    final SPEAK:String = "SPEAK";
+    final MUTE_MEMBERS:String  = "MUTE_MEMBERS";
+    final DEAFEN_MEMBERS:String = "DEAFEN_MEMBERS";
+    final MOVE_MEMBERS:String = "MOVE_MEMBERS";
+    final USE_VAD:String = "USE_VAD";
+    final PRIORITY_SPEAKER:String = "PRIORITY_SPEAKER";
+    final CHANGE_NICKNAME:String = "CHANGE_NICKNAME";
+    final MANAGE_NICKNAMES:String = "MANAGE_NICKNAMES";
+    final MANAGE_ROLES:String = "MANAGE_ROLES";
+    final MANAGE_WEBHOOKS:String = "MANAGE_WEBHOOKS";
+    final MANAGE_EMOJIS:String = "MANAGE_EMOJIS";
 }

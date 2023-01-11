@@ -1,15 +1,15 @@
 package hxdiscord.types;
 
-class CommandType {
-    public static var SUB_COMMAND:Int = 1;
-    public static var SUB_COMMAND_GROUP:Int = 2;
-    public static var STRING:Int = 3;
-    public static var INTEGER:Int = 4;
-    public static var BOOLEAN:Int = 5;
-    public static var USER:Int = 6;
-    public static var CHANNEL:Int = 7;
-    public static var ROLE:Int = 8;
-    public static var MENTIONABLE:Int = 9;
-    public static var NUMBER:Int = 10;
-    public static var ATTACHMENT:Int = 11;
+enum abstract CommandType(Int) from Int to Int {
+    final SUB_COMMAND:Int = 1;
+    final SUB_COMMAND_GROUP:Int = 2;
+    final STRING:Int = 3;
+    final INTEGER:Int = 4;
+    final BOOLEAN:Int = 5;
+    final USER:Int = 6;
+    final CHANNEL:Int = 7;
+    final ROLE:Int = 8;
+    final MENTIONABLE:Int = 9;
+    final NUMBER:Int = 10;
+    final ATTACHMENT:Int = 11;
 }
