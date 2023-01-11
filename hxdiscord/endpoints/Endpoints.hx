@@ -1,3 +1,7 @@
+/**
+    Endpoints. The class that handles all the HTTP requests.
+**/
+
 package hxdiscord.endpoints;
 
 import hxdiscord.utils.Https;
@@ -10,12 +14,17 @@ using StringTools;
 
 class Endpoints
 {
+    @:dox(hide)
     public static var url:String = "https://discord.com/api/";
+    @:dox(hide)
     public static var version:String = "v10";
 
+    @:dox(hide)
     public var getGateway:String = "/gateway";
+    @:dox(hide)
     public static var getGatewayBot:String = "/gateway/bot";
 
+    @:dox(hide)
     public static function getEndpointData(?token:String, _url:String, _version:String, _endpointPath:String, ?_args:String) //idk if that's the correct term to call it
     {
         return Https.sendRequest(_url, _version, _endpointPath, _args, token);
@@ -23,6 +32,9 @@ class Endpoints
 
     //users
 
+    /**
+        Gets the current user information.
+    **/
     public static function getCurrentUser()
     {
         var r = new haxe.Http("https://discord.com/api/v10/users/@me");
@@ -47,6 +59,10 @@ class Endpoints
         return user;
     }
 
+    /**
+        Get the information about a user
+        @param id The ID of the user
+    **/
     public static function getUser(id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v10/users/" + id);
@@ -71,6 +87,10 @@ class Endpoints
         return user;
     }
 
+    /**
+        Get the roles of a guild
+        @param guild_id The guild ID
+    **/
     public static function getRoles(guild_id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v10/guilds/"+guild_id+"/roles");
@@ -101,6 +121,11 @@ class Endpoints
         return response;
     }
 
+    /**
+        Deletes a message
+        @param channel_id Channel ID where the message is
+        @param m_id Message ID
+    **/
     public static function deleteMessage(channel_id:String, m_id:String)
     {
         var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+m_id);
@@ -124,7 +149,14 @@ class Endpoints
 		req.customRequest(true, responseBytes, "DELETE");
     }
 
-    public static function sendMessage(channel_id:String, message:hxdiscord.types.Typedefs.MessageCreate, id:String, reply:Bool)
+    /*
+        Send a message
+        @param channel_id The channel ID to send the message
+        @param message JSON object about the message
+        @param id If you want to ping a message. Enter the ID of the message here
+        @param reply Whether to ping the message or not
+    */
+    public static function sendMessage(channel_id:String, message:hxdiscord.types.Typedefs.MessageCreate, ?id:String, reply:Bool)
     {
         //USING MULTIPART BECAUSE YES.
         if (reply)
@@ -221,6 +253,7 @@ Content-Type: application/json;';
         r.request(true);
     }
 
+    @:dox(hide) @:deprecated
     public static function sendMessageToChannelID(channelID:String, data:Dynamic)
     {
         var r = new haxe.Http("https://discord.com/api/v9/channels/" + channelID + "/messages");
@@ -254,6 +287,7 @@ Content-Type: application/json;';
 		r.request(true);
     }
 
+    @:dox(hide) @:deprecated
     public static function sendDataToMessageAPI(data:Dynamic, channelId:String)
     {
         var r = new haxe.Http("https://discord.com/api/v10/channels/" + channelId + "/messages");
@@ -282,6 +316,10 @@ Content-Type: application/json;';
 
     //guilds
 
+    /**
+        Get a JSON object about a guild
+        @param guild_id Guild ID
+    **/
     public static function getGuild(guild_id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v10/guilds/" + guild_id + "?with_counts=true");
@@ -307,6 +345,12 @@ Content-Type: application/json;';
         return guild;
     }
     
+    /**
+        Ban a user from a guild
+        @param id The ID of the user to ban
+        @param guild_id The guild ID
+        @param reason The ban reason
+    **/
     public static function createGuildBan(id:String, guild_id:String, ?reason:String)
     {
         var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/bans/"+id);
@@ -340,6 +384,11 @@ Content-Type: application/json;';
 		var response = responseBytes.getBytes();
     }
 
+    /**
+        Remove a ban (unban)
+        @param id The user ID to unban
+        @param guild_id The guild ID
+    **/
     public static function removeGuildBan(id:String, guild_id:String)
     {
         var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/bans/"+id);
@@ -364,6 +413,12 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
+    /**
+        Kick a user from a guild
+        @param id The user ID to kick
+        @param guild_id The guild ID
+        @param reason The kick reason
+    **/
     public static function removeGuildMember(id:String, guild_id:String, ?reason:String)
     {
         var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/"+id);
@@ -394,6 +449,10 @@ Content-Type: application/json;';
 
     //interactions
 
+    /**
+        Get application commands
+    **/
+
     public static function getGlobalApplicationCommands()
     {
         var r = new haxe.Http("https://discord.com/api/v10/applications/" + DiscordClient.accountId + "/commands");
@@ -418,7 +477,11 @@ Content-Type: application/json;';
 
         return r.responseData;
     }
-    public static function createGlobalApplicationCommand(data:Any, overwrite:Bool)
+    /**
+        Add application commands
+        @param data JSON object containing application commands
+    **/
+    public static function createGlobalApplicationCommand(data:Any)
     {
         var r:haxe.Http;
 
@@ -441,6 +504,10 @@ Content-Type: application/json;';
         r.request(true);
     }
 
+    /**
+        Override existing commands with new ones
+        @param data JSON object containing application commands
+    **/
     public static function bulkOverwriteGlobalApplicationCommands(data:Any)
     {
         var req:Http = new Http("https://discord.com/api/v10/applications/"+DiscordClient.accountId+"/commands");
@@ -467,6 +534,9 @@ Content-Type: application/json;';
     	return Json.parse(response.toString());
     }
 
+    /**
+        Send the interaction callback
+    **/
     public static function sendInteractionCallback(ic:hxdiscord.types.Typedefs.InteractionCallback, interactionID:String, interactionToken:String, type:Int, ?ephemeral:Bool)
     {
         var attachments:Bool = false;
@@ -555,6 +625,7 @@ Content-Type: application/json;';
         r.request(true);
     }
 
+    @:dox(hide) @:deprecated
     public static function sendDataToInteraction(data:Dynamic, interactionID:String, interactionToken:String, type:Int)
     {
         var url:String = "https://discord.com/api/v10/interactions/" + interactionID + "/" + interactionToken + "/callback";

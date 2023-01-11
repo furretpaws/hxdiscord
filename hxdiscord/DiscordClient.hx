@@ -23,18 +23,25 @@ class DiscordClient
     var receivedHelloOC:Bool = false;
 
     public var readySent:Bool = false;
+    @:dox(hide)
     public var verified:Bool = false;
     public var username:String = "";
+    @:dox(hide)
     public var mfa_enabled = false;
     public static var accountId:String = "";
+    @:dox(hide)
     public var flags:Int = 0;
+    @:dox(hide)
     public var email:Dynamic;
     public var discriminator:String = "";
+    @:dox(hide)
     public var bot:Bool = false;
+    @:dox(hide)
     public var avatar:Dynamic;
 
     public var presence:String = "";
     public var presenceType:Int = 99;
+    @:dox(hide)
     public var afk:Bool = false;
 
     public var intentsNumber:Int = 0;
