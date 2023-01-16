@@ -31,7 +31,7 @@ class Main
     static var Bot:DiscordClient;
     static function main()
     {
-        Bot = new DiscordClient("bot token here", false); //true or false, enables or disables debug mode.
+        Bot = new DiscordClient("your token here", [Intents.ALL], false);
         Bot.onReady = onReady;
         Bot.onMessageCreate = onMessageCreate;
     }
