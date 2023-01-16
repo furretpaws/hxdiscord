@@ -30,6 +30,40 @@ class Endpoints
         return Https.sendRequest(_url, _version, _endpointPath, _args, token);
     }
 
+    //dm
+
+    public static function createDM(userID:String):String
+    {
+        var _data:String;
+        var r = new haxe.Http("https://discord.com/api/v10/users/@me/channels");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        r.setPostData(haxe.Json.stringify({
+            recipient_id: userID
+        }));
+
+		r.onData = function(data:String)
+		{
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+            _data = data;
+		}
+
+		r.onError = function(error)
+		{
+			trace("An error has occurred: " + error);
+		}
+
+		r.request(true);
+
+        return _data;
+    }
+
     //users
 
     /**
@@ -312,6 +346,128 @@ Content-Type: application/json;';
 		}
 
 		r.request(true);
+    }
+
+    //reactions
+
+    public static function createReaction(channel_id:String, message_id:String, emoji:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/@me");
+		var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+    	req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+		};
+		
+		req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+		};
+    
+		req.customRequest(false, responseBytes, "PUT");
+		var response = responseBytes.getBytes();
+    }
+
+    public static function deleteOwnReaction(channel_id:String, message_id:String, emoji:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/@me");
+		var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+    	req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+		};
+		
+		req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+		};
+    
+		req.customRequest(false, responseBytes, "DELETE");
+		var response = responseBytes.getBytes();
+    }
+
+    public static function deleteUserReaction(channel_id:String, message_id:String, emoji:String, user_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/" + user_id);
+		var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+    	req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+		};
+		
+		req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+		};
+    
+		req.customRequest(false, responseBytes, "DELETE");
+		var response = responseBytes.getBytes();
+    }
+    
+    public static function deleteAllReactions(channel_id:String, message_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions");
+		var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+    	req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+		};
+		
+		req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+		};
+    
+		req.customRequest(false, responseBytes, "DELETE");
+		var response = responseBytes.getBytes();
+    }
+
+    public static function deleteAllReactionsForEmoji(channel_id:String, message_id:String, emoji:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "DELETE");
+        var response = responseBytes.getBytes();
     }
 
     //guilds

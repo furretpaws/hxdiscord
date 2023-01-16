@@ -44,6 +44,16 @@ class Message
         guild_id = ms.guild_id;
     }
 
+    public function send(mc:hxdiscord.types.Typedefs.MessageCreate)
+    {
+        try {
+            var id:String = haxe.Json.parse(Endpoints.createDM(author.id)).id;
+            Endpoints.sendMessage(id, mc, null, false);
+        } catch (err) {
+            trace("An error has occurred: " + err);
+        }
+    }
+
     public function reply(mc:hxdiscord.types.Typedefs.MessageCreate, ?ping:Bool)
     {
         Endpoints.sendMessage(channel_id, mc, id, ping);
@@ -52,6 +62,31 @@ class Message
     public function replyData(data:Dynamic) //this will save a lot of time honestly
     {
         Endpoints.sendDataToMessageAPI(data, channel_id);
+    }
+
+    public function react(emoji:String)
+    {
+        Endpoints.createReaction(channel_id, id, emoji);
+    }
+
+    public function deleteOwnReaction(emoji:String)
+    {
+        Endpoints.deleteOwnReaction(channel_id, id, emoji);
+    }
+
+    public function deleteReactions()
+    {
+        Endpoints.deleteAllReactions(channel_id, id);
+    }
+
+    public function deleteEmojiReaction(emoji:String)
+    {
+        Endpoints.deleteAllReactionsForEmoji(channel_id, id, emoji);
+    }
+
+    public function deleteMessage()
+    {
+        Endpoints.deleteMessage(channel_id, id);
     }
 
     public function hasPermission(permissionToLookFor:String):Bool
