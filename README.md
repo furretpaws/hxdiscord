@@ -24,6 +24,7 @@ Here's an example of a Discord Bot, using the hxdiscord library.
 
 ```haxe
 import hxdiscord.DiscordClient;
+import hxdiscord.utils.Intents;
 import hxdiscord.types.*;
 
 class Main
