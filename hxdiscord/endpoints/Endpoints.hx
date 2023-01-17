@@ -64,6 +64,56 @@ class Endpoints
         return _data;
     }
 
+    //guild member stuff
+
+    public function addGuildMemberRole(guild_id:String, user_id:String, role_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
+		var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+    	req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+		};
+		
+		req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+		};
+    
+		req.customRequest(false, responseBytes, "PUT");
+		var response = responseBytes.getBytes();
+    }
+
+    public function removeGuildMemberRole(guild_id:String, user_id:String, role_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "DELETE");
+        var response = responseBytes.getBytes();
+    }
+
     //users
 
     /**
