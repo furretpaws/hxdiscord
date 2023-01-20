@@ -15,8 +15,6 @@ hxdiscord is a Discord Library for Haxe. It's still in development.
 Some targets might not work, I haven't tested any. C++ and Neko will work. (Binary attachments doesn't work on C++. Use Neko if you want to send images or whatever you want)
 
 
-This library is incomplete and many things are missing. As of right now. Messages and Application Commands (slash commands) are working. This will change in the future.
-
 
 ## Example
 
