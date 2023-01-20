@@ -12,6 +12,35 @@ typedef MessageCreate = {
     @:optional var attachments:Array<Dynamic>;
 }
 
+typedef ModifyGuildParams = {
+    @:optional var name:String;
+    @:optional var region:String;
+    @:optional var verification_level:String;
+    @:optional var default_message_notifications:Int;
+    @:optional var explicit_content_filter:String;
+    @:optional var afk_channel_id:String;
+    @:optional var afk_timeout:String;
+    @:optional var owner_id:String;
+    @:optional var system_channel_id:String;
+    @:optional var system_channel_flags:String;
+    @:optional var rules_channel_id:String;
+    @:optional var public_updates_channel_id:String;
+    @:optional var preferred_locale:String;
+    @:optional var features:Array<String>;
+    @:optional var description:String;
+    @:optional var premium_progress_bar_enabled:Bool;
+}
+
+typedef ModifyGuildRoleParams = {
+    @:optional var name:String;
+    @:optional var permissions:String;
+    @:optional var color:Int;
+    @:optional var hoist:Bool;
+    @:optional var icon:Dynamic;
+    @:optional var unicode_emoji:String;
+    @:optional var mentionable:Bool;
+}
+
 typedef ComponentArray = {
     var type:Int;
     var style:Int;

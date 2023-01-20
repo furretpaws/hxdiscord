@@ -89,6 +89,49 @@ class Message
         Endpoints.deleteMessage(channel_id, id);
     }
 
+    public function hasRole(roleToLookFor:String):Bool
+    {
+        var hasRole:Bool = false;
+        if (guildmember == null)
+        {
+            //do nothing
+        }
+        else
+        {
+            var guild = hxdiscord.endpoints.Endpoints.getGuild(guild_id);
+            var owner = hxdiscord.endpoints.Endpoints.getUser(guild.owner_id);
+            if (author.id == owner.id)
+            {
+                hasRole = true;
+            }
+            else
+            {
+                var r = new haxe.Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/" + author.id);
+                //LLL
+                r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+                r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+
+		        r.onData = function(data:String)
+		        {
+                    var jsonParse:Dynamic = haxe.Json.parse(data);
+                    if (jsonParse.roles.contains(roleToLookFor))
+                    {
+                        hasRole = true;
+                    }
+		        }
+
+		        r.onError = function(error)
+		        {
+		        	trace("An error has occurred: " + error);
+		        }
+
+		        r.request();
+            }
+        }
+        return hasRole;
+    }
+
     public function hasPermission(permissionToLookFor:String):Bool
     {
         var hasPermission = false;
