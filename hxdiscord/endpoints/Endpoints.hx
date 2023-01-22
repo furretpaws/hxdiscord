@@ -259,11 +259,12 @@ Content-Type: application/json;';
                 body += 'Content-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(filename);
                 body += '\n\n';
                 var input = sys.io.File.getBytes(json.attachments[i].filename);
-                var hex = input.toHex().toString();
-                body += haxe.io.Bytes.ofHex(hex).toString() + "\n";
-                trace(haxe.io.Bytes.ofHex(hex).toString());
+                body += input + "\n";
             }
             body += '--boundary--';
+            #if (!neko)
+            trace("If the attachment you sent is a corrupted file. Try to use Neko instead. This will probably get fixed in the future.");
+            #end
         }
 
         var r = new haxe.Http("https://discord.com/api/v10/channels/" + channel_id + "/messages");
@@ -272,7 +273,8 @@ Content-Type: application/json;';
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
         r.addHeader("Content-Type", "multipart/form-data; boundary=boundary");
 
-        r.setPostData(body);
+        trace(body);
+        r.setPostBytes(haxe.io.Bytes.ofString(body));
 
         r.onData = function(data:String)
         {
