@@ -15,8 +15,6 @@ class Embed{
     public var author:hxdiscord.types.structTypes.Embed.EmbedAuthor;
     public var fields:Array<hxdiscord.types.structTypes.Embed.EmbedField>;
 
-    public var json:hxdiscord.types.structTypes.Embed;
-
     public function new()
     {
 

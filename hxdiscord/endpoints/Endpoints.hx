@@ -129,7 +129,7 @@ class Endpoints
     public static function getRoles(guild_id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v10/guilds/"+guild_id+"/roles");
-        trace("https://discord.com/api/v10/guilds/"+guild_id+"/roles/");
+        //trace("https://discord.com/api/v10/guilds/"+guild_id+"/roles/");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token); //WHY DO I KEEP ADDING MY TOKEN TO THE SOURCE? :SOB:
@@ -273,7 +273,7 @@ Content-Type: application/json;';
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
         r.addHeader("Content-Type", "multipart/form-data; boundary=boundary");
 
-        trace(body);
+        //trace(body);
         r.setPostBytes(haxe.io.Bytes.ofString(body));
 
         r.onData = function(data:String)

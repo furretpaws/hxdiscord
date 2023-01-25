@@ -82,8 +82,7 @@ class DiscordClient
             if (debug)
                 trace("Connecting");
 
-            var json = haxe.Json.parse(Endpoints.getEndpointData(token, Endpoints.url, Endpoints.version, Endpoints.getGatewayBot));
-            var url = Gateway.GATEWAY_URL = json.url + "/?v=10&encoding=json";
+            var url = Gateway.GATEWAY_URL;
 
             ws = new WebSocketConnection(url);
             ws.onMessage = this.wsm;
