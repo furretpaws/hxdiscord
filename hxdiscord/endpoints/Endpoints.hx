@@ -9,6 +9,7 @@ import hxdiscord.utils.Https;
 import hxdiscord.DiscordClient;
 import haxe.Http;
 import haxe.io.BytesOutput;
+import hxdiscord.gateway.Gateway;
 import haxe.Json;
 
 using StringTools;
@@ -36,7 +37,7 @@ class Endpoints
     public static function createDM(userID:String):String
     {
         var _data:String;
-        var r = new haxe.Http("https://discord.com/api/v10/users/@me/channels");
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/users/@me/channels");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
@@ -72,7 +73,7 @@ class Endpoints
     **/
     public static function getCurrentUser()
     {
-        var r = new haxe.Http("https://discord.com/api/v10/users/@me");
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/users/@me");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -94,13 +95,54 @@ class Endpoints
         return user;
     }
 
+    public static function hasPermission(userID:String, guild_id:String, permissionToLookFor:String)
+    {
+        var hasPermission:Bool = false;
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/" + userID);
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+
+		r.onData = function(dataG:String)
+		{
+            var data = getRoles(guild_id);
+            var json:Dynamic = haxe.Json.parse(dataG);
+
+            var roles:Array<String> = json.roles;
+
+            var jsonRole:Dynamic = haxe.Json.parse(data);
+            for (i in 0...jsonRole.length)
+            {
+                for (x in 0...roles.length)
+                {
+                    if (jsonRole[i].id == roles[x])
+                    {
+                        var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(jsonRole[i].permissions)));
+                        if (array.contains(permissionToLookFor))
+                        {
+                            hasPermission = true;
+                        }
+                    }
+                }
+            }
+		}
+
+		r.onError = function(error)
+		{
+			trace("An error has occurred: " + error);
+		}
+
+		r.request();
+        return hasPermission;
+    }
+
     /**
         Get the information about a user
         @param id The ID of the user
     **/
     public static function getUser(id:String)
     {
-        var r = new haxe.Http("https://discord.com/api/v10/users/" + id);
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/users/" + id);
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -128,8 +170,8 @@ class Endpoints
     **/
     public static function getRoles(guild_id:String)
     {
-        var r = new haxe.Http("https://discord.com/api/v10/guilds/"+guild_id+"/roles");
-        //trace("https://discord.com/api/v10/guilds/"+guild_id+"/roles/");
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/roles");
+        //trace("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/roles/");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token); //WHY DO I KEEP ADDING MY TOKEN TO THE SOURCE? :SOB:
@@ -163,7 +205,7 @@ class Endpoints
     **/
     public static function deleteMessage(channel_id:String, m_id:String)
     {
-        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+m_id);
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+m_id);
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -267,7 +309,7 @@ Content-Type: application/json;';
             #end
         }
 
-        var r = new haxe.Http("https://discord.com/api/v10/channels/" + channel_id + "/messages");
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/messages");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -330,7 +372,7 @@ Content-Type: application/json;';
     @:dox(hide) @:deprecated
     public static function sendDataToMessageAPI(data:Dynamic, channelId:String)
     {
-        var r = new haxe.Http("https://discord.com/api/v10/channels/" + channelId + "/messages");
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channelId + "/messages");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
@@ -358,7 +400,7 @@ Content-Type: application/json;';
 
     public static function createReaction(channel_id:String, message_id:String, emoji:String)
     {
-        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/@me");
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/@me");
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -382,7 +424,7 @@ Content-Type: application/json;';
 
     public static function deleteOwnReaction(channel_id:String, message_id:String, emoji:String)
     {
-        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/@me");
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/@me");
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -406,7 +448,7 @@ Content-Type: application/json;';
 
     public static function deleteUserReaction(channel_id:String, message_id:String, emoji:String, user_id:String)
     {
-        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/" + user_id);
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/" + user_id);
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -430,7 +472,7 @@ Content-Type: application/json;';
     
     public static function deleteAllReactions(channel_id:String, message_id:String)
     {
-        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions");
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+message_id+"/reactions");
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -454,7 +496,7 @@ Content-Type: application/json;';
 
     public static function deleteAllReactionsForEmoji(channel_id:String, message_id:String, emoji:String)
     {
-        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji);
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -484,7 +526,7 @@ Content-Type: application/json;';
     **/
     public static function getGuild(guild_id:String)
     {
-        var r = new haxe.Http("https://discord.com/api/v10/guilds/" + guild_id + "?with_counts=true");
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + guild_id + "?with_counts=true");
 
         var guild:hxdiscord.types.Guild = null;
 
@@ -513,9 +555,10 @@ Content-Type: application/json;';
         @param guild_id The guild ID
         @param reason The ban reason
     **/
-    public static function createGuildBan(id:String, guild_id:String, ?reason:String)
+    public static function createGuildBan(id:String, guild_id:String, ?reason:String):Bool
     {
-        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/bans/"+id);
+        var s:Bool = true;
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/bans/"+id);
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -533,6 +576,7 @@ Content-Type: application/json;';
     
     	req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            s = false;
 		};
 		
 		req.onStatus = function(status:Int) {
@@ -544,6 +588,7 @@ Content-Type: application/json;';
     
 		req.customRequest(true, responseBytes, "PUT");
 		var response = responseBytes.getBytes();
+        return s;
     }
 
     /**
@@ -551,9 +596,10 @@ Content-Type: application/json;';
         @param id The user ID to unban
         @param guild_id The guild ID
     **/
-    public static function removeGuildBan(id:String, guild_id:String)
+    public static function removeGuildBan(id:String, guild_id:String):Bool
     {
-        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/bans/"+id);
+        var s:Bool = true;
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/bans/"+id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -562,6 +608,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -573,6 +620,7 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+        return s;
     }
 
     /**
@@ -581,9 +629,10 @@ Content-Type: application/json;';
         @param guild_id The guild ID
         @param reason The kick reason
     **/
-    public static function removeGuildMember(id:String, guild_id:String, ?reason:String)
+    public static function removeGuildMember(id:String, guild_id:String, ?reason:String):Bool
     {
-        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/"+id);
+        var s:Bool = true;
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/"+id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -596,6 +645,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -607,11 +657,12 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+        return s;
     }
 
     public function modifyGuild(guild_id:String, params:hxdiscord.types.Typedefs.ModifyGuildParams)
     {
-        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id);
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -636,7 +687,7 @@ Content-Type: application/json;';
 
     public function getGuildChannels(guild_id:String)
     {
-        var r = new haxe.Http("https://discord.com/api/v10/guilds/" + guild_id + "/channels");
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + guild_id + "/channels");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -663,7 +714,7 @@ Content-Type: application/json;';
 
     public function deleteGuild(guild_id:String)
     {
-        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id);
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -687,7 +738,7 @@ Content-Type: application/json;';
 
     public function editChannelPermissions(channel_id:String, overwrite_id:String, data:Dynamic)
     {
-        var req:Http = new Http("https://discord.com/api/v10/channels/"+channel_id+"/permissions/"+overwrite_id);
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/permissions/"+overwrite_id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -712,7 +763,7 @@ Content-Type: application/json;';
 
     public function modifyGuildRole(guild_id:String, role_id:String, data:hxdiscord.types.Typedefs.ModifyGuildRoleParams)
     {
-        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/roles/"+role_id);
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/roles/"+role_id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -737,7 +788,7 @@ Content-Type: application/json;';
 
     public function addGuildMemberRole(guild_id:String, user_id:String, role_id:String)
     {
-        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -761,7 +812,7 @@ Content-Type: application/json;';
 
     public function removeGuildMemberRole(guild_id:String, user_id:String, role_id:String)
     {
-        var req:Http = new Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -791,7 +842,7 @@ Content-Type: application/json;';
 
     public static function getGlobalApplicationCommands()
     {
-        var r = new haxe.Http("https://discord.com/api/v10/applications/" + DiscordClient.accountId + "/commands");
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/applications/" + DiscordClient.accountId + "/commands");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -821,7 +872,7 @@ Content-Type: application/json;';
     {
         var r:haxe.Http;
 
-        r = new haxe.Http("https://discord.com/api/v10/applications/"+DiscordClient.accountId+"/commands");
+        r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/applications/"+DiscordClient.accountId+"/commands");
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -846,7 +897,7 @@ Content-Type: application/json;';
     **/
     public static function bulkOverwriteGlobalApplicationCommands(data:Any)
     {
-        var req:Http = new Http("https://discord.com/api/v10/applications/"+DiscordClient.accountId+"/commands");
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/applications/"+DiscordClient.accountId+"/commands");
 		var responseBytes = new BytesOutput();
     
 		req.setPostData(Json.stringify(data));
@@ -936,7 +987,7 @@ Content-Type: application/json;';
             body += "\n--boundary--";
         }
 
-        var r = new haxe.Http("https://discord.com/api/v10/interactions/" + interactionID + "/" + interactionToken + "/callback");
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/interactions/" + interactionID + "/" + interactionToken + "/callback");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -964,7 +1015,7 @@ Content-Type: application/json;';
     @:dox(hide) @:deprecated
     public static function sendDataToInteraction(data:Dynamic, interactionID:String, interactionToken:String, type:Int)
     {
-        var url:String = "https://discord.com/api/v10/interactions/" + interactionID + "/" + interactionToken + "/callback";
+        var url:String = "https://discord.com/api/v"+Gateway.API_VERSION+"/interactions/" + interactionID + "/" + interactionToken + "/callback";
         if (DiscordClient.debug)
         {
             trace(url);

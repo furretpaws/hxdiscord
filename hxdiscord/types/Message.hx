@@ -5,6 +5,7 @@ import hxdiscord.types.structTypes.*;
 import hxdiscord.types.structTypes.MessageS;
 import hxdiscord.types.Typedefs;
 import hxdiscord.endpoints.Endpoints;
+import hxdiscord.gateway.Gateway;
 
 class Message
 {
@@ -106,7 +107,7 @@ class Message
             }
             else
             {
-                var r = new haxe.Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/" + author.id);
+                var r = new haxe.Http("https://discord.com/api/"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/" + author.id);
                 //LLL
                 r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
                 r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -134,7 +135,7 @@ class Message
 
     public function hasPermission(permissionToLookFor:String):Bool
     {
-        var hasPermission = false;
+        var hasPermission:Bool = false;
         if (guildmember == null)
         {
             //do nothing
@@ -143,49 +144,13 @@ class Message
         {
             var guild = hxdiscord.endpoints.Endpoints.getGuild(guild_id);
             var owner = hxdiscord.endpoints.Endpoints.getUser(guild.owner_id);
-
             if (author.id == owner.id)
             {
                 hasPermission = true;
             }
             else
             {
-                var r = new haxe.Http("https://discord.com/api/v10/guilds/"+guild_id+"/members/" + author.id);
-                //LLL
-                r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-                r.addHeader("Authorization", "Bot " + DiscordClient.token);
-
-
-		        r.onData = function(dataG:String)
-		        {
-                    var data = Endpoints.getRoles(guild_id);
-                    var json:Dynamic = haxe.Json.parse(dataG);
-
-                    var roles:Array<String> = json.roles;
-
-                    var jsonRole:Dynamic = haxe.Json.parse(data);
-                    for (i in 0...jsonRole.length)
-                    {
-                        for (x in 0...roles.length)
-                        {
-                            if (jsonRole[i].id == roles[x])
-                            {
-                                var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(jsonRole[i].permissions)));
-                                if (array.contains(permissionToLookFor))
-                                {
-                                    hasPermission = true;
-                                }
-                            }
-                        }
-                    }
-		        }
-
-		        r.onError = function(error)
-		        {
-		        	trace("An error has occurred: " + error);
-		        }
-
-		        r.request();
+                hasPermission = Endpoints.hasPermission(author.id, guild_id, permissionToLookFor);
             }
         }
         return hasPermission;
