@@ -26,6 +26,8 @@ class Message
 
     var client:DiscordClient;
 
+    var prevSentMessage:Message = null;
+
     public function new(ms:MessageS, _client:DiscordClient)
     {
         client = _client;
@@ -57,7 +59,7 @@ class Message
 
     public function reply(mc:hxdiscord.types.Typedefs.MessageCreate, ?ping:Bool)
     {
-        Endpoints.sendMessage(channel_id, mc, id, ping);
+        prevSentMessage = new Message(Endpoints.sendMessage(channel_id, mc, id, ping), client);
     }
 
     public function replyData(data:Dynamic) //this will save a lot of time honestly
@@ -88,6 +90,18 @@ class Message
     public function deleteMessage()
     {
         Endpoints.deleteMessage(channel_id, id);
+    }
+    
+    public function editMessage(m:hxdiscord.types.Typedefs.MessageCreate)
+    {
+        if (prevSentMessage == null)
+        {
+            trace("Couldn't edit a non-existing message");
+        }
+        else
+        {
+            Endpoints.editMessage(channel_id, prevSentMessage.id, m);
+        }
     }
 
     public function hasRole(roleToLookFor:String):Bool

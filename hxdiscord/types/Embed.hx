@@ -1,19 +1,19 @@
 package hxdiscord.types;
 
 class Embed{
-    public var title:String;
-    public var type:String;
-    public var description:String;
-    public var url:String;
-    public var timestamp:Date;
-    public var color:Int;
-    public var footer:hxdiscord.types.structTypes.Embed.EmbedFooter;
-    public var image:hxdiscord.types.structTypes.Embed.EmbedImage;
-    public var thumbnail:hxdiscord.types.structTypes.Embed.EmbedThumbnail;
-    public var video:hxdiscord.types.structTypes.Embed.EmbedVideo;
-    public var provider:hxdiscord.types.structTypes.Embed.EmbedProvider;
-    public var author:hxdiscord.types.structTypes.Embed.EmbedAuthor;
-    public var fields:Array<hxdiscord.types.structTypes.Embed.EmbedField>;
+    private var title:String;
+    private var type:String;
+    private var description:String;
+    private var url:String;
+    private var timestamp:Date;
+    private var color:Int;
+    private var footer:hxdiscord.types.structTypes.Embed.EmbedFooter;
+    private var image:hxdiscord.types.structTypes.Embed.EmbedImage;
+    private var thumbnail:hxdiscord.types.structTypes.Embed.EmbedThumbnail;
+    private var video:hxdiscord.types.structTypes.Embed.EmbedVideo;
+    private var provider:hxdiscord.types.structTypes.Embed.EmbedProvider;
+    private var author:hxdiscord.types.structTypes.Embed.EmbedAuthor;
+    private var fields:Array<hxdiscord.types.structTypes.Embed.EmbedField>;
 
     public function new()
     {

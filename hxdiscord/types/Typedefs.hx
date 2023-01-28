@@ -7,6 +7,7 @@ typedef MessageCreate = {
     @:optional var embeds:Array<Embed>;
     @:optional var nonce:Int;
     @:optional var tts:Bool;
+    @:optional var components:Dynamic;
     @:optional var file:String;
     @:optional var message_reference:Any;
     @:optional var attachments:Array<Dynamic>;

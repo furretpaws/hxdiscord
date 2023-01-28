@@ -227,15 +227,48 @@ class Endpoints
     }
 
     /*
+        Edit a message (Obviously it has to be sent by you)
+
+        @param channel_id The channel id where the message is located
+        @param m_id The message id
+        @param m The message create object
+    */
+
+    public static function editMessage(channel_id:String, m_id:String, m:hxdiscord.types.Typedefs.MessageCreate)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+m_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Content-type", "application/json");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData(haxe.Json.stringify(m));
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(true, responseBytes, "PATCH");
+    }
+
+    /*
         Send a message
         @param channel_id The channel ID to send the message
         @param message JSON object about the message
         @param id If you want to ping a message. Enter the ID of the message here
         @param reply Whether to ping the message or not
     */
-    public static function sendMessage(channel_id:String, message:hxdiscord.types.Typedefs.MessageCreate, ?id:String, reply:Bool)
+    public static function sendMessage(channel_id:String, message:hxdiscord.types.Typedefs.MessageCreate, ?id:String, reply:Bool):Dynamic
     {
         //USING MULTIPART BECAUSE YES.
+        var response:String;
         if (reply)
          {
              message.message_reference = {
@@ -324,6 +357,7 @@ Content-Type: application/json;';
             {
                 trace(data);
             }
+            response = data;
         }
 
         r.onError = function(error)
@@ -333,6 +367,8 @@ Content-Type: application/json;';
         }
 
         r.request(true);
+
+        return haxe.Json.parse(response);
     }
 
     @:dox(hide) @:deprecated

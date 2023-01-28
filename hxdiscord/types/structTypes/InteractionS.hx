@@ -1,5 +1,7 @@
 package hxdiscord.types.structTypes;
 
+import hxdiscord.types.structTypes.MessageComponents;
+
 typedef InteractionS = {
     var username:String;
     var public_flags:Int;
@@ -13,6 +15,7 @@ typedef InteractionS = {
     var intId:String;
     var options:Array<Dynamic>;
     var type:Int;
+    var components:Array<Dynamic>;
     var data:InteractionData;
     var token:String;
 }
@@ -31,6 +34,9 @@ typedef InteractionData = {
     var name:String;
     var type:Int;
     var resolved:InteractionResolvedData;
+    var custom_id:String;
+    var component_type:Int;
+    @:optional var values:Array<String>;
 }
 
 typedef User = {
