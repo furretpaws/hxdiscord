@@ -63,6 +63,6 @@ typedef InteractionCallback = {
     @:optional var embeds:Array<Embed>;
     @:optional var allowed_mentions:Any;
     @:optional var flags:Int;
-    @:optional var components:Array<Component>;
+    @:optional var components:Array<Dynamic>;
     @:optional var attachments:Array<Dynamic>;
 }

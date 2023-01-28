@@ -962,6 +962,7 @@ Content-Type: application/json;';
     **/
     public static function sendInteractionCallback(ic:hxdiscord.types.Typedefs.InteractionCallback, interactionID:String, interactionToken:String, type:Int, ?ephemeral:Bool)
     {
+        var response:String;
         var attachments:Bool = false;
         if (ic.attachments != null)
         {
@@ -1037,14 +1038,15 @@ Content-Type: application/json;';
             {
                 trace(data);
             }
+            response = data;
         }
-
+    
         r.onError = function(error)
         {
             trace("An error has occurred: " + error);
             trace(r.responseData);
         }
-
+    
         r.request(true);
     }
 
