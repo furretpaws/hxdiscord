@@ -1050,37 +1050,31 @@ Content-Type: application/json;';
         r.request(true);
     }
 
-    @:dox(hide) @:deprecated
-    public static function sendDataToInteraction(data:Dynamic, interactionID:String, interactionToken:String, type:Int)
+    public static function editInteractionResponse(ic:hxdiscord.types.Typedefs.InteractionCallback, interactionToken:String)
     {
-        var url:String = "https://discord.com/api/v"+Gateway.API_VERSION+"/interactions/" + interactionID + "/" + interactionToken + "/callback";
-        if (DiscordClient.debug)
-        {
-            trace(url);
-        }
-        var r = new haxe.Http(url);
+        var url:String = "https://discord.com/api/v"+Gateway.API_VERSION+"/webhooks/" + DiscordClient.accountId + "/" + interactionToken + "/messages/@original";
+        var req:Http = new Http(url);
+        var responseBytes = new BytesOutput();
     
-        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData(Json.stringify(ic));
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Content-type", "application/json");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+        };
         
-        var data = null;
-    
-        r.setPostData(haxe.Json.stringify(data));
-    
-        r.onData = function(data:String)
-        {
+        req.onStatus = function(status:Int) {
             if (DiscordClient.debug)
             {
-                trace(data);
+                trace(status);
             }
-        }
+        };
     
-        r.onError = function(error)
-        {
-            trace("An error has occurred: " + error);
-        }
-    
-        r.request(true);
+        req.customRequest(true, responseBytes, "PATCH");
+        var response = responseBytes.getBytes();
+        trace(response);
+        return Json.parse(response.toString());
     }
 }

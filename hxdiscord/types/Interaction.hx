@@ -60,11 +60,6 @@ class Interaction
         Endpoints.sendInteractionCallback(ic, intId, token, type, ephemeral);
     }
 
-    public function replyData(data:Dynamic)
-    {
-        Endpoints.sendDataToInteraction(data, intId, token, type);
-    }
-
     public function getValue(optionName:String):Dynamic
     {
         var daThing:Dynamic = "optionName";
@@ -84,5 +79,10 @@ class Interaction
             daThing = "No value found";
         }
         return daThing;
+    }
+
+    public function edit(ic:Typedefs.InteractionCallback)
+    {
+        Endpoints.editInteractionResponse(ic, token);
     }
 }
