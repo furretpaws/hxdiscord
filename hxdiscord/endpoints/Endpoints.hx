@@ -1074,7 +1074,6 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "PATCH");
         var response = responseBytes.getBytes();
-        trace(response);
         return Json.parse(response.toString());
     }
 }

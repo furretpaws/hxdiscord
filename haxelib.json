@@ -4,7 +4,7 @@
     "license": "GPL",
     "tags": ["Discord", "Haxe"],
     "description": "Discord.hx is an API wrapper for Haxe!",
-    "version": "0.0.6",
-    "releasenote": "Added attachments. (Images only work in Neko for the meantime)",
+    "version": "0.2.0",
+    "releasenote": "Massive update",
     "contributors": ["Furret"]
   }
