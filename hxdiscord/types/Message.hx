@@ -121,7 +121,7 @@ class Message
             }
             else
             {
-                var r = new haxe.Http("https://discord.com/api/"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/" + author.id);
+                var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/" + author.id);
                 //LLL
                 r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
                 r.addHeader("Authorization", "Bot " + DiscordClient.token);
