@@ -16,8 +16,8 @@ typedef MessageS = {
     @:optional var attachments:Array<Attachment>;
     @:optional var referenced_message:MessageS;
     @:optional var message_reference:MessageReference;
-    /*@:optional var embeds:Array<Embed>;
-    @:optional var reactions:Array<Reaction>;*/
+    @:optional var embeds:Array<Embed>;
+    //@:optional var reactions:Array<Reaction>;
     @:optional var nonce:String;
     @:optional var pinned:Bool;
     @:optional var webhook_id:String;

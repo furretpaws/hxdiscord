@@ -10,6 +10,7 @@ typedef InteractionS = {
     var avatar_decoration:Dynamic;
     var avatar:String;
     var member:Member;
+    var user:UserS;
     var channel_id:String;
     var name:String;
     var intId:String;

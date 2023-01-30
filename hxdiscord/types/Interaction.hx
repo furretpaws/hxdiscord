@@ -12,6 +12,7 @@ class Interaction
     public var discriminator:String;
     public var avatar_decoration:Dynamic;
     public var avatar:String;
+    public var user:UserS;
     public var channel_id:String;
     public var name:String;
     public var member:hxdiscord.types.structTypes.InteractionS.Member;
@@ -30,6 +31,7 @@ class Interaction
         id = ins.id;
         discriminator = ins.discriminator;
         avatar_decoration = ins.avatar_decoration;
+        user = ins.user;
         member = ins.member;
         avatar = ins.avatar;
         channel_id = ins.channel_id;

@@ -15,9 +15,11 @@ class Message
     public var pinned:Bool;
     public var id:String;
     public var channel_id:String;
+    public var attachments:Array<Attachment>;
     public var author:User;
     public var guildmember:GuildMember;
     public var referenced_message:MessageS;
+    public var embeds:Array<Embed>;
     public var message_reference:MessageReference;
     public var guild_id:String;
     public var content:String;
@@ -40,7 +42,9 @@ class Message
         pinned = ms.pinned;
         id = ms.id;
         channel_id = ms.channel_id;
+        embeds = ms.embeds;
         //authorUsername = ms.username;
+        attachments = ms.attachments;
         content = ms.content;
         mention_everyone = ms.mention_everyone;
         guildmember = ms.member;

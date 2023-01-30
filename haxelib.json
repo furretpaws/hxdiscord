@@ -3,8 +3,8 @@
     "url" : "https://github.com/FurretLol/discord-hx/",
     "license": "GPL",
     "tags": ["Discord", "Haxe"],
-    "description": "Discord.hx is an API wrapper for Haxe!",
-    "version": "0.2.0",
-    "releasenote": "Massive update",
+    "description": "hxdiscord is an API wrapper for Haxe!",
+    "version": "0.2.1",
+    "releasenote": "fixed something",
     "contributors": ["Furret"]
   }
