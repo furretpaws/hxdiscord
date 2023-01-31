@@ -6,7 +6,7 @@ import hxdiscord.types.CommandType;
 
 class SlashCommand {
     public var id:String;
-    public var type:Int;
+    public var type:Int = 1;
     public var application_id:String;
     public var guild_id:String;
     public var name:String;

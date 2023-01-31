@@ -191,7 +191,7 @@ class DiscordClient
 
     public function setInteractionCommands(j:Dynamic)
     {
-        Endpoints.bulkOverwriteGlobalApplicationCommands(j);
+        return Endpoints.bulkOverwriteGlobalApplicationCommands(j);
     }
 
     /**

@@ -59,6 +59,7 @@ class Endpoints
 		r.onError = function(error)
 		{
 			trace("An error has occurred: " + error);
+            trace(r.responseData);
 		}
 
 		r.request(true);
@@ -88,6 +89,7 @@ class Endpoints
 		r.onError = function(error)
 		{
 			trace("An error has occurred: " + error);
+            trace(r.responseData);
 		}
 
 		r.request();
@@ -130,6 +132,7 @@ class Endpoints
 		r.onError = function(error)
 		{
 			trace("An error has occurred: " + error);
+            trace(r.responseData);
 		}
 
 		r.request();
@@ -157,6 +160,7 @@ class Endpoints
         r.onError = function(error)
         {
             trace("An error has occurred: " + error);
+            trace(r.responseData);
         }
 
         r.request();
@@ -191,6 +195,7 @@ class Endpoints
 		r.onError = function(error)
 		{
 			trace("An error has occurred: " + error);
+            trace(r.responseData);
 		}
 
 		r.request();
@@ -214,6 +219,7 @@ class Endpoints
     
     	req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
 		};
 		
 		req.onStatus = function(status:Int) {
@@ -246,6 +252,7 @@ class Endpoints
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
         };
         
         req.onStatus = function(status:Int) {
@@ -427,6 +434,7 @@ Content-Type: application/json;';
 		r.onError = function(error)
 		{
 			trace("An error has occurred: " + error);
+            trace(r.responseData);
 		}
 
 		r.request(true);
@@ -445,6 +453,7 @@ Content-Type: application/json;';
     
     	req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
 		};
 		
 		req.onStatus = function(status:Int) {
@@ -469,6 +478,7 @@ Content-Type: application/json;';
     
     	req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
 		};
 		
 		req.onStatus = function(status:Int) {
@@ -493,6 +503,7 @@ Content-Type: application/json;';
     
     	req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
 		};
 		
 		req.onStatus = function(status:Int) {
@@ -517,6 +528,7 @@ Content-Type: application/json;';
     
     	req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
 		};
 		
 		req.onStatus = function(status:Int) {
@@ -541,6 +553,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
         };
         
         req.onStatus = function(status:Int) {
@@ -578,6 +591,7 @@ Content-Type: application/json;';
 		r.onError = function(error)
 		{
 			trace("An error has occurred: " + error);
+            trace(r.responseData);
 		}
 
 		r.request();
@@ -612,6 +626,7 @@ Content-Type: application/json;';
     
     	req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
             s = false;
 		};
 		
@@ -644,6 +659,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
             s = false;
         };
         
@@ -681,6 +697,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
             s = false;
         };
         
@@ -708,6 +725,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
         };
         
         req.onStatus = function(status:Int) {
@@ -741,6 +759,7 @@ Content-Type: application/json;';
         r.onError = function(error)
         {
             trace("An error has occurred: " + error);
+            trace(r.responseData);
         }
 
         r.request();
@@ -759,6 +778,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
         };
         
         req.onStatus = function(status:Int) {
@@ -784,6 +804,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
         };
         
         req.onStatus = function(status:Int) {
@@ -809,6 +830,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
         };
         
         req.onStatus = function(status:Int) {
@@ -833,6 +855,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
         };
         
         req.onStatus = function(status:Int) {
@@ -857,6 +880,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
         };
         
         req.onStatus = function(status:Int) {
@@ -894,6 +918,7 @@ Content-Type: application/json;';
 		r.onError = function(error)
 		{
 			trace("An error has occurred: " + error);
+            trace(r.responseData);
 		}
 
 		r.request();
@@ -923,6 +948,7 @@ Content-Type: application/json;';
         r.onError = function(error)
         {
             throw("An error has occurred: " + error);
+            trace(r.responseData);
         }
         r.request(true);
     }
@@ -931,7 +957,7 @@ Content-Type: application/json;';
         Override existing commands with new ones
         @param data JSON object containing application commands
     **/
-    public static function bulkOverwriteGlobalApplicationCommands(data:Any)
+    public static function bulkOverwriteGlobalApplicationCommands(data:Any):Dynamic
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/applications/"+DiscordClient.accountId+"/commands");
 		var responseBytes = new BytesOutput();
@@ -943,6 +969,7 @@ Content-Type: application/json;';
     
     	req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
 		};
 		
 		req.onStatus = function(status:Int) {
@@ -1064,6 +1091,7 @@ Content-Type: application/json;';
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
+            trace(req.responseData);
         };
         
         req.onStatus = function(status:Int) {
