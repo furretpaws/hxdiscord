@@ -13,7 +13,7 @@ class StringSelect {
     private var max_values:Int;
     private var disabled:Bool;
 
-    public function new() { }
+    public function new() { #if cpp max_values = 1; min_values = 0; #end }
 
     public function setCustomId(custom_id:String) {
         this.custom_id = custom_id;

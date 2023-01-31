@@ -1045,6 +1045,7 @@ Content-Type: application/json;';
         {
             trace("An error has occurred: " + error);
             trace(r.responseData);
+            trace(haxe.Json.stringify(ic));
         }
     
         r.request(true);
