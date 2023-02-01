@@ -4,7 +4,7 @@ import hxdiscord.types.structTypes.ApplicationCommand;
 import hxdiscord.types.structTypes.ApplicationCommand.ApplicationCommandOption;
 import hxdiscord.types.CommandType;
 
-class SlashCommand {
+class ApplicationCommand {
     public var id:String;
     public var type:Int = 1;
     public var application_id:String;

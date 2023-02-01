@@ -961,15 +961,16 @@ Content-Type: application/json;';
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/applications/"+DiscordClient.accountId+"/commands");
 		var responseBytes = new BytesOutput();
+        var error:Bool = false;
     
 		req.setPostData(Json.stringify(data));
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
 		req.addHeader("Content-type", "application/json");
         req.addHeader("Authorization", "Bot " + DiscordClient.token);
     
-    	req.onError = function(error:String) {
-            trace("An error has occurred: " + error);
-            trace(req.responseData);
+    	req.onError = function(err:String) {
+            trace("An error has occurred: " + err);
+            error = true;
 		};
 		
 		req.onStatus = function(status:Int) {
@@ -981,6 +982,10 @@ Content-Type: application/json;';
     
 		req.customRequest(true, responseBytes, "PUT");
 		var response = responseBytes.getBytes();
+        if (error)
+        {
+            trace(response);
+        }
     	return Json.parse(response.toString());
     }
 
@@ -1083,15 +1088,16 @@ Content-Type: application/json;';
         var url:String = "https://discord.com/api/v"+Gateway.API_VERSION+"/webhooks/" + DiscordClient.accountId + "/" + interactionToken + "/messages/@original";
         var req:Http = new Http(url);
         var responseBytes = new BytesOutput();
+        var error:Bool = false;
     
         req.setPostData(Json.stringify(ic));
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         req.addHeader("Content-type", "application/json");
         req.addHeader("Authorization", "Bot " + DiscordClient.token);
     
-        req.onError = function(error:String) {
-            trace("An error has occurred: " + error);
-            trace(req.responseData);
+        req.onError = function(err:String) {
+            trace("An error has occurred: " + err);
+            error = true;
         };
         
         req.onStatus = function(status:Int) {
@@ -1103,6 +1109,10 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "PATCH");
         var response = responseBytes.getBytes();
+        if (error)
+        { 
+            trace(response); 
+        }
         return Json.parse(response.toString());
     }
 }

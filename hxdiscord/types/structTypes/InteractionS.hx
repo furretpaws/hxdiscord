@@ -35,6 +35,7 @@ typedef InteractionData = {
     var name:String;
     var type:Int;
     var resolved:InteractionResolvedData;
+    var target_id:String;
     var custom_id:String;
     var component_type:Int;
     @:optional var values:Array<String>;
