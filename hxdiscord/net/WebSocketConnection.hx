@@ -23,6 +23,10 @@ class WebSocketConnection {
             haxe.EntryPoint.runInMainThread(onClose);
         }
 
+        ws.onerror = (err:String) -> {
+            haxe.EntryPoint.runInMainThread(this.onError.bind(err));
+        }
+
         #if sys
         while (true) {
             ws.process();
@@ -54,4 +58,5 @@ class WebSocketConnection {
     dynamic public function onClose() { }
     dynamic public function onReady() { }
     dynamic public function onMessage(m) { }
+    dynamic public function onError(err) { }
 }
