@@ -58,5 +58,5 @@ class WebSocketConnection {
     dynamic public function onClose() { }
     dynamic public function onReady() { }
     dynamic public function onMessage(m) { }
-    dynamic public function onError(err) { }
+    dynamic public function onError(err) { } //:3
 }
