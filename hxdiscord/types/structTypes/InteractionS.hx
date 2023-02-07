@@ -38,6 +38,7 @@ typedef InteractionData = {
     var target_id:String;
     var custom_id:String;
     var component_type:Int;
+    var components:Array<hxdiscord.types.Typedefs.Component>;
     @:optional var values:Array<String>;
 }
 

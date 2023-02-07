@@ -992,6 +992,56 @@ Content-Type: application/json;';
     /**
         Send the interaction callback
     **/
+    public static function showInteractionModal(imc:Array<hxdiscord.types.message.TextInput>, interactionID:String, interactionToken:String, type:Int, title:String, custom_id:String)
+    {
+        var r:haxe.Http;
+
+        r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/interactions/" + interactionID + "/" + interactionToken + "/callback");
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.setPostData(haxe.Json.stringify(
+            {
+                type: 9,
+                data: {
+                    title: title,
+                    type: 5,
+                    custom_id: custom_id,
+                    components: [{
+                        type: 1,
+                        components: imc,
+                    }]
+                }
+            }
+        ));
+        r.onData = function(_data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(_data);
+            }
+        }
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+            trace(haxe.Json.stringify(
+                {
+                    type: 9,
+                    data: {
+                        title: title,
+                        type: 5,
+                        custom_id: custom_id,
+                        components: [{
+                            type: 1,
+                            components: imc,
+                        }]
+                    }
+                }
+            ));
+        }
+        r.request(true);
+    }
     public static function sendInteractionCallback(ic:hxdiscord.types.Typedefs.InteractionCallback, interactionID:String, interactionToken:String, type:Int, ?ephemeral:Bool)
     {
         var response:String;

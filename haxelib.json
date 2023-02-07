@@ -4,7 +4,7 @@
     "license": "GPL",
     "tags": ["Discord", "Haxe"],
     "description": "hxdiscord is an API wrapper for Haxe!",
-    "version": "0.2.1",
-    "releasenote": "fixed something",
+    "version": "0.2.5",
+    "releasenote": "Added modals",
     "contributors": ["Furret"]
   }

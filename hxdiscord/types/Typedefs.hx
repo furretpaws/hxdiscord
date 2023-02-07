@@ -45,6 +45,9 @@ typedef ModifyGuildRoleParams = {
 typedef ComponentArray = {
     var type:Int;
     var style:Int;
+    @:optional var name:String;
+    @:optional var value:String;
+    @:optional var components:Array<ComponentArray>;
     @:optional var label:String;
     @:optional var emoji:Dynamic;
     @:optional var custom_id:String;
@@ -59,6 +62,9 @@ typedef Component = {
 
 typedef InteractionCallback = {
     @:optional var tts:Bool;
+    @:optional var custom_id:String;
+    @:optional var title:String;
+    @:optional var type:Int;
     @:optional var content:String;
     @:optional var embeds:Array<Embed>;
     @:optional var allowed_mentions:Any;

@@ -62,6 +62,11 @@ class Interaction
         Endpoints.sendInteractionCallback(ic, intId, token, type, ephemeral);
     }
 
+    public function showModal(title:String, custom_id:String, imc:Array<hxdiscord.types.message.TextInput>)
+    {
+        Endpoints.showInteractionModal(imc, intId, token, type, title, custom_id);
+    }
+
     public function getValue(optionName:String):Dynamic
     {
         var daThing:Dynamic = "optionName";
