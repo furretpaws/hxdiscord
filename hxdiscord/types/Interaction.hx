@@ -62,7 +62,7 @@ class Interaction
         Endpoints.sendInteractionCallback(ic, intId, token, type, ephemeral);
     }
 
-    public function showModal(title:String, custom_id:String, imc:Array<hxdiscord.types.message.TextInput>)
+    public function showModal(title:String, custom_id:String, imc:Array<hxdiscord.types.message.ActionRow>)
     {
         Endpoints.showInteractionModal(imc, intId, token, type, title, custom_id);
     }

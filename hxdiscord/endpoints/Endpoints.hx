@@ -992,7 +992,7 @@ Content-Type: application/json;';
     /**
         Send the interaction callback
     **/
-    public static function showInteractionModal(imc:Array<hxdiscord.types.message.TextInput>, interactionID:String, interactionToken:String, type:Int, title:String, custom_id:String)
+    public static function showInteractionModal(imc:Array<hxdiscord.types.message.ActionRow>, interactionID:String, interactionToken:String, type:Int, title:String, custom_id:String)
     {
         var r:haxe.Http;
 
@@ -1000,20 +1000,18 @@ Content-Type: application/json;';
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
-        r.setPostData(haxe.Json.stringify(
+        var data:String = haxe.Json.stringify(
             {
                 type: 9,
                 data: {
                     title: title,
                     type: 5,
                     custom_id: custom_id,
-                    components: [{
-                        type: 1,
-                        components: imc,
-                    }]
+                    components: imc
                 }
             }
-        ));
+        );
+        r.setPostData(data);
         r.onData = function(_data:String)
         {
             if (DiscordClient.debug)
@@ -1025,20 +1023,7 @@ Content-Type: application/json;';
         {
             trace("An error has occurred: " + error);
             trace(r.responseData);
-            trace(haxe.Json.stringify(
-                {
-                    type: 9,
-                    data: {
-                        title: title,
-                        type: 5,
-                        custom_id: custom_id,
-                        components: [{
-                            type: 1,
-                            components: imc,
-                        }]
-                    }
-                }
-            ));
+            trace(data);
         }
         r.request(true);
     }
