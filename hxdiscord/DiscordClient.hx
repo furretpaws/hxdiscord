@@ -20,7 +20,14 @@ class DiscordClient
     var ws:WebSocketConnection;
     var heartbeatTimer:Timer;
     public var status:String = "online";
+    private var canResume:Bool = false;
     var receivedHelloOC:Bool = false;
+    private var ignore:Bool = false;
+    private var sequence:String = "";
+    private var session:String = "";
+    private var session_type:String = "";
+    private var session_id:String = "";
+    private var resume_gateway_url:String = "";
 
     public var readySent:Bool = false;
     @:dox(hide)
@@ -86,7 +93,30 @@ class DiscordClient
 
             ws = new WebSocketConnection(url);
             ws.onMessage = this.wsm;
-            ws.onClose = this.connect;
+            ws.onClose = (m:Int) -> {
+                if (heartbeatTimer != null)
+                {
+                    heartbeatTimer.stop();
+                }
+            
+                if (m == 4006 || m == 1000 || m == 1001) //session is invalid so i cannot resume
+                {
+                    session_id = "";
+                    session = "";
+                    session_type = "";
+                    canResume = false;
+
+                    Gateway.GATEWAY_URL = "wss://gateway.discord.gg/?v="+Gateway.API_VERSION+"&encoding=json";
+                }
+            
+                if (debug) {
+                    trace("[!] The socket has closed with code: " + m + ". Re-opening...");
+                }
+                connect();
+            };
+            ws.onError = (e) -> {
+                throw("Websocket gave an error.");
+            }
         } catch (err) {
             throw(err);
         }
@@ -103,6 +133,10 @@ class DiscordClient
         var event = json.event;
         var op = json.op;
         var d:Dynamic = json.d;
+        if (json.s != null)
+        {
+            sequence = json.s;
+        }
         switch (json.op)
         {
             case 10:
@@ -113,21 +147,39 @@ class DiscordClient
             heartbeatTimer = new Timer(json.d.heartbeat_interval);
             heartbeatTimer.run = function()
             {
-                ws.send(Gateway.preparePackage("heartbeat_package"));
+                ws.send(haxe.Json.stringify({
+                    op: 1,
+                    d: sequence
+                }));
             }
-            var idPayload = {
-                op:2,
-                d: {
-                    token: token,
-                    intents: intentsNumber,
-                    properties: {
-                        os: 'customOS',
-                        browser: 'hxdiscord',
-                        device: 'hxdiscord'
+            var payload:Dynamic = null;
+            if (canResume) {
+                payload = {
+                    "op": 6,
+                    "d" : {
+                        "token": token,
+                        "session_id": session_id,
+                        "seq": Std.parseInt(sequence)
                     }
-                }
+                };
             }
-            ws.sendJson(idPayload);
+            else
+            {
+                payload = {
+                    op:2,
+                    d: {
+                        token: token,
+                        intents: intentsNumber,
+                        properties: {
+                            os: 'customOS',
+                            browser: 'hxdiscord',
+                            device: 'hxdiscord'
+                        }
+                    }
+                };
+            }
+            trace(payload);
+            ws.sendJson(payload);
             //alright, i fixed this
             if (presenceType == 99)
             {
@@ -152,6 +204,10 @@ class DiscordClient
                 }
                 ws.sendJson(data);
             }
+            case 9:
+                ws.close();
+            case 7: //gateway needs client to reconnect
+                ws.close();
         }
 
         switch (t) {
@@ -165,11 +221,15 @@ class DiscordClient
                 username = d.user.username;
                 flags = d.user.flags;
                 bot = d.user.bot;
+                session_id = d.session_id;
+                session_type = d.session_type;
+                Gateway.GATEWAY_URL = d.resume_gateway_url + "?v=" + Gateway.API_VERSION;
                 if (!readySent)
                 {
                     onReady();
                     readySent = true;
                 }
+                canResume = true;
             case 'INTERACTION_CREATE':
                 onInteractionCreate(nInteraction(d, d, haxe.Json.parse(msg)));
             case 'MESSAGE_CREATE':
@@ -239,6 +299,13 @@ class DiscordClient
         @param presence Custom presence. (Example: Playing <your presence>, Watching <your presence>)
         @param afk Whether if the bot is AFK or not.
     **/
+
+    public function causeResume() {
+        this.wsm('{
+            "op": 7,
+            "d": null
+          }');
+    }
 
     public function changeStatus(status:String, ?type:String, ?presence:String, ?afk:Bool = false)
     {

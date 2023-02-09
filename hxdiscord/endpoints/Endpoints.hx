@@ -322,7 +322,11 @@ Content-Type: application/json;';
             {
                 var filename:String = "";
                 var thing = "";
+                #if python
+                thing = json.attachments[i].filename;
+                #else
                 thing = json.attachments[i].filename.toString();
+                #end
                 if (thing.contains("/"))
                 {
                     var split = thing.split("/");
@@ -713,7 +717,7 @@ Content-Type: application/json;';
         return s;
     }
 
-    public function modifyGuild(guild_id:String, params:hxdiscord.types.Typedefs.ModifyGuildParams)
+    public static function modifyGuild(guild_id:String, params:hxdiscord.types.Typedefs.ModifyGuildParams)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id);
         var responseBytes = new BytesOutput();
@@ -739,7 +743,7 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
-    public function getGuildChannels(guild_id:String)
+    public static function getGuildChannels(guild_id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + guild_id + "/channels");
 
@@ -767,7 +771,7 @@ Content-Type: application/json;';
         return thing;
     }
 
-    public function deleteGuild(guild_id:String)
+    public static function deleteGuild(guild_id:String)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id);
         var responseBytes = new BytesOutput();
@@ -792,7 +796,7 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
-    public function editChannelPermissions(channel_id:String, overwrite_id:String, data:Dynamic)
+    public static function editChannelPermissions(channel_id:String, overwrite_id:String, data:Dynamic)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/permissions/"+overwrite_id);
         var responseBytes = new BytesOutput();
@@ -818,7 +822,7 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
-    public function modifyGuildRole(guild_id:String, role_id:String, data:hxdiscord.types.Typedefs.ModifyGuildRoleParams)
+    public static function modifyGuildRole(guild_id:String, role_id:String, data:hxdiscord.types.Typedefs.ModifyGuildRoleParams)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/roles/"+role_id);
         var responseBytes = new BytesOutput();
@@ -844,7 +848,7 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
-    public function addGuildMemberRole(guild_id:String, user_id:String, role_id:String)
+    public static function addGuildMemberRole(guild_id:String, user_id:String, role_id:String)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
         var responseBytes = new BytesOutput();
@@ -869,7 +873,7 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
-    public function removeGuildMemberRole(guild_id:String, user_id:String, role_id:String)
+    public static function removeGuildMemberRole(guild_id:String, user_id:String, role_id:String)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
         var responseBytes = new BytesOutput();

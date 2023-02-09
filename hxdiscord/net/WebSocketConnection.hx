@@ -19,8 +19,8 @@ class WebSocketConnection {
         ws.onmessageString = function(message) {
             haxe.EntryPoint.runInMainThread(this.onMessage.bind(message));
         }
-        ws.onclose = () -> {
-            haxe.EntryPoint.runInMainThread(onClose);
+        ws.onclose = (code:Int) -> {
+            haxe.EntryPoint.runInMainThread(this.onClose.bind(code));
         }
 
         ws.onerror = (err:String) -> {
@@ -55,7 +55,7 @@ class WebSocketConnection {
         this.ws.sendString(haxe.Json.stringify(j));
     }
 
-    dynamic public function onClose() { }
+    dynamic public function onClose(code:Int) { }
     dynamic public function onReady() { }
     dynamic public function onMessage(m) { }
     dynamic public function onError(err) { } //:3
