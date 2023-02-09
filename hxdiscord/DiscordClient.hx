@@ -178,7 +178,6 @@ class DiscordClient
                     }
                 };
             }
-            trace(payload);
             ws.sendJson(payload);
             //alright, i fixed this
             if (presenceType == 99)
