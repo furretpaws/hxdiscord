@@ -13,6 +13,7 @@ typedef InteractionS = {
     var user:UserS;
     var channel_id:String;
     var name:String;
+    var guild_id:String;
     var intId:String;
     var options:Array<Dynamic>;
     var type:Int;

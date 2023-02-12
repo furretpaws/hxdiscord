@@ -17,6 +17,7 @@ class Interaction
     public var name:String;
     public var member:hxdiscord.types.structTypes.InteractionS.Member;
     public var intId:String;
+    public var guild_id:String;
     public var components:Array<Dynamic>;
     public var options:Array<Dynamic>;
     public var dataOptions:Dynamic;
@@ -35,6 +36,7 @@ class Interaction
         member = ins.member;
         avatar = ins.avatar;
         channel_id = ins.channel_id;
+        guild_id = ins.guild_id;
         name = ins.name;
         intId = ins.intId;
         components = ins.components;
