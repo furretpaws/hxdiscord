@@ -9,12 +9,15 @@ hxdiscord is a Discord API Wrapper for Haxe.
 
 ## About
 
-hxdiscord is a Discord Library for Haxe. It's still in development.
+hxdiscord is a Discord Library for Haxe. It's still in development. More thing will be added, but for now, you can make your own Discord Bot with this!
 
+## Targets
 
-Some targets might not work, I haven't tested any. C++ and Neko will work. (Binary attachments doesn't work on C++. Use Neko if you want to send images or whatever you want)
+I don't know how many targets does hxdiscord support, since I've not tried them all. But here's a list of them
 
-
+✅ C++
+✅ Neko (RECOMMENDED)
+✅ HashLink
 
 ## Example
 
