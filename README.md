@@ -15,9 +15,9 @@ hxdiscord is a Discord Library for Haxe. It's still in development. More thing w
 
 I don't know how many targets does hxdiscord support, since I've not tried them all. But here's a list of them
 
-✅ C++
-✅ Neko (RECOMMENDED)
-✅ HashLink
+- ✅ C++
+- ✅ Neko (RECOMMENDED)
+- ✅ HashLink
 
 ## Example
 
