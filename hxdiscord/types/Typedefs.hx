@@ -83,6 +83,16 @@ typedef ChannelInvite = {
     var target_application_id:String;
 }
 
+typedef ModifyGuildMemberParams = {
+    @:optional var nick:String;
+    @:optional var roles:Array<String>;
+    @:optional var mute:Bool;
+    @:optional var deaf:Bool;
+    @:optional var channel_id:String;
+    @:optional var communication_disabled_until:Date;
+    @:optional var flags:Int;
+}
+
 typedef ApplicationCommandPermissionsUpdate = {
     var guild_id:String;
     var action:Dynamic;

@@ -199,4 +199,8 @@ class Message
         }
         return hasPermission;
     }
+
+    public function getMember():Member {
+        return hxdiscord.endpoints.Endpoints.getGuildMember(guild_id, author.id);
+    }
 }

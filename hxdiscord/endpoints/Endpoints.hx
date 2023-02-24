@@ -171,6 +171,31 @@ class Endpoints
         return user;
     }
 
+    public static function getGuildMember(guild_id:String, id:String):hxdiscord.types.Member
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + guild_id + "/members/" + id);
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        var guildmember:hxdiscord.types.Member = null;
+
+        r.onData = function(data:String)
+        {
+            guildmember = new hxdiscord.types.Member(haxe.Json.parse(data), guild_id);
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request();
+
+        return guildmember;
+    }
+
     /**
         Get the roles of a guild
         @param guild_id The guild ID
@@ -721,19 +746,20 @@ Content-Type: application/json;';
         return s;
     }
 
-    public static function modifyGuild(guild_id:String, params:hxdiscord.types.Typedefs.ModifyGuildParams)
-    {
-        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id);
+    public static function modifyGuildMember(guild_id:String, user_id:String, d:hxdiscord.types.Typedefs.ModifyGuildMemberParams):Bool {
+        var s:Bool = true;
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/"+user_id);
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         req.addHeader("Authorization", "Bot " + DiscordClient.token);
         req.addHeader("Content-Type", "application/json");
-        req.setPostData(haxe.Json.stringify(params));
+        req.setPostData(haxe.Json.stringify(d));
     
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -745,6 +771,36 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "PATCH");
         var response = responseBytes.getBytes();
+        return s;
+    }
+
+    public static function modifyGuild(guild_id:String, params:hxdiscord.types.Typedefs.ModifyGuildParams):Bool
+    {
+        var s:Bool = true;
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Content-Type", "application/json");
+        req.setPostData(haxe.Json.stringify(params));
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+            s = false;
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(true, responseBytes, "PATCH");
+        var response = responseBytes.getBytes();
+        return s;
     }
 
     public static function getGuildChannels(guild_id:String)
@@ -775,8 +831,9 @@ Content-Type: application/json;';
         return thing;
     }
 
-    public static function deleteGuild(guild_id:String)
+    public static function deleteGuild(guild_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id);
         var responseBytes = new BytesOutput();
     
@@ -787,6 +844,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -798,10 +856,12 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+        return s;
     }
 
-    public static function editChannelPermissions(channel_id:String, overwrite_id:String, data:Dynamic)
+    public static function editChannelPermissions(channel_id:String, overwrite_id:String, data:Dynamic):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/permissions/"+overwrite_id);
         var responseBytes = new BytesOutput();
     
@@ -813,6 +873,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -824,6 +885,7 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+        return s;
     }
 
     public static function getChannelInvites(channel_id:String)
@@ -854,8 +916,9 @@ Content-Type: application/json;';
         return thing;
     }
 
-    public static function createChannelInvite(channel_id:String, obj:hxdiscord.types.Typedefs.ChannelInvite)
+    public static function createChannelInvite(channel_id:String, obj:hxdiscord.types.Typedefs.ChannelInvite):Bool
     {
+        var s:Bool = false;
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -876,13 +939,16 @@ Content-Type: application/json;';
         {
             trace("An error has occurred: " + error);
             trace(r.responseData);
+            s = false;
         }
 
         r.request(true);
+        return s;
     }
 
-    public static function deleteChannelPermission(channel_id:String, overwrite_id:String)
+    public static function deleteChannelPermission(channel_id:String, overwrite_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/permissions/"+overwrite_id);
         var responseBytes = new BytesOutput();
     
@@ -894,6 +960,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -905,6 +972,7 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+        return s;
     }
 
     public static function followAnnouncementChannel(channel_id:String, id:String)
@@ -992,8 +1060,9 @@ Content-Type: application/json;';
         return thing;
     }
 
-    public static function pinMessage(channel_id:String, message_id:String)
+    public static function pinMessage(channel_id:String, message_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/pins/"+message_id);
         var responseBytes = new BytesOutput();
     
@@ -1004,6 +1073,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -1015,10 +1085,12 @@ Content-Type: application/json;';
     
         req.customRequest(false, responseBytes, "PUT");
         var response = responseBytes.getBytes();
+        return s;
     }
 
-    public static function unpinMessage(channel_id:String, message_id:String)
+    public static function unpinMessage(channel_id:String, message_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/pins/"+message_id);
         var responseBytes = new BytesOutput();
     
@@ -1029,6 +1101,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -1040,6 +1113,7 @@ Content-Type: application/json;';
     
         req.customRequest(false, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+        return s;
     }
 
     public static function groupDMAddRecipient(channel_id:String, user_id:String, access_token:String, nick:String)
@@ -1095,8 +1169,9 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
-    public static function startThreadFromMessage(channel_id:String, message_id:String, obj:FromMessage)
+    public static function startThreadFromMessage(channel_id:String, message_id:String, obj:FromMessage):Bool
     {
+        var s:Bool = true;
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/messages/" + message_id + "/threads");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -1117,13 +1192,16 @@ Content-Type: application/json;';
         {
             trace("An error has occurred: " + error);
             trace(r.responseData);
+            s = false;
         }
 
         r.request(true);
+        return s;
     }
 
-    public static function startThreadWithoutMessage(channel_id:String, message_id:String, obj:WithoutMessage)
+    public static function startThreadWithoutMessage(channel_id:String, message_id:String, obj:WithoutMessage):Bool
     {
+        var s:Bool = true;
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/threads");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -1144,13 +1222,16 @@ Content-Type: application/json;';
         {
             trace("An error has occurred: " + error);
             trace(r.responseData);
+            s = false;
         }
 
         r.request(true);
+        return s;
     }
 
-    public static function startThreadInForumChannel(channel_id:String, message_id:String, obj:ForumChannel)
+    public static function startThreadInForumChannel(channel_id:String, message_id:String, obj:ForumChannel):Bool
     {
+        var s:Bool = true;
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/threads");
     
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -1171,13 +1252,16 @@ Content-Type: application/json;';
         {
             trace("An error has occurred: " + error);
             trace(r.responseData);
+            s = false;
         }
        
         r.request(true);
+        return s;
     }
 
-    public static function joinThread(channel_id:String)
+    public static function joinThread(channel_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/thread-members/@me");
         var responseBytes = new BytesOutput();
     
@@ -1188,6 +1272,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -1199,10 +1284,12 @@ Content-Type: application/json;';
     
         req.customRequest(false, responseBytes, "PUT");
         var response = responseBytes.getBytes();
+        return s;
     }
 
-    public static function addThreadMember(channel_id:String, user_id:String)
+    public static function addThreadMember(channel_id:String, user_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/thread-members/" + user_id);
         var responseBytes = new BytesOutput();
     
@@ -1213,6 +1300,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -1224,10 +1312,12 @@ Content-Type: application/json;';
     
         req.customRequest(false, responseBytes, "PUT");
         var response = responseBytes.getBytes();
+        return s;
     }
 
-    public static function leaveThread(channel_id:String)
+    public static function leaveThread(channel_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/thread-members/@me");
         var responseBytes = new BytesOutput();
     
@@ -1238,6 +1328,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -1249,10 +1340,12 @@ Content-Type: application/json;';
     
         req.customRequest(false, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+        return s;
     }
 
-    public static function removeThreadMember(channel_id:String, user_id:String)
+    public static function removeThreadMember(channel_id:String, user_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/thread-members/" + user_id);
         var responseBytes = new BytesOutput();
     
@@ -1263,6 +1356,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -1274,6 +1368,7 @@ Content-Type: application/json;';
     
         req.customRequest(false, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+        return s;
     }
 
     public static function getThreadMember(channel_id:String, user_id:String)
@@ -1421,8 +1516,9 @@ Content-Type: application/json;';
         return thing;
     }
 
-    public static function modifyGuildRole(guild_id:String, role_id:String, data:hxdiscord.types.Typedefs.ModifyGuildRoleParams)
+    public static function modifyGuildRole(guild_id:String, role_id:String, data:hxdiscord.types.Typedefs.ModifyGuildRoleParams):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/roles/"+role_id);
         var responseBytes = new BytesOutput();
     
@@ -1434,6 +1530,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -1445,10 +1542,12 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "PATCH");
         var response = responseBytes.getBytes();
+        return s;
     }
 
-    public static function addGuildMemberRole(guild_id:String, user_id:String, role_id:String)
+    public static function addGuildMemberRole(guild_id:String, user_id:String, role_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
         var responseBytes = new BytesOutput();
     
@@ -1459,6 +1558,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -1470,10 +1570,12 @@ Content-Type: application/json;';
     
         req.customRequest(false, responseBytes, "PUT");
         var response = responseBytes.getBytes();
+        return s;
     }
 
-    public static function removeGuildMemberRole(guild_id:String, user_id:String, role_id:String)
+    public static function removeGuildMemberRole(guild_id:String, user_id:String, role_id:String):Bool
     {
+        var s:Bool = true;
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/"+user_id+"/roles/"+role_id);
         var responseBytes = new BytesOutput();
     
@@ -1484,6 +1586,7 @@ Content-Type: application/json;';
         req.onError = function(error:String) {
             trace("An error has occurred: " + error);
             trace(req.responseData);
+            s = false;
         };
         
         req.onStatus = function(status:Int) {
@@ -1495,6 +1598,7 @@ Content-Type: application/json;';
     
         req.customRequest(false, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+        return s;
     }
 
     //interactions
