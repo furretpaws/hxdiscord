@@ -72,3 +72,42 @@ typedef InteractionCallback = {
     @:optional var components:Array<Dynamic>;
     @:optional var attachments:Array<Dynamic>;
 }
+
+typedef ChannelInvite = {
+    var max_age:Int;
+    var max_uses:Int;
+    var temporary:Bool;
+    var unique:Bool;
+    var target_type:Int;
+    var target_user_id:String;
+    var target_application_id:String;
+}
+
+typedef ApplicationCommandPermissionsUpdate = {
+    var guild_id:String;
+    var action:Dynamic;
+    var rule_id:String;
+    var rule_trigger_type:Dynamic;
+    var user_id:String;
+    @:optional var channel_id:String;
+    @:optional var message_id:String;
+    @:optional var alert_system_message_id:String;
+    @:optional var content:String;
+    @:optional var matched_keyword:String;
+    @:optional var matched_content:String;
+}
+
+typedef Channel = {
+    var id:String;
+    var type:Int;
+    @:optional var guild_id:String;
+    @:optional var position:Int;
+    @:optional var permission_overwrites:Array<Dynamic>;
+    @:optional var name:String;
+    @:optional var topic:String;
+    @:optional var nsfw:Bool;
+    @:optional var last_message_id:String;
+    @:optional var bitrate:Int;
+    @:optional var user_limit:Int;
+    @:optional var rate_limit_per_user:Int;
+}

@@ -51,10 +51,6 @@ class WebSocketConnection {
         this.ws.sendString(haxe.Json.stringify(j));
     }
 
-    public inline function sendJSON(j:Dynamic) {
-        this.ws.sendString(haxe.Json.stringify(j));
-    }
-
     dynamic public function onClose(code:Int) { }
     dynamic public function onReady() { }
     dynamic public function onMessage(m) { }

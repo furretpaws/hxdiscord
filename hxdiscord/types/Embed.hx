@@ -17,7 +17,7 @@ class Embed{
 
     public function new()
     {
-
+        fields = new Array<hxdiscord.types.structTypes.Embed.EmbedField>();
     }
 
     public function setTitle(title:String)

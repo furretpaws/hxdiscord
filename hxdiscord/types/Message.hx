@@ -2,6 +2,7 @@ package hxdiscord.types;
 
 import hxdiscord.DiscordClient;
 import hxdiscord.types.structTypes.*;
+import hxdiscord.types.structTypes.Thread.FromMessage;
 import hxdiscord.types.structTypes.MessageS;
 import hxdiscord.types.Typedefs;
 import hxdiscord.endpoints.Endpoints;
@@ -94,6 +95,31 @@ class Message
     public function deleteMessage()
     {
         Endpoints.deleteMessage(channel_id, id);
+    }
+
+    public function pin()
+    {
+        Endpoints.pinMessage(channel_id, id);
+    }
+
+    public function pinMessage()
+    {
+        Endpoints.pinMessage(channel_id, id);
+    }
+
+    public function unpin()
+    {
+        Endpoints.unpinMessage(channel_id, id);
+    }
+
+    public function unpinMessage()
+    {
+        Endpoints.unpinMessage(channel_id, id);
+    }
+
+    public function createThread(obj:FromMessage)
+    {
+        Endpoints.startThreadFromMessage(channel_id, id, obj);
     }
     
     public function editMessage(m:hxdiscord.types.Typedefs.MessageCreate)

@@ -4,6 +4,9 @@
 
 package hxdiscord.endpoints;
 
+import hxdiscord.types.structTypes.Thread.ForumChannel;
+import hxdiscord.types.structTypes.Thread.WithoutMessage;
+import hxdiscord.types.structTypes.Thread.FromMessage;
 import hxdiscord.types.Typedefs.ModifyGuildParams;
 import hxdiscord.utils.Https;
 import hxdiscord.DiscordClient;
@@ -342,9 +345,10 @@ Content-Type: application/json;';
                 }
                 body += '--boundary\n';
                 body += 'Content-Disposition: form-data; name="files[' + i + ']"; filename="' + filename + '"' + "\n";
-                body += 'Content-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(filename);
+                body += 'Content-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(filename) + ";base64";
                 body += '\n\n';
-                var input = sys.io.File.getBytes(json.attachments[i].filename);
+                var input = haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(sys.io.File.getBytes(json.attachments[i].filename).toString()));
+                trace(input); // SGVsbG8gd29ybGQh
                 body += input + "\n";
             }
             body += '--boundary--';
@@ -820,6 +824,601 @@ Content-Type: application/json;';
     
         req.customRequest(true, responseBytes, "DELETE");
         var response = responseBytes.getBytes();
+    }
+
+    public static function getChannelInvites(channel_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        var thing:String = "";
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+            thing = data;
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request();
+
+        return thing;
+    }
+
+    public static function createChannelInvite(channel_id:String, obj:hxdiscord.types.Typedefs.ChannelInvite)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        r.setPostData(haxe.Json.stringify(obj));
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(true);
+    }
+
+    public static function deleteChannelPermission(channel_id:String, overwrite_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/permissions/"+overwrite_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Content-Type", "application/json");
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(true, responseBytes, "DELETE");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function followAnnouncementChannel(channel_id:String, id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        r.setPostData(haxe.Json.stringify({
+            webhook_channel_id: id
+        }));
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(true);
+    }
+
+    public static function triggerTypingIndicator(channel_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/typing");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        r.setPostData("");
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(true);
+    }
+
+    public static function getPinnedMessages(channel_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/pins");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        var thing:String = null;
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+                thing = data;
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(false);
+        return thing;
+    }
+
+    public static function pinMessage(channel_id:String, message_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/pins/"+message_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "PUT");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function unpinMessage(channel_id:String, message_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/pins/"+message_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "DELETE");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function groupDMAddRecipient(channel_id:String, user_id:String, access_token:String, nick:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/recipients/"+user_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData(haxe.Json.stringify({
+            access_token: access_token,
+            nick: nick
+        }));
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "PUT");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function groupDMRemoveRecipient(channel_id:String, user_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/recipients/"+user_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "DELETE");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function startThreadFromMessage(channel_id:String, message_id:String, obj:FromMessage)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/messages/" + message_id + "/threads");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        r.setPostData(haxe.Json.stringify(obj));
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(true);
+    }
+
+    public static function startThreadWithoutMessage(channel_id:String, message_id:String, obj:WithoutMessage)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/threads");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        r.setPostData(haxe.Json.stringify(obj));
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(true);
+    }
+
+    public static function startThreadInForumChannel(channel_id:String, message_id:String, obj:ForumChannel)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/threads");
+    
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+    
+        r.setPostData(haxe.Json.stringify(obj));
+    
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+        }
+       
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+       
+        r.request(true);
+    }
+
+    public static function joinThread(channel_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/thread-members/@me");
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "PUT");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function addThreadMember(channel_id:String, user_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/thread-members/" + user_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "PUT");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function leaveThread(channel_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/thread-members/@me");
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "DELETE");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function removeThreadMember(channel_id:String, user_id:String)
+    {
+        var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/thread-members/" + user_id);
+        var responseBytes = new BytesOutput();
+    
+        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.setPostData("");
+    
+        req.onError = function(error:String) {
+            trace("An error has occurred: " + error);
+            trace(req.responseData);
+        };
+        
+        req.onStatus = function(status:Int) {
+            if (DiscordClient.debug)
+            {
+                trace(status);
+            }
+        };
+    
+        req.customRequest(false, responseBytes, "DELETE");
+        var response = responseBytes.getBytes();
+    }
+
+    public static function getThreadMember(channel_id:String, user_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/thread-members/" + user_id);
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        var thing:String = null;
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+                thing = data;
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(false);
+        return thing;
+    }
+
+    public static function listThreadMembers(channel_id:String, user_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/thread-members/");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        var thing:String = null;
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+                thing = data;
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(false);
+        return thing;
+    }
+
+    public static function listPublicArchivedThreads(channel_id:String, user_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/thread-members/archived/public");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        var thing:String = null;
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+                thing = data;
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(false);
+        return thing;
+    }
+
+    public static function listPrivateArchivedThreads(channel_id:String, user_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/thread-members/archived/public");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        var thing:String = null;
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+                thing = data;
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(false);
+        return thing;
+    }
+
+    public static function listJoinedPrivateArchivedThreads(channel_id:String, user_id:String)
+    {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/users/@me/thread-members/archived/private");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+
+        var thing:String = null;
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+                thing = data;
+            }
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request(false);
+        return thing;
     }
 
     public static function modifyGuildRole(guild_id:String, role_id:String, data:hxdiscord.types.Typedefs.ModifyGuildRoleParams)
