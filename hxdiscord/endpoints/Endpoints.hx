@@ -37,6 +37,11 @@ class Endpoints
 
     //dm
 
+    /**
+        Creates a DM chat with a specified user ID
+        @param userID The user ID
+    **/
+
     public static function createDM(userID:String):String
     {
         var _data:String;
@@ -99,6 +104,13 @@ class Endpoints
 
         return user;
     }
+
+    /**
+        Check if the user has a specific permission
+        @param userID The ID of the user you want to check
+        @param guildID The ID of the guild where the user is in
+        @param permissionToLookFor The permission which you wanna look for. (Example: ADMINISTRATOR)
+    **/
 
     public static function hasPermission(userID:String, guild_id:String, permissionToLookFor:String)
     {
@@ -170,6 +182,12 @@ class Endpoints
 
         return user;
     }
+
+    /**
+        Returns a GuildMember object of a user
+        @param guild_id The guild id where the user is in
+        @param id The user ID
+    **/
 
     public static function getGuildMember(guild_id:String, id:String):hxdiscord.types.Member
     {
@@ -475,6 +493,13 @@ Content-Type: application/json;';
 
     //reactions
 
+    /**
+        React to a message
+        @param channel_id The channel id where the message is located
+        @param message_id The id of the message you wanna react to
+        @param emoji The emoji itself
+    **/
+
     public static function createReaction(channel_id:String, message_id:String, emoji:String)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/@me");
@@ -499,6 +524,13 @@ Content-Type: application/json;';
 		req.customRequest(false, responseBytes, "PUT");
 		var response = responseBytes.getBytes();
     }
+
+    /**
+        Remove your own reaction from a message
+        @param channel_id The channel id where the message is located
+        @param message_id The id of the message you wanna remove the reaction
+        @param emoji The emoji itself
+    **/
 
     public static function deleteOwnReaction(channel_id:String, message_id:String, emoji:String)
     {
@@ -525,6 +557,14 @@ Content-Type: application/json;';
 		var response = responseBytes.getBytes();
     }
 
+    /**
+        Remove a user reaction
+        @param channel_id The channel id where the message is located
+        @param message_id The id of the message you wanna remove the reaction
+        @param emoji The emoji itself
+        @param user_id The ID of the user
+    **/
+
     public static function deleteUserReaction(channel_id:String, message_id:String, emoji:String, user_id:String)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/" + user_id);
@@ -549,6 +589,12 @@ Content-Type: application/json;';
 		req.customRequest(false, responseBytes, "DELETE");
 		var response = responseBytes.getBytes();
     }
+
+    /**
+        Remove ALL reactions
+        @param channel_id The channel id where the message is located
+        @param message_id The id of the message
+    **/
     
     public static function deleteAllReactions(channel_id:String, message_id:String)
     {
@@ -574,6 +620,13 @@ Content-Type: application/json;';
 		req.customRequest(false, responseBytes, "DELETE");
 		var response = responseBytes.getBytes();
     }
+
+    /**
+        Remove ALL reactions for an specific emoji
+        @param channel_id The channel id where the message is located
+        @param message_id The id of the message
+        @param emoji The emoji itself
+    **/
 
     public static function deleteAllReactionsForEmoji(channel_id:String, message_id:String, emoji:String)
     {
@@ -745,6 +798,13 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
         return s;
     }
+    
+    /**
+        Modify a member of a guild
+        @param guild_id The ID of the guild
+        @param user_id The ID of the user you want to modify
+        @param d The request object
+    **/
 
     public static function modifyGuildMember(guild_id:String, user_id:String, d:hxdiscord.types.Typedefs.ModifyGuildMemberParams):Bool {
         var s:Bool = true;
@@ -773,6 +833,12 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
         return s;
     }
+
+    /**
+        Modifies a guild
+        @param guild_id The ID of the guild
+        @param params The request object
+    **/
 
     public static function modifyGuild(guild_id:String, params:hxdiscord.types.Typedefs.ModifyGuildParams):Bool
     {
@@ -803,6 +869,11 @@ Content-Type: application/json;';
         return s;
     }
 
+    /**
+        Returns a JSON object representing all the channels in a guild
+        @param guild_id The ID of the guild
+    **/
+
     public static function getGuildChannels(guild_id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + guild_id + "/channels");
@@ -831,6 +902,11 @@ Content-Type: application/json;';
         return thing;
     }
 
+    /**
+        Removes a guild (This will only work if you're the owner of the guild)
+        @param guild_id The ID of the guild you want to remove
+    **/
+
     public static function deleteGuild(guild_id:String):Bool
     {
         var s:Bool = true;
@@ -858,6 +934,12 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
         return s;
     }
+
+    /**
+        Edit channel's permissions
+        @param channel_id The ID of the channel
+        @param overwrite_id The ID of the role you want to over
+    **/
 
     public static function editChannelPermissions(channel_id:String, overwrite_id:String, data:Dynamic):Bool
     {
@@ -888,6 +970,11 @@ Content-Type: application/json;';
         return s;
     }
 
+    /**
+        Returns a JSON representation of the invites from the channel
+        @param channel_id The ID of the channel
+    **/
+
     public static function getChannelInvites(channel_id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
@@ -916,9 +1003,15 @@ Content-Type: application/json;';
         return thing;
     }
 
-    public static function createChannelInvite(channel_id:String, obj:hxdiscord.types.Typedefs.ChannelInvite):Bool
+    /**
+        Creates a channel invite
+        @param channel_id The id of the channel
+        @param obj The request object
+    **/
+
+    public static function createChannelInvite(channel_id:String, obj:hxdiscord.types.Typedefs.ChannelInvite):String
     {
-        var s:Bool = false;
+        var thing:String = "";
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
@@ -929,6 +1022,7 @@ Content-Type: application/json;';
 
         r.onData = function(data:String)
         {
+            thing = data;
             if (DiscordClient.debug)
             {
                 trace(data);
@@ -939,12 +1033,17 @@ Content-Type: application/json;';
         {
             trace("An error has occurred: " + error);
             trace(r.responseData);
-            s = false;
         }
 
         r.request(true);
-        return s;
+        return thing;
     }
+
+    /**
+        Delete channel permission
+        @param channel_id The ID of the channel
+        @param overwrite_id The overwrite ID of the permission
+    **/
 
     public static function deleteChannelPermission(channel_id:String, overwrite_id:String):Bool
     {
@@ -975,6 +1074,12 @@ Content-Type: application/json;';
         return s;
     }
 
+    /**
+        Follows an announcement channel
+        @param channel_id The ID of the channel to follow
+        @param id
+    **/
+
     public static function followAnnouncementChannel(channel_id:String, id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
@@ -1003,6 +1108,11 @@ Content-Type: application/json;';
 
         r.request(true);
     }
+
+    /**
+        Triggers the typing indicator on a channel
+        @param channel_id The channel ID on which to trigger the typing indicator
+    **/
 
     public static function triggerTypingIndicator(channel_id:String)
     {
@@ -1060,6 +1170,12 @@ Content-Type: application/json;';
         return thing;
     }
 
+    /**
+        Pin a message to the channel
+        @param channel_id The channel ID where the message is located on
+        @param message_id The message ID
+    **/
+
     public static function pinMessage(channel_id:String, message_id:String):Bool
     {
         var s:Bool = true;
@@ -1087,6 +1203,12 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
         return s;
     }
+
+    /**
+        Unpin a message from the channel
+        @param channel_id The id of the channel where the message is located on
+        @param message_id The id of the message you want to unpin
+    **/
 
     public static function unpinMessage(channel_id:String, message_id:String):Bool
     {
@@ -1116,6 +1238,7 @@ Content-Type: application/json;';
         return s;
     }
 
+    @:dox(hide)
     public static function groupDMAddRecipient(channel_id:String, user_id:String, access_token:String, nick:String)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/recipients/"+user_id);
@@ -1144,6 +1267,7 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
+    @:dox(hide)
     public static function groupDMRemoveRecipient(channel_id:String, user_id:String)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/recipients/"+user_id);
@@ -1169,6 +1293,12 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
     }
 
+    /**
+        Starts a new thread from a message
+        @param channel_id The channel ID where the message is located in/where to start a thread
+        @param message_id The message ID you want to start a thread from
+        @param obj The request object
+    **/
     public static function startThreadFromMessage(channel_id:String, message_id:String, obj:FromMessage):Bool
     {
         var s:Bool = true;
@@ -1199,7 +1329,13 @@ Content-Type: application/json;';
         return s;
     }
 
-    public static function startThreadWithoutMessage(channel_id:String, message_id:String, obj:WithoutMessage):Bool
+    /**
+        Starts a new thread without a message
+        @param channel_id The id of the channel
+        @param obj The object request
+    **/
+
+    public static function startThreadWithoutMessage(channel_id:String, obj:WithoutMessage):Bool
     {
         var s:Bool = true;
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/threads");
@@ -1259,6 +1395,11 @@ Content-Type: application/json;';
         return s;
     }
 
+    /**
+        Join a thread
+        @param channel_id The channel ID
+    **/
+
     public static function joinThread(channel_id:String):Bool
     {
         var s:Bool = true;
@@ -1286,6 +1427,12 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
         return s;
     }
+
+    /**
+        Add a member to a thread
+        @param channel_id The ID of the thread
+        @param user_id The ID of the user
+    **/
 
     public static function addThreadMember(channel_id:String, user_id:String):Bool
     {
@@ -1315,6 +1462,11 @@ Content-Type: application/json;';
         return s;
     }
 
+    /**
+        Leave a thread
+        @param channel_id The ID of the channel
+    **/
+
     public static function leaveThread(channel_id:String):Bool
     {
         var s:Bool = true;
@@ -1342,6 +1494,12 @@ Content-Type: application/json;';
         var response = responseBytes.getBytes();
         return s;
     }
+
+    /**
+        Kick a member from a thread
+        @param channel_id The channel ID
+        @param user_id The ID of the user
+    **/
 
     public static function removeThreadMember(channel_id:String, user_id:String):Bool
     {
@@ -1371,6 +1529,12 @@ Content-Type: application/json;';
         return s;
     }
 
+    /**
+        Returns the information about a thread member
+        @param channel_id
+        @param user_id
+    **/
+
     public static function getThreadMember(channel_id:String, user_id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/thread-members/" + user_id);
@@ -1399,6 +1563,12 @@ Content-Type: application/json;';
         r.request(false);
         return thing;
     }
+
+    /**
+        Returns a list of the thread members that are in a thread
+        @param channel_id The ID of the channel
+        @param user_id The ID of the user
+    **/
 
     public static function listThreadMembers(channel_id:String, user_id:String)
     {

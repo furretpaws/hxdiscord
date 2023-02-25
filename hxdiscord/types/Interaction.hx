@@ -85,7 +85,7 @@ class Interaction
         }
         else
         {
-            daThing = "No value found";
+            daThing = null;
         }
         return daThing;
     }
