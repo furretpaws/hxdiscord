@@ -1867,7 +1867,7 @@ Content-Type: application/json;';
     }
 
     /**
-        Send the interaction callback
+        Send the interaction callback for modals only!
     **/
     public static function showInteractionModal(imc:Array<hxdiscord.types.message.ActionRow>, interactionID:String, interactionToken:String, type:Int, title:String, custom_id:String)
     {
@@ -1904,6 +1904,10 @@ Content-Type: application/json;';
         }
         r.request(true);
     }
+
+    /**
+        Send the interaction callback
+    **/
     public static function sendInteractionCallback(ic:hxdiscord.types.Typedefs.InteractionCallback, interactionID:String, interactionToken:String, type:Int, ?ephemeral:Bool)
     {
         var response:String;
@@ -1931,7 +1935,7 @@ Content-Type: application/json;';
         if (attachments)
         {
             var newJson:Dynamic = haxe.Json.parse(haxe.Json.stringify({
-                "type": 4,
+                "type": type,
                 "data": ic
             }));
             var filename:String = "";
@@ -1947,7 +1951,7 @@ Content-Type: application/json;';
         else
         {
             body += haxe.Json.stringify({
-                "type": 4,
+                "type": type,
                 "data": ic
             });
         }

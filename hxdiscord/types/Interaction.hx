@@ -61,7 +61,12 @@ class Interaction
 
     public function reply(ic:hxdiscord.types.Typedefs.InteractionCallback, ?ephemeral:Bool)
     {
-        Endpoints.sendInteractionCallback(ic, intId, token, type, ephemeral);
+        Endpoints.sendInteractionCallback(ic, intId, token, 4, ephemeral);
+    }
+
+    public function editComponent(ic:hxdiscord.types.Typedefs.InteractionCallback)
+    {
+        Endpoints.sendInteractionCallback(ic, intId, token, 7);
     }
 
     public function showModal(title:String, custom_id:String, imc:Array<hxdiscord.types.message.ActionRow>)
