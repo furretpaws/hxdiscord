@@ -390,8 +390,7 @@ Content-Type: application/json;';
                 body += 'Content-Disposition: form-data; name="files[' + i + ']"; filename="' + filename + '"' + "\n";
                 body += 'Content-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(filename) + ";base64";
                 body += '\n\n';
-                var input = haxe.crypto.Base64.encode(haxe.io.Bytes.ofString(sys.io.File.getBytes(json.attachments[i].filename).toString()));
-                trace(input); // SGVsbG8gd29ybGQh
+                var input = sys.io.File.getBytes(json.attachments[i].filename).toString();
                 body += input + "\n";
             }
             body += '--boundary--';
@@ -978,6 +977,39 @@ Content-Type: application/json;';
     public static function getChannelInvites(channel_id:String)
     {
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        var thing:String = "";
+
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+            thing = data;
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.request();
+
+        return thing;
+    }
+
+    /**
+        Returns a JSON object containing the messages you wanted. Also, read https://discord.com/developers/docs/resources/channel#get-channel-messages
+        @param channel_id The channel ID to get the messages
+        @param obj The JSON object (Read API)
+    **/
+
+    public static function getChannelMessages(channel_id:String, limit:Int) {
+        var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/messages?limit=" + limit);
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
@@ -1864,6 +1896,32 @@ Content-Type: application/json;';
             trace(response);
         }
     	return Json.parse(response.toString());
+    }
+
+    public static function bulkDeleteMessages(channel_id:String, messages:Array<String>)
+    {
+        var r:haxe.Http;
+
+        r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/bulk-delete");
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.setPostData(haxe.Json.stringify({
+            messages: messages
+        }));
+        r.onData = function(_data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(_data);
+            }
+        }
+        r.onError = function(error)
+        {
+            throw("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+        r.request(true);
     }
 
     /**
