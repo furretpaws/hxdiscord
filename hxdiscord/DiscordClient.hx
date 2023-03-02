@@ -240,6 +240,28 @@ class DiscordClient
                     trace(author + ": " + content);
                 }*/
                 onMessageCreate(nMessage(d, d));
+            case 'THREAD_MEMBER_UPDATE':
+                onThreadMemberUpdate(d);
+            case 'THREAD_MEMBERS_UPDATE':
+                onThreadMembersUpdate(d);
+            case 'GUILD_CREATE':
+                onGuildCreate(d);
+            case 'GUILD_UPDATE':
+                onGuildUpdate(d);
+            case 'GUILD_DELETE':
+                onGuildDelete(d);
+            case "GUILD_BAN_ADD":
+                onGuildBanAdd(d);
+            case "GUILD_BAN_REMOVE":
+                onGuildBanRemove(d);
+            case 'GUILD_AUDIT_LOG_ENTRY_CREATE':
+                onGuildAuditLogEntryCreate(d);
+            case 'GUILD_MEMBER_ADD':
+                onGuildMemberAdd(d);
+            case "GUILD_MEMBER_REMOVE":
+                onGuildMemberRemove(d);
+            case "GUILD_MEMBER_UPDATE":
+                onGuildMemberUpdate(d);
         }
     }
 
@@ -472,5 +494,102 @@ class DiscordClient
     dynamic public function onMessageCreate(m:Message)
     {
 
+    }
+    
+    /**
+        Event hook for THREAD_MEMBER_UPDATE
+    **/
+
+    dynamic public function onThreadMemberUpdate(d:hxdiscord.types.Typedefs.ThreadMemberUpdate)
+    {
+
+    }
+
+    /**
+        Event hook for THREAD_MEMBERS_UPDATE
+    **/
+
+    dynamic public function onThreadMembersUpdate(d:hxdiscord.types.Typedefs.ThreadMembersUpdate)
+    {
+
+    }
+
+    /**
+        Event hook for GUILD_CREATE
+    **/
+
+    dynamic public function onGuildCreate(d:hxdiscord.types.Typedefs.GuildCreate) {
+
+    }
+
+    /**
+        Event hook for GUILD_UPDATE
+    **/
+
+    dynamic public function onGuildUpdate(d:hxdiscord.types.structTypes.Guild)
+    {
+
+    }
+
+    /**
+        Event hook for GUILD_DELETE
+    **/
+
+    dynamic public function onGuildDelete(d:hxdiscord.types.structTypes.Guild) {
+
+    }
+
+    /**
+        Event hook for GUILD_BAN_ADD
+    **/
+
+    dynamic public function onGuildBanAdd(d:hxdiscord.types.Typedefs.GuildBanAddEventFields)
+    {
+
+    }
+
+    /**
+        Event hook for GUILD_BAN_REMOVE
+    **/
+
+    dynamic public function onGuildBanRemove(d:hxdiscord.types.Typedefs.GuildBanRemoveEventFields)
+    {
+
+    }
+
+    /**
+        Event hook for GUILD_AUDIT_LOG_ENTRY_CREATE
+    **/
+
+    dynamic public function onGuildAuditLogEntryCreate(d:hxdiscord.types.Typedefs.AuditLogEntryStructure)
+    {
+
+    }
+
+    /**
+        Event hook for GUILD_MEMBER_ADD
+    **/
+
+    dynamic public function onGuildMemberAdd(d:Dynamic)
+    {
+
+    }
+
+    /**
+        Event hook for GUILD_MEMBER_REMOVE
+    **/
+
+    dynamic public function onGuildMemberRemove(d:hxdiscord.types.Typedefs.GuildBanRemoveEventFields)
+    {
+
+    }
+
+    /**
+        Event hook for GUILD_MEMBER_UPDATE
+    **/
+
+    dynamic public function onGuildMemberUpdate(d:hxdiscord.types.structTypes.GuildMember)
+    {
+        
     }
 }

@@ -13,6 +13,55 @@ typedef MessageCreate = {
     @:optional var attachments:Array<Dynamic>;
 }
 
+typedef AuditLogChangeStructure = {
+    new_value:Dynamic,
+    old_value:Dynamic,
+    key:String
+}
+
+typedef OptionalAuditEntryInfo = {
+    application_id:String,
+    auto_moderation_rule_name:String,
+    auto_moderation_rule_trigger_type:String,
+    channel_id:String,
+    count:String,
+    delete_member_days:String,
+    id:String,
+    members_removed:String,
+    message_id:String,
+    role_name:String,
+    type:String
+}
+
+typedef AuditLogEntryStructure = {
+    target_id:String,
+    ?changes:Array<AuditLogChangeStructure>,
+    user_id:String,
+    id:String,
+    action_type:Int,
+    options:OptionalAuditEntryInfo,
+    reason:String
+}
+
+typedef GuildBanAddEventFields = {
+    guild_id:String,
+    user:hxdiscord.types.structTypes.UserS
+}
+
+typedef GuildBanRemoveEventFields = {
+    guild_id:String,
+    user:hxdiscord.types.structTypes.UserS
+}
+
+typedef GuildMemberAdd = {
+    guild_id:String
+}
+
+typedef GuildMemberRemove = {
+    guild_id:String,
+    user:hxdiscord.types.structTypes.UserS
+}
+
 typedef ModifyGuildParams = {
     @:optional var name:String;
     @:optional var region:String;
@@ -40,6 +89,40 @@ typedef ModifyGuildRoleParams = {
     @:optional var icon:Dynamic;
     @:optional var unicode_emoji:String;
     @:optional var mentionable:Bool;
+}
+
+typedef ThreadMemberUpdate = {
+    guild_id:String
+}
+
+typedef ThreadMembersUpdate = {
+    id:String,
+    guild_id:String,
+    member_count:Int,
+    ?added_members:Array<ThreadMemberObject>,
+    removed_member_ids:Array<String>
+}
+
+typedef ThreadMemberObject = {
+    ?id:String,
+    ?user_id:String,
+    join_timestamp:String,
+    flags:Int,
+    ?member:hxdiscord.types.structTypes.GuildMember
+}
+
+typedef GuildCreate = {
+    joined_at:String,
+    large:Bool,
+    ?unavailable:Bool,
+    member_count:Int,
+    voice_states:Array<Dynamic>,
+    members:Array<hxdiscord.types.structTypes.GuildMember>,
+    channels:Array<Channel>,
+    threads:Array<Channel>,
+    presences:Array<Dynamic>,
+    stage_instances:Array<Dynamic>,
+    guild_scheduled_events:Array<Dynamic>
 }
 
 typedef ComponentArray = {
