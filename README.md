@@ -1,4 +1,5 @@
-# hxdiscord
+![hxdiscord](https://user-images.githubusercontent.com/99131021/222229452-cffd2b4f-0a7f-47a4-946f-5c568f64de1d.png)
+## hxdiscord
 
 hxdiscord is a Discord API Wrapper for Haxe.
 ## Installation
@@ -18,6 +19,11 @@ I don't know how many targets does hxdiscord support, since I've not tried them 
 - ✅ C++ (Does not support attachments)
 - ✅ Neko (Supports attachments - Recommended)
 - ✅ HashLink (Does not support attachments)
+
+## Need help with something?
+
+Feel free to join our Discord server. Here you can talk with the developer, make questions or even ask for help!
+https://discord.gg/gKQh5cC59w
 
 ## Example
 
