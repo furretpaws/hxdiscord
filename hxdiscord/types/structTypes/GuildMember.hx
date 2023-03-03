@@ -12,7 +12,7 @@ typedef GuildMember = {
     @:optional var joined_at:Date;
     @:optional var flags:Int;
     @:optional var deaf:Bool;
-    @:optional var communication_disabled_until:haxe.extern.EitherType<Date, String>;
+    @:optional var communication_disabled_until:String;
     @:optional var avatar:Dynamic;
     @:optional var permissions:String;
 }

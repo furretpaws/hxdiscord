@@ -12,7 +12,7 @@ class Member {
     public var flags:Int;
     public var pending:Bool;
     public var permissions:String;
-    public var communication_disabled_until:Date;
+    public var communication_disabled_until:String;
     public var guild_id:String;
     public var id:String;
     public function new(d:hxdiscord.types.structTypes.GuildMember, gi:String) {
@@ -29,7 +29,6 @@ class Member {
         this.permissions = d.permissions;
         this.communication_disabled_until = d.communication_disabled_until;
         this.guild_id = gi;
-        trace(this.guild_id);
     }
     public function ban(?reason:String):Bool {
         return hxdiscord.endpoints.Endpoints.createGuildBan(user.id, guild_id, reason);
@@ -73,9 +72,10 @@ class Member {
         });
     }
 
-    public function setTimeout(d:Date):Bool {
+    public function setTimeout(d:String):Bool {
+        var daTime:String = hxdiscord.utils.ISO8601Resolver.getCalculatedISODate(d);
         return hxdiscord.endpoints.Endpoints.modifyGuildMember(guild_id, user.id, {
-            communication_disabled_until: d
+            communication_disabled_until: daTime
         });
     }
 

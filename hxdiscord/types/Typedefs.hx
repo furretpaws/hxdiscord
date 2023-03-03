@@ -172,7 +172,7 @@ typedef ModifyGuildMemberParams = {
     @:optional var mute:Bool;
     @:optional var deaf:Bool;
     @:optional var channel_id:String;
-    @:optional var communication_disabled_until:Date;
+    @:optional var communication_disabled_until:String;
     @:optional var flags:Int;
 }
 
