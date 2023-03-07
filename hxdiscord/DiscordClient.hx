@@ -115,10 +115,15 @@ class DiscordClient
                 connect();
             };
             ws.onError = (e) -> {
-                throw("Websocket gave an error.");
+                 throw("Websocket gave an error. (" + e + ")");
             }
         } catch (err) {
-            throw(err);
+            if (err == "ssl@ssl_close") {
+                return;
+            }
+            else {
+                throw err;
+            }
         }
     }
 
