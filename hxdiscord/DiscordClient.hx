@@ -140,10 +140,12 @@ class DiscordClient
         var event = json.event;
         var op = json.op;
         var d:Dynamic = json.d;
+        #if (!hl)
         if (json.s != null)
         {
             sequence = json.s;
         }
+        #end
         switch (json.op)
         {
             case 10:
