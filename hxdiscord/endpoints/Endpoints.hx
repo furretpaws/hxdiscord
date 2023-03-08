@@ -49,7 +49,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         r.setPostData(haxe.Json.stringify({
             recipient_id: userID
@@ -85,7 +85,7 @@ class Endpoints
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/users/@me");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         var user:hxdiscord.types.User = null;
 
@@ -117,7 +117,7 @@ class Endpoints
         var hasPermission:Bool = false;
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/members/" + userID);
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
 
 		r.onData = function(dataG:String)
@@ -163,7 +163,7 @@ class Endpoints
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/users/" + id);
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         var user:hxdiscord.types.User = null;
 
@@ -194,7 +194,7 @@ class Endpoints
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + guild_id + "/members/" + id);
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         var guildmember:hxdiscord.types.Member = null;
 
@@ -224,7 +224,7 @@ class Endpoints
         //trace("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/"+guild_id+"/roles/");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token); //WHY DO I KEEP ADDING MY TOKEN TO THE SOURCE? :SOB:
+        r.addHeader("Authorization", DiscordClient.authHeader); //WHY DO I KEEP ADDING MY TOKEN TO THE SOURCE? :SOB:
 
         var response:String = "";
 
@@ -261,7 +261,7 @@ class Endpoints
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
 		req.addHeader("Content-type", "application/json");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
     
     	req.onError = function(error:String) {
             trace("An error has occurred: " + error);
@@ -293,7 +293,7 @@ class Endpoints
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         req.addHeader("Content-type", "application/json");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData(haxe.Json.stringify(m));
     
         req.onError = function(error:String) {
@@ -403,11 +403,13 @@ class Endpoints
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/messages");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
         r.addHeader("Content-Type", "multipart/form-data; boundary=boundary");
 
         //trace(body);
         r.setPostBytes(bytesOutput.getBytes());
+
+        var daRealResponse:Dynamic = "";
 
         r.onData = function(data:String)
         {
@@ -426,6 +428,12 @@ class Endpoints
 
         r.request(true);
 
+        try {
+            daRealResponse = haxe.Json.parse(response);
+        } catch (e) {
+            daRealResponse = response;
+        }
+
         return haxe.Json.parse(response);
     }
 
@@ -442,7 +450,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         r.setPostData(haxe.Json.stringify(data));
 
@@ -470,7 +478,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         r.setPostData(haxe.Json.stringify(data));
 
@@ -506,7 +514,7 @@ class Endpoints
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
     	req.onError = function(error:String) {
@@ -538,7 +546,7 @@ class Endpoints
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
     	req.onError = function(error:String) {
@@ -571,7 +579,7 @@ class Endpoints
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
     	req.onError = function(error:String) {
@@ -602,7 +610,7 @@ class Endpoints
 		var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
     	req.onError = function(error:String) {
@@ -634,7 +642,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -666,7 +674,7 @@ class Endpoints
         var guild:hxdiscord.types.Guild = null;
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
 		r.onData = function(data:String)
 		{
@@ -703,7 +711,7 @@ class Endpoints
         {
             req.addHeader("X-Audit-Log-Reason", reason);
         }
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
 
         req.setPostData(haxe.Json.stringify({
             delete_message_days: 0,
@@ -740,7 +748,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
 
     
         req.onError = function(error:String) {
@@ -774,7 +782,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         if (reason != null)
         {
             req.addHeader("X-Audit-Log-Reason", reason);
@@ -812,7 +820,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.addHeader("Content-Type", "application/json");
         req.setPostData(haxe.Json.stringify(d));
     
@@ -847,7 +855,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.addHeader("Content-Type", "application/json");
         req.setPostData(haxe.Json.stringify(params));
     
@@ -879,7 +887,7 @@ class Endpoints
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + guild_id + "/channels");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
         var thing:String = "";
 
         r.onData = function(data:String)
@@ -914,7 +922,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -948,7 +956,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.addHeader("Content-Type", "application/json");
         req.setPostData(haxe.Json.stringify(data));
     
@@ -980,7 +988,7 @@ class Endpoints
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
         var thing:String = "";
 
         r.onData = function(data:String)
@@ -1013,7 +1021,7 @@ class Endpoints
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/messages?limit=" + limit);
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
         var thing:String = "";
 
         r.onData = function(data:String)
@@ -1049,7 +1057,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         r.setPostData(haxe.Json.stringify(obj));
 
@@ -1085,7 +1093,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.addHeader("Content-Type", "application/json");
         req.setPostData("");
     
@@ -1119,7 +1127,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         r.setPostData(haxe.Json.stringify({
             webhook_channel_id: id
@@ -1153,7 +1161,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         r.setPostData("");
 
@@ -1180,7 +1188,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         var thing:String = null;
 
@@ -1216,7 +1224,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -1250,7 +1258,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -1278,7 +1286,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData(haxe.Json.stringify({
             access_token: access_token,
             nick: nick
@@ -1307,7 +1315,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -1339,7 +1347,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         r.setPostData(haxe.Json.stringify(obj));
 
@@ -1375,7 +1383,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         r.setPostData(haxe.Json.stringify(obj));
 
@@ -1405,7 +1413,7 @@ class Endpoints
     
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
     
         r.setPostData(haxe.Json.stringify(obj));
     
@@ -1440,7 +1448,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -1474,7 +1482,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -1507,7 +1515,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -1541,7 +1549,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -1574,7 +1582,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         var thing:String = null;
 
@@ -1609,7 +1617,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         var thing:String = null;
 
@@ -1638,7 +1646,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         var thing:String = null;
 
@@ -1667,7 +1675,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         var thing:String = null;
 
@@ -1696,7 +1704,7 @@ class Endpoints
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
         var thing:String = null;
 
@@ -1726,7 +1734,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.addHeader("Content-Type", "application/json");
         req.setPostData(haxe.Json.stringify(data));
     
@@ -1755,7 +1763,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -1783,7 +1791,7 @@ class Endpoints
         var responseBytes = new BytesOutput();
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
         req.setPostData("");
     
         req.onError = function(error:String) {
@@ -1815,7 +1823,7 @@ class Endpoints
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/applications/" + DiscordClient.accountId + "/commands");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
 
 		r.onData = function(data:String)
 		{
@@ -1846,7 +1854,7 @@ class Endpoints
         r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/applications/"+DiscordClient.accountId+"/commands");
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
         r.setPostData(haxe.Json.stringify(data));
         r.onData = function(_data:String)
         {
@@ -1888,7 +1896,7 @@ class Endpoints
 		req.setPostData(Json.stringify(json));
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
 		req.addHeader("Content-type", "application/json");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
     
     	req.onError = function(err:String) {
             trace("An error has occurred: " + err);
@@ -1918,7 +1926,7 @@ class Endpoints
         r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/bulk-delete");
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
         r.setPostData(haxe.Json.stringify({
             messages: messages
         }));
@@ -1947,7 +1955,7 @@ class Endpoints
         r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/interactions/" + interactionID + "/" + interactionToken + "/callback");
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Content-Type", "application/json");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
         var data:String = haxe.Json.stringify(
             {
                 type: 9,
@@ -2049,7 +2057,7 @@ class Endpoints
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/interactions/" + interactionID + "/" + interactionToken + "/callback");
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        r.addHeader("Authorization", "Bot " + DiscordClient.token);
+        r.addHeader("Authorization", DiscordClient.authHeader);
         r.addHeader("Content-Type", "multipart/form-data; boundary=boundary");
 
         r.setPostBytes(bytesOutput.getBytes());
@@ -2083,7 +2091,7 @@ class Endpoints
         req.setPostData(Json.stringify(ic));
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         req.addHeader("Content-type", "application/json");
-        req.addHeader("Authorization", "Bot " + DiscordClient.token);
+        req.addHeader("Authorization", DiscordClient.authHeader);
     
         req.onError = function(err:String) {
             trace("An error has occurred: " + err);

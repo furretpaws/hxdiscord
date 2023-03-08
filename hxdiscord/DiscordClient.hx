@@ -51,6 +51,7 @@ class DiscordClient
     public var presenceArray:Array<Dynamic> = []; //current presences
     @:dox(hide)
     public var afk:Bool = false;
+    public static var authHeader:String = "";
 
     public var intentsNumber:Int = 0;
 
@@ -233,6 +234,12 @@ class DiscordClient
                     readySent = true;
                 }
                 canResume = true;
+                if (!bot) {
+                    authHeader = token;
+                }
+                else {
+                    authHeader = "Bot " + token;
+                }
             case 'INTERACTION_CREATE':
                 onInteractionCreate(nInteraction(d, d, haxe.Json.parse(msg)));
             case 'MESSAGE_CREATE':
