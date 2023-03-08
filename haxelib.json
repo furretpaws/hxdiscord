@@ -4,7 +4,7 @@
     "license": "GPL",
     "tags": ["Discord", "Haxe"],
     "description": "hxdiscord is an API wrapper for Haxe!",
-    "version": "0.3.1",
-    "releasenote": "Added ISO8601 date format support (also, added timeout)",
+    "version": "0.4.0",
+    "releasenote": "Added attachment support for every target",
     "contributors": ["Furret"]
 }
