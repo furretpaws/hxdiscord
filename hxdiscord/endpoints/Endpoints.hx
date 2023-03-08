@@ -1880,8 +1880,6 @@ class Endpoints
             for (field in Reflect.fields(json[i])) {
                 if (Reflect.field(json[i], field) == null) {
                     Reflect.deleteField(json[i], field);
-                    trace("uh");
-                    trace(field);
                 }
             }
         }
