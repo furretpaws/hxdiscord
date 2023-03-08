@@ -48,6 +48,7 @@ class DiscordClient
 
     public var presence:String = "";
     public var presenceType:Int = 99;
+    public var presenceArray:Array<Dynamic> = []; //current presences
     @:dox(hide)
     public var afk:Bool = false;
 
@@ -118,7 +119,8 @@ class DiscordClient
                  throw("Websocket gave an error. (" + e + ")");
             }
         } catch (err) {
-            if (err == "ssl@ssl_close") {
+            trace(err.message);
+            if (err.message == "ssl@ssl_close") {
                 return;
             }
             else {
@@ -185,12 +187,7 @@ class DiscordClient
             }
             ws.sendJson(payload);
             //alright, i fixed this
-            if (presenceType == 99)
-            {
-                //do nothing
-            }
-            else
-            {
+            if (presenceArray != []) {
                 var numericType = presenceType;
                 var data = {
                     op: 3,
@@ -198,12 +195,12 @@ class DiscordClient
                         since: null,
                         activities: [
                             {
-                                name: presence,
-                                type: numericType
+                                name: presenceArray[2],
+                                type: presenceArray[4],
                             }
                         ],
-                        status: status,
-                        afk: afk
+                        status: presenceArray[0],
+                        afk: presenceArray[3]
                     }
                 }
                 ws.sendJson(data);
@@ -382,6 +379,7 @@ class DiscordClient
         this.presence = presence;
         this.presenceType = numericType;
         this.afk = afk;
+        presenceArray = [status, type, presence, afk, numericType];
 
         ws.sendJson(data);
     }
