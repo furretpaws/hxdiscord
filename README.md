@@ -16,9 +16,11 @@ hxdiscord is a Discord Library for Haxe. It's still in development. More thing w
 
 I don't know how many targets does hxdiscord support, since I've not tried them all. But here's a list of them
 
-- ✅ C++ (Does not support attachments)
-- ✅ Neko (Supports attachments - Recommended)
-- ✅ HashLink (Does not support attachments)
+NOTE (08/03/2022): I made attachments work for every single target that hxdiscord supports, so you don't have to worry about using Neko
+
+- ✅ C++
+- ✅ Neko
+- ✅ HashLink
 
 ## Need help with something?
 
