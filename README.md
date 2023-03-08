@@ -18,7 +18,7 @@ I don't know how many targets does hxdiscord support, since I've not tried them 
 
 NOTE (08/03/2022): I made attachments work for every single target that hxdiscord supports, so you don't have to worry about using Neko
 
-- ✅ C++
+- ✅ C++ (RECOMMENDED)
 - ✅ Neko
 - ✅ HashLink
 
