@@ -398,9 +398,6 @@ class Endpoints
                 bytesOutput.writeString("\n");
             }
             bytesOutput.writeString('--boundary--');
-            #if (!neko)
-            trace("If the attachment you sent is a corrupted file. Try to use Neko instead. This will probably get fixed in the future.");
-            #end
         }
 
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/messages");
