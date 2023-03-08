@@ -1867,13 +1867,26 @@ class Endpoints
         Override existing commands with new ones
         @param data JSON object containing application commands
     **/
-    public static function bulkOverwriteGlobalApplicationCommands(data:Any):Dynamic
+    public static function bulkOverwriteGlobalApplicationCommands(data:Dynamic):Dynamic
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/applications/"+DiscordClient.accountId+"/commands");
 		var responseBytes = new BytesOutput();
         var error:Bool = false;
-    
-		req.setPostData(Json.stringify(data));
+
+        var json:Dynamic = haxe.Json.parse(Json.stringify(data));
+
+        #if (!neko)
+        for (i in 0...json.length) {
+            for (field in Reflect.fields(json[i])) {
+                if (Reflect.field(json[i], field) == null) {
+                    Reflect.deleteField(json[i], field);
+                }
+            }
+        }
+        #end
+        trace(Json.stringify(json));
+        
+		req.setPostData(Json.stringify(json));
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
 		req.addHeader("Content-type", "application/json");
         req.addHeader("Authorization", "Bot " + DiscordClient.token);
