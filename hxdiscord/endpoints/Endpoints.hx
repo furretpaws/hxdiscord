@@ -334,10 +334,14 @@ class Endpoints
         else
             attachments = true;
 
-        var body:String = '--boundary
-Content-Disposition: form-data; name="payload_json";
-Content-Type: application/json;';
-        body += "\n\n";
+
+        var bytesOutput:BytesOutput = new BytesOutput();
+        bytesOutput.writeString("--boundary");
+        bytesOutput.writeString("\n");
+        bytesOutput.writeString("Content-Disposition: form-data; name=\"payload_json\"");
+        bytesOutput.writeString("\n");
+        bytesOutput.writeString("Content-Type: application/json;");
+        bytesOutput.writeString("\n\n");
         //quick check
         var jsonCheck:Dynamic = haxe.Json.parse(haxe.Json.stringify(message));
         if (jsonCheck.attachments != null)
@@ -351,15 +355,15 @@ Content-Type: application/json;';
                 var split = thing.split("/");
                 returnJson.attachments[i].filename = split[split.length-1];
             }
-            body += haxe.Json.stringify(returnJson) + "\n";
+            bytesOutput.writeString(haxe.Json.stringify(returnJson) + "\n");
         }
         else
         {
-            body += haxe.Json.stringify(message) + "\n";
+            bytesOutput.writeString(haxe.Json.stringify(message) + "\n");
         }
         if (!attachments)
         {
-            body += '--boundary--';
+            bytesOutput.writeString('--boundary--');
         }
         else if (attachments)
         {
@@ -386,14 +390,14 @@ Content-Type: application/json;';
                 {
                     throw('"' + json.attachments[i].filename + '" does not exist.');
                 }
-                body += '--boundary\n';
-                body += 'Content-Disposition: form-data; name="files[' + i + ']"; filename="' + filename + '"' + "\n";
-                body += 'Content-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(filename) + ";base64";
-                body += '\n\n';
-                var input = sys.io.File.getBytes(json.attachments[i].filename).toString();
-                body += input + "\n";
+                bytesOutput.writeString('--boundary\n');
+                bytesOutput.writeString('Content-Disposition: form-data; name="files[' + i + ']"; filename="' + filename + '"' + "\n");
+                bytesOutput.writeString('Content-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(filename) + ";base64"); //idk why's base64 there but it works so i'm leaving it like that
+                bytesOutput.writeString("\n\n");
+                bytesOutput.writeFullBytes(sys.io.File.getBytes(json.attachments[i].filename), 0, sys.FileSystem.stat(json.attachments[i].filename).size);
+                bytesOutput.writeString("\n");
             }
-            body += '--boundary--';
+            bytesOutput.writeString('--boundary--');
             #if (!neko)
             trace("If the attachment you sent is a corrupted file. Try to use Neko instead. This will probably get fixed in the future.");
             #end
@@ -406,7 +410,7 @@ Content-Type: application/json;';
         r.addHeader("Content-Type", "multipart/form-data; boundary=boundary");
 
         //trace(body);
-        r.setPostBytes(haxe.io.Bytes.ofString(body));
+        r.setPostBytes(bytesOutput.getBytes());
 
         r.onData = function(data:String)
         {
@@ -1986,10 +1990,13 @@ Content-Type: application/json;';
         }
 
         //generate body / now using multipart :money_mouth:
-        var body:String = '--boundary';
-        body += '\nContent-Disposition: form-data; name="payload_json"';
-        body += '\nContent-Type: application/json\n';
-        body += '\n';
+        var bytesOutput:BytesOutput = new BytesOutput();
+        bytesOutput.writeString("--boundary");
+        bytesOutput.writeString("\n");
+        bytesOutput.writeString("Content-Disposition: form-data; name=\"payload_json\"");
+        bytesOutput.writeString("\n");
+        bytesOutput.writeString("Content-Type: application/json;");
+        bytesOutput.writeString("\n\n");
         if (attachments)
         {
             var newJson:Dynamic = haxe.Json.parse(haxe.Json.stringify({
@@ -2004,30 +2011,30 @@ Content-Type: application/json;';
                 var split = thing.split("/");
                 newJson.data.attachments[i].filename = split[split.length-1];
             }
-            body += haxe.Json.stringify(newJson);
+            bytesOutput.writeString(haxe.Json.stringify(newJson));
         }
         else
         {
-            body += haxe.Json.stringify({
+            bytesOutput.writeString(haxe.Json.stringify({
                 "type": type,
                 "data": ic
-            });
+            }));
         }
         if (attachments)
         {
             for (i in 0...ic.attachments.length)
             {
-                body += "\n--boundary";
-                body += '\nContent-Disposition: form-data; name="files[' + i + ']"; filename="' + getJson.attachments[i].filename + '"';
-                body += '\nContent-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(getJson.attachments[i].filename);
-                body += '\n\n';
-                body += sys.io.File.getBytes(getJson.attachments[i].filename.toString()).toString();
+                bytesOutput.writeString("\n--boundary");
+                bytesOutput.writeString('\nContent-Disposition: form-data; name="files[' + i + ']"; filename="' + getJson.attachments[i].filename + '"');
+                bytesOutput.writeString('\nContent-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(getJson.attachments[i].filename));
+                bytesOutput.writeString('\n\n');
+                bytesOutput.writeFullBytes(sys.io.File.getBytes(getJson.attachments[i].filename), 0, sys.FileSystem.stat(getJson.attachments[i].filename).size);
             }
-            body += "\n--boundary--";
+            bytesOutput.writeString("\n--boundary--");
         }
         else
         {
-            body += "\n--boundary--";
+            bytesOutput.writeString("\n--boundary--");
         }
 
         var r = new haxe.Http("https://discord.com/api/v"+Gateway.API_VERSION+"/interactions/" + interactionID + "/" + interactionToken + "/callback");
@@ -2036,7 +2043,7 @@ Content-Type: application/json;';
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
         r.addHeader("Content-Type", "multipart/form-data; boundary=boundary");
 
-        r.setPostData(body);
+        r.setPostBytes(bytesOutput.getBytes());
 
         r.onData = function(data:String)
         {
