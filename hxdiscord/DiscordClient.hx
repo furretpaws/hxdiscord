@@ -24,6 +24,7 @@ class DiscordClient
     var receivedHelloOC:Bool = false;
     private var ignore:Bool = false;
     private var sequence:String = "";
+    private var connectedVoiceClients:Array<VoiceClient> = [];
     private var session:String = "";
     private var session_type:String = "";
     private var session_id:String = "";
@@ -36,6 +37,7 @@ class DiscordClient
     @:dox(hide)
     public var mfa_enabled = false;
     public static var accountId:String = "";
+    public var accId:String = accountId;
     @:dox(hide)
     public var flags:Int = 0;
     @:dox(hide)
@@ -52,6 +54,9 @@ class DiscordClient
     @:dox(hide)
     public var afk:Bool = false;
     public static var authHeader:String = "";
+
+    @:dox(hide)
+    public var currentVoiceClients:Array<VoiceClient> = [];
 
     public var intentsNumber:Int = 0;
 
@@ -273,6 +278,29 @@ class DiscordClient
                 onGuildMemberRemove(d);
             case "GUILD_MEMBER_UPDATE":
                 onGuildMemberUpdate(d);
+            case "VOICE_SERVER_UPDATE":
+                for (i in 0...currentVoiceClients.length) {
+                    @:privateAccess
+                    if (currentVoiceClients[i].guild_id == d.guild_id) {
+                        currentVoiceClients[i].giveCredentials(d);
+                    }
+                }
+            case "VOICE_STATE_UPDATE":
+                //deal with functions later
+                for (i in 0...currentVoiceClients.length) {
+                    trace(haxe.Json.stringify(d));
+                    @:privateAccess
+                    if (currentVoiceClients[i].guild_id == d.guild_id) {
+                        if (d.channel_id != null && d.session_id != null) {
+                            @:privateAccess
+                            currentVoiceClients[i].session_id = d.session_id;
+                        }
+                        else
+                        {
+                            currentVoiceClients.remove(currentVoiceClients[i]); //like, if there's no channel id (which means that the bot disconnected), it removes its instance?
+                        }
+                    }
+                }
         }
     }
 
@@ -284,6 +312,29 @@ class DiscordClient
     public function setInteractionCommands(j:Dynamic)
     {
         return Endpoints.bulkOverwriteGlobalApplicationCommands(j);
+    }
+
+    /**
+        Join a voice channel
+        @param server_id
+        @param channel_id
+        @param self_mute
+        @param self_deaf
+    **/
+
+    public function createVoiceConnection(guild_id:String, channel_id:String, ?self_mute:Bool = false, ?self_deaf:Bool = false):VoiceClient {
+        var client = new VoiceClient(guild_id, channel_id, this);
+        currentVoiceClients.push(client);
+        this.ws.sendJson({
+            op: 4,
+            d: {
+                guild_id: guild_id,
+                channel_id: channel_id,
+                self_mute: self_mute,
+                self_deaf: self_deaf
+            }
+        });
+        return client;
     }
 
     /**
