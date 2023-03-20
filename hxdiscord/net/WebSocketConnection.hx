@@ -17,7 +17,11 @@ class WebSocketConnection {
             haxe.EntryPoint.runInMainThread(onReady);
         }
         ws.onmessageString = function(message) {
+            #if (js&&nodejs)
+            haxe.EntryPoint.runInMainThread(this.onMessage.bind(message.toString()));
+            #else
             haxe.EntryPoint.runInMainThread(this.onMessage.bind(message));
+            #end
         }
         ws.onclose = (code:Int) -> {
             haxe.EntryPoint.runInMainThread(this.onClose.bind(code));

@@ -1,7 +1,11 @@
 package hxdiscord.utils;
-import haxe.Http;
+import hxdiscord.utils.Http;
 import haxe.Json;
 import haxe.io.BytesOutput;
+
+/**
+    NOTE: Please don't use this at all because it's useless.
+**/
 
 class Https
 {
@@ -10,11 +14,11 @@ class Https
         var discordAuth = null;
         if (path != null)
         {
-            discordAuth = new haxe.Http(url + version + endpoint + path);
+            discordAuth = new Http(url + version + endpoint + path);
         }
         else
         {
-            discordAuth = new haxe.Http(url + version + endpoint);
+            discordAuth = new Http(url + version + endpoint);
         }
 
         /*trace(url + version + endpoint + path);
@@ -34,16 +38,18 @@ class Https
 			throw("An error has occurred: " + error);
 		}
 
-		discordAuth.request();
+		discordAuth.send();
+
+        discordAuth.setMethod("GET");
 
         return data;
     }
 
     public static function sendNormalRequest(url:String, ?token:String, ?id:String, ?data:String)
     {
-        var r:haxe.Http;
+        var r:Http;
 
-        r = new haxe.Http(url + "?data=" + StringTools.urlEncode(data));
+        r = new Http(url + "?data=" + StringTools.urlEncode(data));
         trace(url + "?data=" + StringTools.urlEncode(data));
         r.addHeader("Authorization", "Bot " + token);
 		r.onData = function(_data:String)
@@ -57,14 +63,15 @@ class Https
 		{
 			throw("An error has occurred: " + error);
 		}
-		r.request();
+        r.setMethod("GET");
+		r.send();
     }
 
     public static function sendDeleteRequest(url:String)
     {
-        var r:haxe.Http;
+        var r:Http;
 
-        r = new haxe.Http(url);
+        r = new Http(url);
         r.addHeader("Content-Type", "application/json");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
 		r.onData = function(_data:String)
@@ -79,14 +86,15 @@ class Https
 			trace("An error has occurred: " + error);
             trace(r.responseData);
 		}
-		r.customRequest(true, null, haxe.http.HttpMethod.Delete);
+        r.setMethod("DELETE");
+		r.send();
     }
 
     public static function sendEmptyPutRequest(url:String)
     {
-        var r:haxe.Http;
+        var r:Http;
 
-        r = new haxe.Http(url);
+        r = new Http(url);
         r.addHeader("Content-Type", "application/json");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
         r.onData = function(_data:String)
@@ -101,7 +109,8 @@ class Https
             trace("An error has occurred: " + error);
             trace(r.responseData);
         }
-        r.customRequest(true, null, haxe.http.HttpMethod.Put);
+        r.setMethod("PUT");
+        r.send();
     }
 
     public static function sendPutData(url:String, data:Any)
@@ -121,8 +130,9 @@ class Https
 		req.onStatus = function(status:Int) {
 			trace(status);
 		};
+        req.setMethod("PUT");
     
-		req.customRequest( true, responseBytes, "PUT" );
+		req.send();
 		var response = responseBytes.getBytes();
     
     	trace(Json.parse(response.toString()));
@@ -130,9 +140,9 @@ class Https
 
     public static function sendPostData(url:String, data:Dynamic)
     {
-        var r:haxe.Http;
+        var r:Http;
 
-        r = new haxe.Http(url);
+        r = new Http(url);
         r.addHeader("Content-Type", "application/json");
         r.addHeader("Authorization", "Bot " + DiscordClient.token);
         r.setPostData(haxe.Json.stringify(data));
@@ -147,6 +157,7 @@ class Https
         {
             throw("An error has occurred: " + error);
         }
-        r.request(true);
+        r.setMethod("POST");
+        r.send();
     }
 }

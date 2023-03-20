@@ -2,48 +2,49 @@ package haxe.net.impl;
 
 import haxe.io.Bytes;
 import haxe.net.WebSocket;
+import haxe.extern.EitherType;
 
-class WebSocketJs extends WebSocket {
-    private var impl:js.html.WebSocket;
+//By RAIDANDFADE. (yeah this was taken from haxicord, thank you raidandfade)
+class WebSocketNodeJs extends WebSocket {
+    private var impl:NodeJsWS;
 
-    public function new(url:String, protocols:Array<String> = null) {
+    public function new(url:String, options = null) {
         super();
 
-        if (protocols != null) {
-            impl = new js.html.WebSocket(url, protocols);
-        } else {
-            impl = new js.html.WebSocket(url);
-        }
-        impl.onopen = function(e:js.html.Event) {
+        impl = new NodeJsWS(url);
+
+        impl.on("open",function(){
             this.onopen();
-        };
-        impl.onclose = function(e:js.html.CloseEvent) {
-            this.onclose(e.code);
-        };
-        impl.onerror = function(e:js.html.Event) {
-            this.onerror('error');
-        };
-        impl.onmessage = function(e:js.html.MessageEvent) {
-            var m = e.data;
+        });
+
+        impl.on("close",function(c,r){
+            this.onclose(c);
+        });
+
+        impl.on("error",function(e){
+            this.onerror(e);
+        });
+
+        impl.on("message",function(e:EitherType< String, EitherType< js.node.buffer.Buffer, EitherType< js.lib.ArrayBuffer, Array< js.node.buffer.Buffer >>>>) {
+            var m = e;
             if (Std.is(m, String)) {
                 this.onmessageString(m);
-            } else if (Std.is(m, js.html.ArrayBuffer)) {
+            } else if (Std.is(m, js.lib.ArrayBuffer)) {
                 //haxe.io.Int8Array
                 //js.html.ArrayBuffer
                 trace('Unhandled websocket onmessage ' + m);
-            } else if (Std.is(m, js.html.Blob)) {
-				var arrayBuffer : js.html.ArrayBuffer;
-				var fileReader = new js.html.FileReader();
-				fileReader.onload = function() {
-					arrayBuffer = fileReader.result;
-					this.onmessageBytes(Bytes.ofData(arrayBuffer));
-				}
-				fileReader.readAsArrayBuffer(cast (m, js.html.Blob));
+            } else if (Std.is(m, js.node.Buffer)) {
+                trace("what the hellll");
+                //i've got an idea :)
+                //this.onmessageBytes(Bytes.ofData(m)); // <- Screw this
+                var datas = "";
+                datas += m;
+                this.onmessageString(datas);
             } else {
-                //ArrayBuffer
+                //ArrayBuffer but bigger
                 trace('Unhandled websocket onmessage ' + m);
             }
-        };
+        });
     }
 
     override public function sendString(message:String) {
@@ -52,7 +53,7 @@ class WebSocketJs extends WebSocket {
 
     override public function sendBytes(message:Bytes) {
 //	Separate message data, because 'message.getData().length' not equal 'message.length'
-	message = message.sub(0, message.length);
+	// message = message.sub(0, message.length);
         this.impl.send(message.getData());
     }
 	

@@ -30,6 +30,8 @@ class DiscordClient
     private var session_id:String = "";
     private var resume_gateway_url:String = "";
 
+    public var data:BotData = null;
+
     public var readySent:Bool = false;
     @:dox(hide)
     public var verified:Bool = false;
@@ -64,13 +66,14 @@ class DiscordClient
         Constructor. This will start a new hxdiscord instance.
         @param _token You're token (I'm not sure if user tokens work.)
         @param intents Array of intents.
-        @param _debug Debug mode. This will print every single websocket incomming message from the Discord Gateway.
+        @param _debug Debug mode. This will print every single websocket incoming message from the Discord Gateway.
     **/
 
     public function new (_token:String, intents:Array<Int>, ?_debug:Bool)
     {
         token = _token;
         debug = _debug;
+        data = new BotData();
 
         if (intents == null || intents == [])
         {
@@ -84,10 +87,16 @@ class DiscordClient
         }
 
         connect();
+
+        #if (js&&nodejs)
+        haxe.MainLoop.add(tick);
+        #end
     }
 
     @:dox(hide)
-    public function tick() {}
+    public function tick() {
+        
+    }
 
     @:dox(hide)
     function connect()
@@ -195,7 +204,7 @@ class DiscordClient
             }
             ws.sendJson(payload);
             //alright, i fixed this
-            if (presenceArray != []) {
+            if (presenceArray.length != 0) {
                 var numericType = presenceType;
                 var data = {
                     op: 3,
@@ -233,17 +242,22 @@ class DiscordClient
                 session_id = d.session_id;
                 session_type = d.session_type;
                 Gateway.GATEWAY_URL = d.resume_gateway_url + "?v=" + Gateway.API_VERSION;
-                if (!readySent)
-                {
-                    onReady();
-                    readySent = true;
-                }
                 canResume = true;
                 if (!bot) {
                     authHeader = token;
                 }
                 else {
                     authHeader = "Bot " + token;
+                }
+                if (!readySent)
+                {
+                    onReady();
+                    readySent = true;
+                }
+                try {
+                    accId = d.application.id;
+                } catch (e) {
+                    trace(e.message);
                 }
             case 'INTERACTION_CREATE':
                 onInteractionCreate(nInteraction(d, d, haxe.Json.parse(msg)));
@@ -288,7 +302,6 @@ class DiscordClient
             case "VOICE_STATE_UPDATE":
                 //deal with functions later
                 for (i in 0...currentVoiceClients.length) {
-                    trace(haxe.Json.stringify(d));
                     @:privateAccess
                     if (currentVoiceClients[i].guild_id == d.guild_id) {
                         if (d.channel_id != null && d.session_id != null) {
@@ -323,7 +336,8 @@ class DiscordClient
     **/
 
     public function createVoiceConnection(guild_id:String, channel_id:String, ?self_mute:Bool = false, ?self_deaf:Bool = false):VoiceClient {
-        var client = new VoiceClient(guild_id, channel_id, this);
+        trace(this.accId);
+        var client = new VoiceClient(guild_id, channel_id, this.accId);
         currentVoiceClients.push(client);
         this.ws.sendJson({
             op: 4,
@@ -654,5 +668,36 @@ class DiscordClient
     dynamic public function onGuildMemberUpdate(d:hxdiscord.types.structTypes.GuildMember)
     {
         
+    }
+}
+
+class BotData {
+    public var target:String = "";
+    public function new() {
+        #if cpp
+        target = "cpp";
+        #elseif cppia
+        target = "cppia";
+        #elseif cs
+        target = "cs";
+        #elseif eval
+        target = "eval";
+        #elseif hl
+        target = "hl";
+        #elseif java
+        target = "java";
+        #elseif js
+        target = "js";
+        #elseif lua
+        target = "lua";
+        #elseif neko
+        target = "neko";
+        #elseif php
+        target = "php";
+        #elseif python
+        target = "python";
+        #elseif swf
+        target = "swf";
+        #end
     }
 }
