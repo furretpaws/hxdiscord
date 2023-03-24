@@ -5,8 +5,8 @@ class Member {
     public var nick:String;
     public var avatar:String;
     public var roles:Array<String>;
-    public var joined_at:Date;
-    public var premium_since:Date;
+    public var joined_at:String;
+    public var premium_since:String;
     public var deaf:Bool;
     public var mute:Bool;
     public var flags:Int;
