@@ -5,11 +5,11 @@ typedef GuildMember = {
     @:optional var guild_id:String;
     @:optional var id:String;
     @:optional var roles:Array<String>;
-    @:optional var premium_since:Date;
+    @:optional var premium_since:String;
     @:optional var pending:Bool;
     @:optional var nick:String;
     @:optional var mute:Bool;
-    @:optional var joined_at:Date;
+    @:optional var joined_at:String;
     @:optional var flags:Int;
     @:optional var deaf:Bool;
     @:optional var communication_disabled_until:String;
