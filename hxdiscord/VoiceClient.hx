@@ -1,9 +1,10 @@
 /**
     FOR ANYONE WHO'S READING THIS (i hope so)
     I'M HAVING SOME SERIOUS TROUBLES DOING THIS, COLLABORATIONS ARE HIGHLY APPRECIATED
-    I MAY REMOVE THIS AND MAKE AS IF NOTHING HAPPENED
+    I MAY REMOVE THIS AND PRETEND NOTHING HAPPENED
 
     NOTE (12/03/2023): Don't expect this to be done in a few months or so. I just found out that Discord requires RTP packets, and there are no haxelibs available for it. So I will have to take my own on this
+    NOTE (24/03/2023): gotta commit this again because of a grammar issue :sob:, also, i think i've found the solution for the rtp packets, not sure tho
 **/
 
 package hxdiscord;
