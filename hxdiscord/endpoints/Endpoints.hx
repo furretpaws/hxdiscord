@@ -11,6 +11,9 @@ import hxdiscord.types.Typedefs.ModifyGuildParams;
 import hxdiscord.utils.Https;
 import hxdiscord.DiscordClient;
 import hxdiscord.utils.Http;
+#if (js&&nodejs)
+import js.node.Fs;
+#end
 import haxe.io.BytesOutput;
 import hxdiscord.gateway.Gateway;
 import haxe.Json;
@@ -195,30 +198,30 @@ class Endpoints
         @param id The user ID
     **/
 
-    public static function getGuildMember(guild_id:String, id:String):hxdiscord.types.Member
+    public static function getGuildMember(guild_id:String, id:String, cb:hxdiscord.types.Member -> Void, err:Dynamic->Void):Void
     {
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + guild_id + "/members/" + id);
-
+    
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", DiscordClient.authHeader);
         r.setMethod("GET");
-
+    
         var guildmember:hxdiscord.types.Member = null;
-
+    
         r.onData = function(data:String)
         {
             guildmember = new hxdiscord.types.Member(haxe.Json.parse(data), guild_id);
+            cb(guildmember);
         }
-
+    
         r.onError = function(error)
         {
             trace("An error has occurred: " + error);
             trace(r.responseData);
+            err(error);
         }
-
+    
         r.send();
-
-        return guildmember;
     }
 
     /**
@@ -506,7 +509,8 @@ class Endpoints
                 request += ('Content-Disposition: form-data; name="files[' + i + ']"; filename="' + filename + '"' + "\n");
                 request += ('Content-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(filename) + ";base64"); //idk why's base64 there but it works so i'm leaving it like that
                 request += ("\n\n");
-                request += (sys.io.File.getBytes(json.attachments[i].filename).toString());
+                //request += (sys.io.File.getBytes(json.attachments[i].filename).toString());
+                request += (Fs.readFileSync(json.attachments[i].filename, {encoding: "binary"}));
                 request += ("\n");
             }
             request += ('--boundary--');
@@ -2145,6 +2149,7 @@ class Endpoints
             ic.flags = 64;
         }
 
+        #if (!js)
         //generate body / now using multipart :money_mouth:
         var bytesOutput:BytesOutput = new BytesOutput();
         bytesOutput.writeString("--boundary");
@@ -2192,6 +2197,55 @@ class Endpoints
         {
             bytesOutput.writeString("\n--boundary--");
         }
+        #else
+        //generate body / now using multipart :money_mouth:
+        var reqData:String = "";
+        reqData += ("--boundary");
+        reqData += ("\n");
+        reqData += ("Content-Disposition: form-data; name=\"payload_json\"");
+        reqData += ("\n");
+        reqData += ("Content-Type: application/json;");
+        reqData += ("\n\n");
+        if (attachments)
+        {
+            var newJson:Dynamic = haxe.Json.parse(haxe.Json.stringify({
+                "type": type,
+                "data": ic
+            }));
+            var filename:String = "";
+            var thing = "";
+            for (i in 0...newJson.data.attachments.length)
+            {
+                thing = newJson.data.attachments[i].filename.toString();
+                var split = thing.split("/");
+                newJson.data.attachments[i].filename = split[split.length-1];
+            }
+            reqData += (haxe.Json.stringify(newJson));
+        }
+        else
+        {
+            reqData += (haxe.Json.stringify({
+                "type": type,
+                "data": ic
+            }));
+        }
+        if (attachments)
+        {
+            for (i in 0...ic.attachments.length)
+            {
+                reqData += ("\n--boundary");
+                reqData += ('\nContent-Disposition: form-data; name="files[' + i + ']"; filename="' + getJson.attachments[i].filename + '"');
+                reqData += ('\nContent-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(getJson.attachments[i].filename));
+                reqData += ('\n\n');
+                reqData += (Fs.readFileSync(getJson.attachments[i].filename, {encoding: "binary"}));
+            }
+            reqData += ("\n--boundary--");
+        }
+        else
+        {
+            reqData += ("\n--boundary--");
+        }
+        #end
 
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/interactions/" + interactionID + "/" + interactionToken + "/callback");
 
@@ -2201,7 +2255,11 @@ class Endpoints
 
         r.setMethod("POST");
 
+        #if (!js)
         r.setPostBytes(bytesOutput.getBytes());
+        #else
+        r.setPostData(reqData);
+        #end
 
         r.onData = function(data:String)
         {

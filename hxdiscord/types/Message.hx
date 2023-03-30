@@ -201,6 +201,8 @@ class Message
     }
 
     public function getMember():Member {
-        return hxdiscord.endpoints.Endpoints.getGuildMember(guild_id, author.id);
+        var member:Member = null;
+        hxdiscord.endpoints.Endpoints.getGuildMember(guild_id, author.id, (m) -> {trace(m); member = m;}, null);
+        return member;
     }
 }

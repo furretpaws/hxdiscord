@@ -34,7 +34,6 @@ class WebSocketNodeJs extends WebSocket {
                 //js.html.ArrayBuffer
                 trace('Unhandled websocket onmessage ' + m);
             } else if (Std.is(m, js.node.Buffer)) {
-                trace("what the hellll");
                 //i've got an idea :)
                 //this.onmessageBytes(Bytes.ofData(m)); // <- Screw this
                 var datas = "";

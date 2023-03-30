@@ -5,6 +5,7 @@ import js.node.Url;
 import haxe.DynamicAccess;
 import haxe.extern.EitherType;
 import js.node.http.IncomingMessage;
+import js.SyncRequest;
 #end
 
 class Http {
@@ -42,8 +43,21 @@ class Http {
     }
 
     public function send() {
-        #if nodejs
-        var headersMap = new Map<String, String>();
+        #if js
+        var baseThing:String = "{}";
+        var headersJson:Dynamic = haxe.Json.parse(baseThing);
+        for (i in 0...headers.length) {
+            Reflect.setProperty(headersJson, headers[i][0], headers[i][1]);
+        }
+        var request:SyncRequest = new SyncRequest(method, url, {
+            headers: headersJson,
+            body: postData
+        });
+        var data:String = "";
+        data += request.getBody();
+        responseData = data;
+        onData(data);
+        /*var headersMap = new Map<String, String>();
 
         for (i in 0...headers.length) {
             if (!headersMap.exists(headers[i][0])) {
@@ -76,7 +90,7 @@ class Http {
         });
         if(["POST","PUT","PATCH","DELETE"].indexOf(method)>-1&&postData!=null)
             req.write(postData);
-        req.end();
+        req.end();*/
         #else
         var req:haxe.Http = new haxe.Http(url);
         for (i in 0...headers.length) {
