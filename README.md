@@ -21,7 +21,7 @@ NOTE (08/03/2022): I made attachments work for every single target that hxdiscor
 - ✅ C++ (RECOMMENDED)
 - ✅ Neko
 - ✅ HashLink
-- ⌛ NodeJS (Coming soon.. I hope)
+- ⚠️ NodeJS (Partially usable)
 - ❌ Python (I want to support it tho)
 
 ## Need help with something?
