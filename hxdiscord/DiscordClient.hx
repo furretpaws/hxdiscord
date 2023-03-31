@@ -6,6 +6,7 @@ import hxdiscord.endpoints.Endpoints;
 import hxdiscord.net.WebSocketConnection;
 import hxdiscord.types.*;
 import hxdiscord.types.structTypes.*;
+import hxdiscord.cache.CachedData;
 import hxdiscord.utils.Https;
 import haxe.Timer;
 
@@ -29,6 +30,8 @@ class DiscordClient
     private var session_type:String = "";
     private var session_id:String = "";
     private var resume_gateway_url:String = "";
+
+    private var cache:CachedData;
 
     public var data:BotData = null;
 
@@ -91,6 +94,8 @@ class DiscordClient
         #if (js&&nodejs)
         haxe.MainLoop.add(tick);
         #end
+
+        cache = new CachedData(this);
     }
 
     @:dox(hide)
@@ -292,6 +297,65 @@ class DiscordClient
                 onGuildMemberRemove(d);
             case "GUILD_MEMBER_UPDATE":
                 onGuildMemberUpdate(d);
+                //caching shit
+                var member:Member = null;
+                hxdiscord.endpoints.Endpoints.getGuildMember(d.guild_id, d.user.id, (m) -> {member = m;}, null);
+                trace(haxe.Json.stringify(member));
+                var foundRoles:Bool = false;
+                var dataRoles:Dynamic = null;
+                if (cache.roles.length == 0) {
+                    var r:Dynamic = Endpoints.getRoles(d.guild_id);
+                    cache.roles.push([d.guild_id, r]);
+                    dataRoles = r;
+                    foundRoles = true;
+                } else {
+                    for (i in 0...cache.roles.length) {
+                        if (cache.roles[i][0] == d.guild_id) {
+                            dataRoles = cache.roles[i][1];
+                            foundRoles = true;
+                            trace("there are already roles");
+                        }
+                    }
+                }
+                if (!foundRoles) {
+                    dataRoles = Endpoints.getRoles(d.guild_id);
+                }
+
+                dataRoles = haxe.Json.parse(dataRoles);
+
+                for (i in 0...member.roles.length)
+                {
+                    trace(i + " " + member.roles[i]);
+                    for (x in 0...dataRoles.length)
+                    {
+                        if (member.roles[i] == dataRoles[x].id)
+                        {
+                            trace(dataRoles[x].permissions + " | " + member.roles[i] + " | " + member.user.id + " | " + member.user.username);
+                            member.permissionsBitwise.push(dataRoles[x].permissions);
+                        }
+                    }
+                }
+                if (cache.guild_members.length == 0) {
+                    cache.guild_members.push(member);
+                } else {
+                    trace(cache.guild_members);
+                    for (i in 0...cache.guild_members.length) {
+                        var found:Bool = false;
+                        trace(cache.guild_members[i].user.id);
+                        if (cache.guild_members[i].user.id == member.user.id && cache.guild_members[i].guild_id == d.guild_id) {
+                            found = true;
+                        }
+                        if (found) {
+                            cache.guild_members.remove(cache.guild_members[i]);
+                            cache.guild_members.push(member);
+                        } else {
+                            cache.guild_members.push(member);
+                        }
+                    }
+                }
+                for (i in 0...cache.guild_members.length) {
+                    trace(haxe.Json.stringify(cache.guild_members[i]));
+                }
             case "VOICE_SERVER_UPDATE":
                 for (i in 0...currentVoiceClients.length) {
                     @:privateAccess

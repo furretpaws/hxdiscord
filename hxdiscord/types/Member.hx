@@ -1,7 +1,6 @@
 package hxdiscord.types;
 
 class Member {
-    public var user:User;
     public var nick:String;
     public var avatar:String;
     public var roles:Array<String>;
@@ -9,16 +8,18 @@ class Member {
     public var premium_since:String;
     public var deaf:Bool;
     public var mute:Bool;
+    public var user:User;
     public var flags:Int;
     public var pending:Bool;
     public var permissions:String;
     public var communication_disabled_until:String;
     public var guild_id:String;
     public var id:String;
+    public var permissionsBitwise:Array<String> = [];
     public function new(d:hxdiscord.types.structTypes.GuildMember, gi:String) {
         this.id = d.id;
         this.nick = d.nick;
-        this.user = d.user;
+        this.user = new User(d.user);
         this.avatar = d.avatar;
         this.roles = d.roles;
         this.joined_at = d.joined_at;

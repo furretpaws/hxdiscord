@@ -180,6 +180,41 @@ class Message
     public function hasPermission(permissionToLookFor:String):Bool
     {
         var hasPermission:Bool = false;
+        var member:Member = null;
+        @:privateAccess
+        for (i in 0...client.cache.guild_members.length) {
+            if (client.cache.guild_members[i].user.id == this.author.id && client.cache.guild_members[i].guild_id == this.guild_id) {
+                member = client.cache.guild_members[i];
+            }
+        }
+        if (member != null) {
+            for (i in 0...member.permissionsBitwise.length) {
+                var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(member.permissionsBitwise[i])));
+                if (array.contains(permissionToLookFor))
+                {
+                    hasPermission = true;
+                }
+            }
+        } else {
+            //MEMBER NOT CACHED? time to cache it then try again
+            @:privateAccess
+            client.cache.cacheMemberAndRoles(guild_id, author.id);
+            var member:Member = null;
+            @:privateAccess
+            for (i in 0...client.cache.guild_members.length) {
+                if (client.cache.guild_members[i].user.id == this.author.id && client.cache.guild_members[i].guild_id == this.guild_id) {
+                    member = client.cache.guild_members[i];
+                }
+            }
+            for (i in 0...member.permissionsBitwise.length) {
+                var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(member.permissionsBitwise[i])));
+                if (array.contains(permissionToLookFor))
+                {
+                    hasPermission = true;
+                }
+            }
+        }
+        /*var hasPermission:Bool = false;
         if (guildmember == null)
         {
             //do nothing
@@ -197,12 +232,13 @@ class Message
                 hasPermission = Endpoints.hasPermission(author.id, guild_id, permissionToLookFor);
             }
         }
+        return hasPermission;*/
         return hasPermission;
     }
 
     public function getMember():Member {
         var member:Member = null;
-        hxdiscord.endpoints.Endpoints.getGuildMember(guild_id, author.id, (m) -> {trace(m); member = m;}, null);
+        hxdiscord.endpoints.Endpoints.getGuildMember(guild_id, author.id, (m) -> {member = m;}, null);
         return member;
     }
 }
