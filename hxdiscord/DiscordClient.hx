@@ -300,7 +300,6 @@ class DiscordClient
                 //caching shit
                 var member:Member = null;
                 hxdiscord.endpoints.Endpoints.getGuildMember(d.guild_id, d.user.id, (m) -> {member = m;}, null);
-                trace(haxe.Json.stringify(member));
                 var foundRoles:Bool = false;
                 var dataRoles:Dynamic = null;
                 if (cache.roles.length == 0) {
@@ -325,12 +324,10 @@ class DiscordClient
 
                 for (i in 0...member.roles.length)
                 {
-                    trace(i + " " + member.roles[i]);
                     for (x in 0...dataRoles.length)
                     {
                         if (member.roles[i] == dataRoles[x].id)
                         {
-                            trace(dataRoles[x].permissions + " | " + member.roles[i] + " | " + member.user.id + " | " + member.user.username);
                             member.permissionsBitwise.push(dataRoles[x].permissions);
                         }
                     }
@@ -338,10 +335,8 @@ class DiscordClient
                 if (cache.guild_members.length == 0) {
                     cache.guild_members.push(member);
                 } else {
-                    trace(cache.guild_members);
                     for (i in 0...cache.guild_members.length) {
                         var found:Bool = false;
-                        trace(cache.guild_members[i].user.id);
                         if (cache.guild_members[i].user.id == member.user.id && cache.guild_members[i].guild_id == d.guild_id) {
                             found = true;
                         }
@@ -352,9 +347,6 @@ class DiscordClient
                             cache.guild_members.push(member);
                         }
                     }
-                }
-                for (i in 0...cache.guild_members.length) {
-                    trace(haxe.Json.stringify(cache.guild_members[i]));
                 }
             case "VOICE_SERVER_UPDATE":
                 for (i in 0...currentVoiceClients.length) {

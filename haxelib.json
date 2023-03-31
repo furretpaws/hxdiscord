@@ -5,6 +5,6 @@
     "tags": ["Discord", "Haxe"],
     "description": "hxdiscord is an API wrapper for Haxe!",
     "version": "0.5.0",
-    "releasenote": "Added attachment support for every target",
+    "releasenote": "NodeJS support and also cache stuff",
     "contributors": ["Furret"]
 }
