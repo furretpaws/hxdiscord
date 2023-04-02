@@ -41,6 +41,7 @@ class DiscordClient
     public var username:String = "";
     @:dox(hide)
     public var mfa_enabled = false;
+    public var user:User = null;
     public static var accountId:String = "";
     public var accId:String = accountId;
     @:dox(hide)
@@ -235,6 +236,7 @@ class DiscordClient
 
         switch (t) {
             case 'READY':
+                user = new hxdiscord.types.User(this, d.user);
                 verified = d.user.verified;
                 avatar = d.user.avatar;
                 mfa_enabled = d.user.mfa_enabled;
@@ -295,6 +297,22 @@ class DiscordClient
                 onGuildMemberAdd(d);
             case "GUILD_MEMBER_REMOVE":
                 onGuildMemberRemove(d);
+                //UNcaching shit haha
+                //actually i'm doing this because i found out this was crashing the thing so yeah
+                //this is actually needed
+                for (i in 0...cache.guild_members.length) {
+                    if (cache.guild_members[i].guild_id == d.guild_id) {
+                        if (cache.guild_members[i].user.id == d.user.id) {
+                            cache.guild_members.remove(cache.guild_members[i]);
+                            if (d.user.id == user.id)
+                                for (i in 0...cache.roles.length) {
+                                    if (cache.roles[i][0] == d.guild_id) {
+                                        cache.roles.remove(cache.roles[i]);
+                                    }
+                                }
+                        }
+                    }
+                }
             case "GUILD_MEMBER_UPDATE":
                 onGuildMemberUpdate(d);
                 //caching shit
@@ -312,7 +330,6 @@ class DiscordClient
                         if (cache.roles[i][0] == d.guild_id) {
                             dataRoles = cache.roles[i][1];
                             foundRoles = true;
-                            trace("there are already roles");
                         }
                     }
                 }
