@@ -1,6 +1,14 @@
 package hxdiscord.utils;
 
+/**
+    A MimeResolver for file extensions. Used in Discord's attachments
+**/
+
 class MimeResolver {
+    /**
+        Returns the mime type for a filename
+        @param file The filename
+    **/
     public static function getMimeType(file:String)
     {
         var mimetype:String = "";

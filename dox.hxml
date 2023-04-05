@@ -1,0 +1,9 @@
+-cp hxdiscord
+-D doc-gen
+--macro include('hxdiscord')
+--no-output
+--each
+
+--next
+-xml dox-gen/neko.xml
+-neko dox-gen/dummy.n

@@ -68,7 +68,7 @@ class DiscordClient
 
     /**
         Constructor. This will start a new hxdiscord instance.
-        @param _token You're token (I'm not sure if user tokens work.)
+        @param _token Your token (I'm not sure if user tokens work.)
         @param intents Array of intents.
         @param _debug Debug mode. This will print every single websocket incoming message from the Discord Gateway.
     **/
@@ -137,7 +137,11 @@ class DiscordClient
                 connect();
             };
             ws.onError = (e) -> {
-                 throw("Websocket gave an error. (" + e + ")");
+                if (debug) {
+                    trace("Websocket gave an error. (" + e + ")");
+                }
+                ws.close();
+                connect();
             }
         } catch (err) {
             trace(err.message);
@@ -189,7 +193,7 @@ class DiscordClient
                     "d" : {
                         "token": token,
                         "session_id": session_id,
-                        "seq": Std.parseInt(sequence)
+                        "seq": sequence
                     }
                 };
             }
@@ -210,24 +214,6 @@ class DiscordClient
             }
             ws.sendJson(payload);
             //alright, i fixed this
-            if (presenceArray.length != 0) {
-                var numericType = presenceType;
-                var data = {
-                    op: 3,
-                    d: {
-                        since: null,
-                        activities: [
-                            {
-                                name: presenceArray[2],
-                                type: presenceArray[4],
-                            }
-                        ],
-                        status: presenceArray[0],
-                        afk: presenceArray[3]
-                    }
-                }
-                ws.sendJson(data);
-            }
             case 9:
                 ws.close();
             case 7: //gateway needs client to reconnect
@@ -235,6 +221,9 @@ class DiscordClient
         }
 
         switch (t) {
+            case "RESUMED":
+                //nothing happens except the onResumed() function is called :)
+                onResumed();
             case 'READY':
                 user = new hxdiscord.types.User(this, d.user);
                 verified = d.user.verified;
@@ -300,18 +289,22 @@ class DiscordClient
                 //UNcaching shit haha
                 //actually i'm doing this because i found out this was crashing the thing so yeah
                 //this is actually needed
-                for (i in 0...cache.guild_members.length) {
-                    if (cache.guild_members[i].guild_id == d.guild_id) {
-                        if (cache.guild_members[i].user.id == d.user.id) {
-                            cache.guild_members.remove(cache.guild_members[i]);
-                            if (d.user.id == user.id)
-                                for (i in 0...cache.roles.length) {
-                                    if (cache.roles[i][0] == d.guild_id) {
-                                        cache.roles.remove(cache.roles[i]);
+                try {
+                    for (i in 0...cache.guild_members.length) {
+                        if (cache.guild_members[i].guild_id == d.guild_id) {
+                            if (cache.guild_members[i].user.id == d.user.id) {
+                                cache.guild_members.remove(cache.guild_members[i]);
+                                if (d.user.id == user.id)
+                                    for (i in 0...cache.roles.length) {
+                                        if (cache.roles[i][0] == d.guild_id) {
+                                            cache.roles.remove(cache.roles[i]);
+                                        }
                                     }
-                                }
+                            }
                         }
                     }
+                } catch (err) {
+                    
                 }
             case "GUILD_MEMBER_UPDATE":
                 onGuildMemberUpdate(d);
@@ -401,7 +394,7 @@ class DiscordClient
     }
 
     /**
-        Join a voice channel
+        Join a voice channel (Won't play any audio for now)
         @param server_id
         @param channel_id
         @param self_mute
@@ -470,13 +463,26 @@ class DiscordClient
         @param afk Whether if the bot is AFK or not.
     **/
 
+    //FOR TESTING PURPOSES
+
+    /**
+        Causes a resume. This is for testing purposes and it has no logical sense to use this
+    **/
     public function causeResume() {
+        trace("Causing resume at " + Date.now());
         this.wsm('{
             "op": 7,
             "d": null
           }');
     }
 
+    /**
+        Changes the status from the account
+        @param status
+        @param type
+        @param presence
+        @param afk
+    **/
     public function changeStatus(status:String, ?type:String, ?presence:String, ?afk:Bool = false)
     {
         var availableStatus:Array<String> = ["online", "dnd", "idle", "invisible", "offline"];
@@ -633,6 +639,15 @@ class DiscordClient
     **/
 
     dynamic public function onReady()
+    {
+
+    }
+
+    /**
+        Event hook for the "RESUMED" event
+    **/
+
+    dynamic public function onResumed()
     {
 
     }

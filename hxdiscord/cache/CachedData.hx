@@ -4,6 +4,8 @@ import hxdiscord.endpoints.Endpoints;
 /**
     Maybe it's not the best way to do this but I wanna try. If I see that this does not go well then I'll find another way
     Also, I'm going to cache ONLY guild members, including their roles and permissions (for now)
+
+    If you're reading the documentation, please ignore this
 **/
 
 class CachedData {

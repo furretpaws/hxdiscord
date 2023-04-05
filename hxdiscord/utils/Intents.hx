@@ -1,5 +1,9 @@
 package hxdiscord.utils;
 
+/**
+    The intents for the DiscordClient. This class tells Discord which intentions you have with your application
+**/
+
 enum abstract Intents(Int) from Int to Int {
     final GUILDS:Int = 1 << 0;
     final GUILD_MEMBERS:Int = 1 << 1;

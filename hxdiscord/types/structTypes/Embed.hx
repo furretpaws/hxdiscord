@@ -51,7 +51,7 @@ typedef Embed = {
     @:optional var type:String;
     @:optional var description:String;
     @:optional var url:String;
-    @:optional var timestamp:Date;
+    @:optional var timestamp:String;
     @:optional var color:Int;
     @:optional var footer:EmbedFooter;
     @:optional var image:EmbedImage;

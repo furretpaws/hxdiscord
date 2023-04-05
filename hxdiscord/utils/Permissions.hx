@@ -2,6 +2,10 @@ package hxdiscord.utils;
 
 import haxe.Int64;
 
+/**
+    Discord's permissions, but in a class
+**/
+
 class Permissions {
     public static inline final _CREATE_INSTANT_INVITE:Int = 0x00000001;
     public static inline final _KICK_MEMBERS:Int = 0x00000002;
@@ -33,6 +37,10 @@ class Permissions {
     public static inline final _MANAGE_WEBHOOKS:Int = 0x20000000;
     public static inline final _MANAGE_EMOJIS:Int = 0x40000000;
 
+    /**
+        Resolve some sort of permissions based on a bitwise integer. Returns an array
+        @param _int The integer (Int64)
+    **/
     public static function resolve(_int:Int64):Array<String>
     {
         var allIntents:Array<Int> = [_CREATE_INSTANT_INVITE, _KICK_MEMBERS, _BAN_MEMBERS, _ADMINISTRATOR, _MANAGE_CHANNELS, _MANAGE_GUILD, _ADD_REACTIONS, _VIEW_AUDIT_LOG, _VIEW_CHANNEL, _SEND_MESSAGES, _SEND_TTS_MESSAGES, _MANAGE_MESSAGES, _EMBED_LINKS, _ATTACH_FILES, _READ_MESSAGE_HISTORY, _MENTION_EVERYONE, _USE_EXTERNAL_EMOJIS, _CONNECT, _SPEAK, _MUTE_MEMBERS, _DEAFEN_MEMBERS, _MOVE_MEMBERS, _USE_VAD, _PRIORITY_SPEAKER, _CHANGE_NICKNAME, _MANAGE_NICKNAMES, _MANAGE_ROLES, _MANAGE_WEBHOOKS, _MANAGE_EMOJIS];
@@ -48,6 +56,10 @@ class Permissions {
         return thingToReturn;
     }
 
+    /**
+        Convert an array with bitwise numbers into a unique bitwise number
+        @param perms The array with the bitwise perms
+    **/
     public static function convert(perms:Array<Int>):Int
     {
         var permissionInt:Int = 0;

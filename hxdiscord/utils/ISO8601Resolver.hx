@@ -4,12 +4,24 @@ package hxdiscord.utils;
 
 using StringTools;
 
+/**
+    The ISO8601 class for Discord. This is used for Discord's date system
+**/
+
 class ISO8601Resolver {
+    /**
+        Returns an ISO8601 formatted string about the current date
+    **/
     public static function getActualISODate():String {
         return DateTools.format(Date.now(), "%Y-%m-%dT%H:%M:%S." + Std.string(haxe.Timer.stamp() * 10000).split(".")[1] + "Z"); //I DON'T KNOW IF THIS WORKS FOR JS, I'LL TRY TO FIX IT ONCE I ADD JS SUPPORT
     }
 
-    public static function getCalculatedISODate(time:String, ?returnMilliseconds):String {
+    /**
+        Returns an ISO8601 formatted string about the calculated time you want
+        @param time Enter the time you wanna calculate (i.e 10m)
+        @param returnMilliseconds Whether to return miliseconds or not
+    **/
+    public static function getCalculatedISODate(time:String, ?returnMilliseconds:Bool):String {
         var dateToReturn:String = "";
         if (!time.endsWith("s") && !time.endsWith("m") && !time.endsWith("h") && !time.endsWith("d") && !time.endsWith("w") && !time.endsWith("m") && !time.endsWith("y"))
         {

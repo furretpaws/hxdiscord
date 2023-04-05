@@ -25,6 +25,13 @@ class Interaction
     public var token:String;
     public var data:hxdiscord.types.structTypes.InteractionS.InteractionData;
 
+    /**
+        Constructor (You won't probably use this since it's useless to construct one)
+        @param ins The interaction object
+        @param _client The client instance you're running
+        @param parsedJSON Same thing as the interaction object but as a Dynamic object, don't ask why I did that
+    **/
+
     public function new(ins:InteractionS, _client:DiscordClient, parsedJSON:Dynamic)
     {
         username = ins.username;
@@ -59,21 +66,41 @@ class Interaction
         }
     }
 
+    /**
+        Reply to the interaction
+        @param ic The interaction object
+        @param ephemeral Whether it's an ephemeral message or not (Only visible to the user interacting)
+    **/
+
     public function reply(ic:hxdiscord.types.Typedefs.InteractionCallback, ?ephemeral:Bool)
     {
         Endpoints.sendInteractionCallback(ic, intId, token, 4, ephemeral);
     }
 
+    /**
+        Edits the interaction respond if it's called by a component
+        @param ic The interaction object
+    **/
     public function editComponent(ic:hxdiscord.types.Typedefs.InteractionCallback)
     {
         Endpoints.sendInteractionCallback(ic, intId, token, 7);
     }
 
+    /**
+        Shows a modal
+        @param title The modal title
+        @param custom_id The custom id of the modal
+        @param imc An array full of action rows
+    **/
     public function showModal(title:String, custom_id:String, imc:Array<hxdiscord.types.message.ActionRow>)
     {
         Endpoints.showInteractionModal(imc, intId, token, type, title, custom_id);
     }
 
+    /**
+        Returns a value from the interaction options
+        @param optionName The name of the option
+    **/
     public function getValue(optionName:String):Dynamic
     {
         var daThing:Dynamic = "optionName";
@@ -94,6 +121,11 @@ class Interaction
         }
         return daThing;
     }
+
+    /**
+        Edits the interaction response
+        @param ic The interaction object
+    **/
 
     public function edit(ic:Typedefs.InteractionCallback)
     {

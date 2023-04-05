@@ -31,6 +31,10 @@ class Message
 
     var prevSentMessage:Message = null;
 
+    /**
+        Constructor
+    **/
+
     public function new(ms:MessageS, _client:DiscordClient)
     {
         client = _client;
@@ -52,6 +56,11 @@ class Message
         guild_id = ms.guild_id;
     }
 
+    /**
+        Send a message to the message owner privately (DM)
+        @param mc Message object
+    **/
+
     public function send(mc:hxdiscord.types.Typedefs.MessageCreate)
     {
         try {
@@ -62,65 +71,120 @@ class Message
         }
     }
 
+    /**
+        Replies to a message
+        @param mc Message object
+        @param ping Whether to ping the user or not (reply)
+    **/
+
     public function reply(mc:hxdiscord.types.Typedefs.MessageCreate, ?ping:Bool)
     {
         prevSentMessage = new Message(Endpoints.sendMessage(channel_id, mc, id, ping), client);
     }
 
+    @:deprecated("Use reply() instead")
     public function replyData(data:Dynamic) //this will save a lot of time honestly
     {
         Endpoints.sendDataToMessageAPI(data, channel_id);
     }
+
+    /**
+        Reacts to a message
+        @param emoji The emoji, it can be a custom emoji or a regular emoji
+    **/
 
     public function react(emoji:String)
     {
         Endpoints.createReaction(channel_id, id, emoji);
     }
 
+    /**
+        Deletes an own reaction
+        @param emoji The emoji you wanna remove
+    **/
+
     public function deleteOwnReaction(emoji:String)
     {
         Endpoints.deleteOwnReaction(channel_id, id, emoji);
     }
+
+    /**
+        Deletes ALL reactions from a message
+    **/
 
     public function deleteReactions()
     {
         Endpoints.deleteAllReactions(channel_id, id);
     }
 
+    /**
+        Deletes ALL reactions for an emoji
+    **/
+
     public function deleteEmojiReaction(emoji:String)
     {
         Endpoints.deleteAllReactionsForEmoji(channel_id, id, emoji);
     }
+
+    /**
+        Deletes the message
+    **/
 
     public function deleteMessage()
     {
         Endpoints.deleteMessage(channel_id, id);
     }
 
+    /**
+        Pins the message
+    **/
+
     public function pin()
     {
         Endpoints.pinMessage(channel_id, id);
     }
+
+    /**
+        Pins the message
+    **/
 
     public function pinMessage()
     {
         Endpoints.pinMessage(channel_id, id);
     }
 
+    /**
+        Unpins the message
+    **/
+
     public function unpin()
     {
         Endpoints.unpinMessage(channel_id, id);
     }
+
+    /**
+        Unpins the message
+    **/
 
     public function unpinMessage()
     {
         Endpoints.unpinMessage(channel_id, id);
     }
 
+    /**
+        Created a thread based on this message
+        @param obj The FromMessage thread object
+    **/
+
     public function createThread(obj:FromMessage)
     {
         Endpoints.startThreadFromMessage(channel_id, id, obj);
     }
+
+    /**
+        Edits a previously sent message by you
+        @param m Message object
+    **/
     
     public function editMessage(m:hxdiscord.types.Typedefs.MessageCreate)
     {
@@ -133,6 +197,11 @@ class Message
             Endpoints.editMessage(channel_id, prevSentMessage.id, m);
         }
     }
+
+    /**
+        Check if the user has an specific role or not
+        @param roleToLookFor The ID of the role to look for
+    **/
 
     public function hasRole(roleToLookFor:String):Bool
     {
@@ -176,6 +245,11 @@ class Message
         }
         return hasRole;
     }
+
+    /**
+        Check if the user has permissions or not
+        @param permissionToLookFor The permission to look for (i.e "ADMINISTRATOR")
+    **/
 
     public function hasPermission(permissionToLookFor:String):Bool
     {
@@ -235,6 +309,10 @@ class Message
         return hasPermission;*/
         return hasPermission;
     }
+
+    /**
+        Returns a GuildMember object about the message author (only if it's in a guild)
+    **/
 
     public function getMember():Member {
         var member:Member = null;

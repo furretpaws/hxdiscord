@@ -20,6 +20,10 @@ import sys.net.UdpSocket;
 
 using StringTools;
 
+/**
+    VoiceClient, I'm still working on this so please do not bother using it as it won't work
+**/
+
 class VoiceClient {
     var guild_id:String;
     var channel_id:String;

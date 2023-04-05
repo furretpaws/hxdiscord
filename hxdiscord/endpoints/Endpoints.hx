@@ -1307,6 +1307,11 @@ class Endpoints
         r.send();
     }
 
+    /**
+        Returns a list of the pinned messages in a channel
+        @param channel_id The channel ID
+    **/
+
     public static function getPinnedMessages(channel_id:String)
     {
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/pins");
@@ -1534,6 +1539,12 @@ class Endpoints
         return s;
     }
 
+    /**
+        Starts a thread in a forum channel
+        @param channel_id The channel ID
+        @param message_id The message ID
+        @param obj The request object
+    **/
     public static function startThreadInForumChannel(channel_id:String, message_id:String, obj:ForumChannel):Bool
     {
         var s:Bool = true;
@@ -1771,6 +1782,11 @@ class Endpoints
         return thing;
     }
 
+    /**
+        List public archived threads
+        @param channel_id The channel ID
+        @param user_id The user ID
+    **/
     public static function listPublicArchivedThreads(channel_id:String, user_id:String)
     {
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/thread-members/archived/public");
@@ -1801,6 +1817,12 @@ class Endpoints
         return thing;
     }
 
+    /**
+        List private archived threads
+        @param channel_id The channel ID
+        @param user_id The user ID
+    **/
+
     public static function listPrivateArchivedThreads(channel_id:String, user_id:String)
     {
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/thread-members/archived/public");
@@ -1830,8 +1852,13 @@ class Endpoints
         r.send();
         return thing;
     }
+    
+    /**
+        List joined private archived threads
+        @param channel_id The channel ID
+    **/
 
-    public static function listJoinedPrivateArchivedThreads(channel_id:String, user_id:String)
+    public static function listJoinedPrivateArchivedThreads(channel_id:String)
     {
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/users/@me/thread-members/archived/private");
 
@@ -1860,6 +1887,13 @@ class Endpoints
         r.send();
         return thing;
     }
+
+    /**
+        Modify a guild role
+        @param guild_id The guild ID
+        @param role_id The role ID
+        @param data The request data
+    **/
 
     public static function modifyGuildRole(guild_id:String, role_id:String, data:hxdiscord.types.Typedefs.ModifyGuildRoleParams):Bool
     {
@@ -1890,6 +1924,13 @@ class Endpoints
         return s;
     }
 
+    /**
+        Adds a role to a guild member
+        @param guild_id The guild ID
+        @param user_id The user ID
+        @param role_id The role ID
+    **/
+
     public static function addGuildMemberRole(guild_id:String, user_id:String, role_id:String):Bool
     {
         var s:Bool = true;
@@ -1917,6 +1958,13 @@ class Endpoints
         req.send();
         return s;
     }
+
+    /**
+        Removes a role from a guild member
+        @param guild_id The guild ID
+        @param user_id The user ID
+        @param role_id The role ID
+    **/
 
     public static function removeGuildMemberRole(guild_id:String, user_id:String, role_id:String):Bool
     {
@@ -2059,6 +2107,12 @@ class Endpoints
         return req.responseData;
         #end
     }
+
+    /**
+        Bulk delete messages from a channel
+        @param channel_id The channel ID
+        @param messages An array with message ids
+    **/
 
     public static function bulkDeleteMessages(channel_id:String, messages:Array<String>)
     {
@@ -2279,6 +2333,12 @@ class Endpoints
     
         r.send();
     }
+
+    /**
+        Edit a recent interaction response
+        @param ic The content of the message
+        @param interactionToken The token of the interaction you wanna edit
+    **/
 
     public static function editInteractionResponse(ic:hxdiscord.types.Typedefs.InteractionCallback, interactionToken:String)
     {

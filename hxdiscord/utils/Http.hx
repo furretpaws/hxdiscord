@@ -8,6 +8,11 @@ import js.node.http.IncomingMessage;
 import js.SyncRequest;
 #end
 
+/**
+    The HTTP class hxdiscord uses
+    NOTE: If you're going to use http requests for any of your applications. It is extremely recommended to use this class, since it's supported for every language hxdiscord supports
+**/
+
 class Http {
     var url:String = "";
     var method:String = "";
@@ -15,14 +20,27 @@ class Http {
     var postData:Dynamic = null;
     public var responseData:String;
     var response:String;
+    /**
+        Constructor
+        @param url The URL you wanna request
+    **/
     public function new(url:String) {
         this.url = url;
     }
 
+    /**
+        Set a method, it can be GET, POST, DELETE, PATCH, PUT.. (Case sensitive tho)
+        @param method The method
+    **/
     public function setMethod(method:String) {
         this.method = method;
     }
 
+    /**
+        Adds a header to your request
+        @param val1 The first parameter
+        @param val2 The second parameter
+    **/
     public function addHeader(val1:String, val2:String) {
         var array:Array<String> = [];
         array.push(val1);
@@ -30,18 +48,34 @@ class Http {
         headers.push(array);
     }
 
+    /**
+        Add a header with an array
+        @param header The array for the header (i.e ["User-Agent", "hxdiscord"])
+    **/
     public function addHeaderByArray(header:Array<String>) {
         headers.push(header);
     }
 
+    /**
+        If you're going to send a HTTP request that's not a GET method, you'll have to use this
+        Sets the POST data you wanna send
+        @param postData The data
+    **/
     public function setPostData(postData:String) {
         this.postData = postData;
     }
 
+    /**
+        Sets the POST data with bytes (Mostly used for uploading files)
+        @param postData The data (but with bytes!)
+    **/
     public function setPostBytes(postData:haxe.io.Bytes) {
         this.postData = postData;
     }
 
+    /**
+        Send the data
+    **/
     public function send() {
         #if js
         var baseThing:String = "{}";
@@ -123,6 +157,10 @@ class Http {
         #end
     }
 
+    /**
+        Also sends the data, but it's more haxe.Http syntaxed
+        @param post Whether it's a POST request or not
+    **/
     public function request(?post:Bool) {
         #if nodejs
         var headersMap = new Map<String, String>();
@@ -194,6 +232,8 @@ class Http {
         #end
     }
     
+    @:dox(hide)
+    @:deprecated("Please don't use this. Use setMethod instead")
     public function customRequest(?post:Bool, ?output:haxe.io.BytesOutput, ?method:String) {
         #if nodejs
         var headersMap = new Map<String, String>();
@@ -266,7 +306,16 @@ class Http {
         #end
     }
 
+    /**
+        Event hook for the incoming data
+    **/
     dynamic public function onData(d:String) { }
+    /**
+        Event hook if any errors occur
+    **/
     dynamic public function onError(d:String) { }
+    /**
+        Event hook for code status (Not sure if it works on every targets)
+    **/
     dynamic public function onStatus(d:Int) { }
 }
