@@ -48,17 +48,14 @@ class WebSocketConnection {
     }
 
     public inline function send(message:String) {
-        trace(message);
         this.ws.sendString(message);
     }
 
     public inline function sendString(message:String) {
-        trace(message);
         this.ws.sendString(message);
     }
 
     public inline function sendJson(j:Dynamic) {
-        trace(haxe.Json.stringify(j));
         this.ws.sendString(haxe.Json.stringify(j));
     }
 
