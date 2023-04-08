@@ -31,6 +31,7 @@ class DiscordClient
     private var session:String = "";
     private var session_type:String = "";
     private var session_id:String = "";
+    private var heartbeat_interval:Int = 0;
     private var resume_gateway_url:String = "";
 
     private var cache:CachedData;
@@ -122,6 +123,7 @@ class DiscordClient
                 {
                     heartbeatTimer.stop();
                 }
+                heartbeatTimer = null;
             
                 if (m == 4007) //session is invalid so i cannot resume
                 {
@@ -158,11 +160,6 @@ class DiscordClient
                         trace("Websocket gave an error. (" + e + ")");
                     }
                     ws.close();
-                    if (heartbeatTimer != null)
-                    {
-                        heartbeatTimer.stop();
-                    }
-                    connect();
                 } catch (err) {
                     trace(err.message);
                 }
@@ -175,13 +172,11 @@ class DiscordClient
                     {
                         heartbeatTimer.stop();
                     }
-                    connect();
                 } catch (err) {
                     if (heartbeatTimer != null)
                     {
                         heartbeatTimer.stop();
                     }
-                    connect();
                 }
             }
         } catch (err) {
@@ -200,7 +195,7 @@ class DiscordClient
         if (heartbeatTimer != null) {
             heartbeatTimer.stop();
         }
-        connect();
+        heartbeatTimer = null;
     }
 
     @:dox(hide)
@@ -229,7 +224,8 @@ class DiscordClient
                 {
                     trace("hello op code");
                 }
-                heartbeatTimer = new Timer(json.d.heartbeat_interval);
+                heartbeat_interval = json.d.heartbeat_interval;
+                heartbeatTimer = new Timer(heartbeat_interval);
                 heartbeatTimer.run = function()
                 {
                     try {
