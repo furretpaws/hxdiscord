@@ -200,7 +200,6 @@ class DiscordClient
 
     @:dox(hide)
     function wsm(msg){
-        trace(sequence);
         #if (!hl)
         try {
         #end
