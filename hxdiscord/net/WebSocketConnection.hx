@@ -31,6 +31,10 @@ class WebSocketConnection {
             haxe.EntryPoint.runInMainThread(this.onError.bind(err));
         }
 
+        ws.requiredReconnect = () -> {
+            requiredReconnect();
+        }
+
         #if sys
         while (true) {
             ws.process();
@@ -44,18 +48,22 @@ class WebSocketConnection {
     }
 
     public inline function send(message:String) {
+        trace(message);
         this.ws.sendString(message);
     }
 
     public inline function sendString(message:String) {
+        trace(message);
         this.ws.sendString(message);
     }
 
     public inline function sendJson(j:Dynamic) {
+        trace(haxe.Json.stringify(j));
         this.ws.sendString(haxe.Json.stringify(j));
     }
 
     dynamic public function onClose(code:Int) { }
+    dynamic public function requiredReconnect() { }
     dynamic public function onReady() { }
     dynamic public function onMessage(m) { }
     dynamic public function onError(err) { } //:3

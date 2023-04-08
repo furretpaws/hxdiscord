@@ -58,6 +58,10 @@ class WebSocket {
 
     public function sendBytes(message:Bytes) {
     }
+
+    public dynamic function requiredReconnect() {
+        
+    }
 	
     public function close() {
     }

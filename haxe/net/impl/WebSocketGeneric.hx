@@ -357,14 +357,22 @@ class WebSocketGeneric extends WebSocket {
     }
 
     override public inline function sendString(message:String) {
-        if (readyState != Open) throw('websocket not open');
-        sendFrame(Utf8Encoder.encode(message), Opcode.Text);
+        if (readyState != Open) {
+            requiredReconnect(); //instead of "websocket not open" it just reconnects, big brain move don't you think?
+        } else {
+            sendFrame(Utf8Encoder.encode(message), Opcode.Text);
+        }
     }
 
     override public inline function sendBytes(message:Bytes) {
-        if (readyState != Open) throw('websocket not open');
-        sendFrame(message, Opcode.Binary);
+        if (readyState != Open) {
+            requiredReconnect();
+        } else {
+            sendFrame(message, Opcode.Binary);
+        }
     }
+
+    override dynamic public function requiredReconnect() {}
 
     static private inline function generateMask() {
         var maskData = Bytes.alloc(4);
