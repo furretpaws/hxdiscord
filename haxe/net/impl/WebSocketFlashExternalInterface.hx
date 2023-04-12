@@ -141,7 +141,7 @@ class WebSocketFlashExternalInterface extends WebSocket {
     override public function process() {
     }
 
-    static public inline function available():Bool {
+    static public function available():Bool {
         return ExternalInterface.available && ExternalInterface.call('function() { return (typeof WebSocket) != "undefined"; }');
     }
 }

@@ -27,6 +27,7 @@ class DiscordClient
     var receivedHelloOC:Bool = false;
     private var ignore:Bool = false;
     private var sequence:Int = 0;
+    var showWsLogsVar:Bool = false;
     private var connectedVoiceClients:Array<VoiceClient> = [];
     private var session:String = "";
     private var session_type:String = "";
@@ -68,6 +69,7 @@ class DiscordClient
     public var currentVoiceClients:Array<VoiceClient> = [];
 
     public var intentsNumber:Int = 0;
+    public var noConnection:Bool = false;
 
     /**
         Constructor. This will start a new hxdiscord instance.
@@ -107,77 +109,135 @@ class DiscordClient
         
     }
 
+    public function showWsLogs() {
+        if (showWsLogsVar) {
+            Sys.println("[hxdiscord] WebSocket logs are already shown! To hide them, use hideWsLogs()");
+        } else {
+            showWsLogsVar = true;
+            Sys.println("[hxdiscord] WebSocket logs will be shown now!");
+        }
+    }
+
+    public function hideWsLogs() {
+        if (!showWsLogsVar) {
+            Sys.println("[hxdiscord] WebSocket logs are already hidden! To hide them, use hideWsLogs()");
+        } else {
+            showWsLogsVar = false;
+            Sys.println("[hxdiscord] WebSocket logs will be hidden now!");
+        }
+    }
+
     @:dox(hide)
     function connect()
     {
+        if (noConnection) {
+            Sys.println("[i] - Waiting 30 seconds for the connection to come back...");
+            var wait = new Timer(30000);
+            wait.run = function()
+            {
+                noConnection = false;
+                wait.stop();
+                connect();
+            }
+        }
         try {
-            if (debug)
-                trace("Connecting");
-
-            var url = Gateway.GATEWAY_URL;
-
-            ws = new WebSocketConnection(url);
-            ws.onMessage = this.wsm;
-            ws.onClose = (m:Dynamic) -> {
-                if (heartbeatTimer != null)
-                {
-                    heartbeatTimer.stop();
+            if (!noConnection) {
+                if (debug)
+                    trace("Connecting");
+    
+                var url = Gateway.GATEWAY_URL;
+    
+                ws = new WebSocketConnection(url);
+                ws.onReady = () -> {
+                    if (showWsLogsVar) {
+                        Sys.println("[ws-hxdiscord] The WebSocket connection is ready!");
+                    }
                 }
-                heartbeatTimer = null;
-            
-                if (m == 4007) //session is invalid so i cannot resume
-                {
-                    session_id = "";
-                    session = "";
-                    session_type = "";
-                    canResume = false;
-
-                    Gateway.GATEWAY_URL = "wss://gateway.discord.gg/?v="+Gateway.API_VERSION+"&encoding=json";
-                }
-            
-                if (Std.is(m, String)) {
-                    var error:String = m.toLowerCase();
-                    if (error.contains("intent")) {
-                        throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with your intents.\nFor further information you can look at this Discord Developer pages\nhttps://discord.com/developers/docs/change-log#message-content-is-a-privileged-intent\nhttps://discord.com/developers/docs/topics/gateway-events#gateway-events";
-                    } else if (error.contains("invalid")) {
-                        throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with something you've sent to the Discord API. Please check the Discord Developer Portal documentation for more information";
-                    } else if (error.contains("sharding")) {
-                        throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with shards. If it says that shards are required then it's because the session would have handled too many guilds, you are required to shard your connection in order to connect.";
+                ws.onMessage = this.wsm;
+                ws.onClose = (m:Dynamic) -> {
+                    if (showWsLogsVar) {
+                        Sys.println("[ws-hxdiscord] The WebSocket connection has been closed. Code: " + m);
+                    }
+                    if (heartbeatTimer != null)
+                    {
+                        heartbeatTimer.stop();
+                    }
+                    heartbeatTimer = null;
+                
+                    if (m == 4007) //session is invalid so i cannot resume
+                    {
+                        session_id = "";
+                        session = "";
+                        session_type = "";
+                        canResume = false;
+    
+                        Gateway.GATEWAY_URL = "wss://gateway.discord.gg/?v="+Gateway.API_VERSION+"&encoding=json";
+                    }
+                
+                    if (Std.is(m, String)) {
+                        var error:String = m.toLowerCase();
+                        if (error.contains("intent")) {
+                            throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with your intents.\nFor further information you can look at this Discord Developer pages\nhttps://discord.com/developers/docs/change-log#message-content-is-a-privileged-intent\nhttps://discord.com/developers/docs/topics/gateway-events#gateway-events";
+                        } else if (error.contains("invalid")) {
+                            throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with something you've sent to the Discord API. Please check the Discord Developer Portal documentation for more information";
+                        } else if (error.contains("sharding")) {
+                            throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with shards. If it says that shards are required then it's because the session would have handled too many guilds, you are required to shard your connection in order to connect.";
+                        } else {
+                            if (debug)
+                                trace("[!] The socket has closed with the error \"" + m + "\". Re-opening...");
+                        }
                     } else {
                         if (debug)
-                            trace("[!] The socket has closed with the error \"" + m + "\". Re-opening...");
+                            trace("[!] The socket has closed with code: " + m + ". Re-opening...");
                     }
-                } else {
-                    if (debug)
-                        trace("[!] The socket has closed with code: " + m + ". Re-opening...");
-                }
-                connect();
-            };
-            ws.onError = (e) -> {
-                try {
-                    trace("thing errored");
-                    if (debug) {
-                        trace("Websocket gave an error. (" + e + ")");
-                    }
-                    ws.close();
-                } catch (err) {
-                    trace(err.message);
-                }
-            }
-            ws.requiredReconnect = () -> { //library bug
-                try {
-                    ws.close(); //IT'S ALREADY CLOSED?????
+                    //destroying since it's not required anymore
+                    ws.destroy();
                     ws = null;
-                    if (heartbeatTimer != null)
-                    {
-                        heartbeatTimer.stop();
+                    Sys.println('Waiting 2.5 seconds..');
+                    var t:Timer = new Timer(2500);
+                    t.run = () -> {
+                        t.stop();
+                        ws.destroy();
+                        connect();
                     }
-                } catch (err) {
-                    if (heartbeatTimer != null)
-                    {
-                        heartbeatTimer.stop();
+                };
+                ws.onError = (e) -> {
+                    #if neko
+                    if (e.contains("ssl@ssl_handshake")) {
+                        trace("oh no");
+                        noConnection = true;
+                    }
+                    #end
+                    if (showWsLogsVar) {
+                        Sys.println("[ws-hxdiscord] The WebSocket has got an error. Error: " + e);
+                    }
+                    try {
+                        if (debug) {
+                            trace("Websocket gave an error. (" + e + ")");
+                        }
+                        ws.close();
+                    } catch (err) {
+                        Sys.println("[!] Catched an error from the WebSocket, please make a new GitHub issue if this problem persists\nError: " + e);
                     }
                 }
+                /*ws.requiredReconnect = () -> { //library bug
+                    if (showWsLogsVar) {
+                        Sys.println("[ws-hxdiscord] The WebSocket is required to close itself and reconnect due to a library issue");
+                    }
+                    try {
+                        ws.close(); //IT'S ALREADY CLOSED?????
+                        ws = null;
+                        if (heartbeatTimer != null)
+                        {
+                            heartbeatTimer.stop();
+                        }
+                    } catch (err) {
+                        if (heartbeatTimer != null)
+                        {
+                            heartbeatTimer.stop();
+                        }
+                    }
+                }*/
             }
         } catch (err) {
             if (err.message == "ssl@ssl_close") {
@@ -200,6 +260,9 @@ class DiscordClient
 
     @:dox(hide)
     function wsm(msg){
+        if (showWsLogsVar) {
+            Sys.println("[ws-hxdiscord] New message!");
+        }
         #if (!hl)
         try {
         #end
@@ -212,10 +275,6 @@ class DiscordClient
             var event = json.event;
             var op = json.op;
             var d:Dynamic = json.d;
-            if (json.s != null)
-            {
-                sequence = json.s;
-            }
             switch (json.op)
             {
                 case 10:
@@ -278,6 +337,8 @@ class DiscordClient
                     }
                 case 7: //gateway needs client to reconnect
                     ws.close();
+                case 0:
+                    sequence = json.s;
             }
         
             switch (t) {

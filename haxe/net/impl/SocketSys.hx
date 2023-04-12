@@ -12,10 +12,9 @@ class SocketSys extends Socket2 {
     private var sendError:Bool = false;
 	private var wasCloseSent:Bool = false;
     private var secure:Bool;
-	private var isClosed:Bool = false;
 
     private function new(host:String, port:Int, debug:Bool = false) super(host, port, debug);
-	
+
 	private function initialize(secure:Bool) {
         this.secure = secure;
         var impl:Dynamic = null;
@@ -39,14 +38,14 @@ class SocketSys extends Socket2 {
             this.sendError = true;
             if (debug) trace('socket.error! $e');
         }
-		
+
 		return this;
     }
-	
-	public static inline function create(host:String, port:Int, secure:Bool, debug:Bool = false) {
+
+	public static function create(host:String, port:Int, secure:Bool, debug:Bool = false) {
 		return new SocketSys(host, port, debug).initialize(secure);
 	}
-	
+
 	static function createFromExistingSocket(socket:sys.net.Socket, debug:Bool = false) {
 		var socketSys = new SocketSys(socket.host().host.host, socket.host().port, debug);
 		socket.setBlocking(false);
@@ -57,8 +56,9 @@ class SocketSys extends Socket2 {
 
     override public function close() {
 		this.impl.close();
+		isClosed = true;
 		if (!wasCloseSent) {
-			
+
 			wasCloseSent = true;
 			if (debug) trace('socket.onclose!');
 			onclose();
@@ -66,50 +66,57 @@ class SocketSys extends Socket2 {
     }
 
     override public function process() {
-        if (sendConnect) {
-            if (debug) trace('socket.onconnect!');
-            sendConnect = false;
-            onconnect();
-        }
+        try {
+            if (sendConnect) {
+                if (debug) trace('socket.onconnect!');
+                sendConnect = false;
+                onconnect();
+            }
 
-        if (sendError) {
-            if (debug) trace('socket.onerror!');
-            sendError = false;
-            onerror();
-        }
-		
-		var needClose = false;
-		var result = null;
-		try {
-			result = sys.net.Socket.select([this.impl], [this.impl], [this.impl], 0.4);
-		}
-		catch (e:Dynamic) {
-			if(debug) trace('closing socket because of $e');
-			needClose = true;
-		}
+            if (sendError) {
+                if (debug) trace('socket.onerror!');
+                sendError = false;
+                onerror();
+            }
 
-		if(result != null && !needClose) {
-			if (result.read.length > 0) {
-				var out = new BytesRW();
-				try {
-					var input = this.impl.input;
-					while (true) {
-						var data = Bytes.alloc(1024);
-						var readed = input.readBytes(data, 0, data.length);
-						if (readed <= 0) break;
-						out.writeBytes(data.sub(0, readed));
-					}
-				} catch (e:Dynamic) {
-					needClose = !(e == 'Blocking' || (Std.is(e, Error) && (e:Error).match(Error.Blocked)));
-					if(needClose && debug) trace('closing socket because of $e');
-				}
-				ondata(out.readAllAvailableBytes());
-			}
-		}
-		
-		if (needClose) {
-			close();
-		}
+		    var needClose = false;
+		    var result = null;
+		    try {
+		    	result = sys.net.Socket.select([this.impl], [this.impl], [this.impl], 0.4);
+		    }
+		    catch (e:Dynamic) {
+		    	if(debug) trace('closing socket because of $e');
+		    	needClose = true;
+		    }
+
+		    if(result != null && !needClose) {
+		    	if (result.read.length > 0) {
+		    		var out = new BytesRW();
+		    		try {
+		    			var input = this.impl.input;
+		    			while (true) {
+		    				var data = Bytes.alloc(1024);
+		    				var readed = input.readBytes(data, 0, data.length);
+		    				if (readed <= 0) break;
+		    				out.writeBytes(data.sub(0, readed));
+		    			}
+		    		} catch (e:Dynamic) {
+                        needClose = !(e == 'Blocking' || (Std.is(e, Error) && (
+                            (e:Error).match(Error.Custom(Error.Blocked)) ||
+                            (e:Error).match(Error.Blocked))
+                        ));
+		    			if(needClose && debug) trace('closing socket because of $e');
+		    		}
+		    		ondata(out.readAllAvailableBytes());
+		    	}
+		    }
+
+		    if (needClose && !isClosed) {
+		    	close();
+		    }
+        } catch (e:Dynamic) {
+            
+        }
     }
 
     override public dynamic function onconnect() {

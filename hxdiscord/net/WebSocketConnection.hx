@@ -6,6 +6,7 @@ using StringTools;
 class WebSocketConnection {
     var host = "";
     var ws:haxe.net.WebSocket;
+    var destroyed:Bool = false;
     public function new(host:String) {
         this.host = host;
         haxe.MainLoop.addThread(create);
@@ -23,7 +24,7 @@ class WebSocketConnection {
             haxe.EntryPoint.runInMainThread(this.onMessage.bind(message));
             #end
         }
-        ws.onclose = (code:Int) -> {
+        ws.onclose = (code:Dynamic) -> {
             haxe.EntryPoint.runInMainThread(this.onClose.bind(code));
         }
 
@@ -31,14 +32,16 @@ class WebSocketConnection {
             haxe.EntryPoint.runInMainThread(this.onError.bind(err));
         }
 
-        ws.requiredReconnect = () -> {
-            requiredReconnect();
-        }
-
         #if sys
         while (true) {
-            ws.process();
-            Sys.sleep(0.1);
+            try {
+                if (!destroyed) {
+                    ws.process();
+                    Sys.sleep(0.1);
+                }
+            } catch (err) {
+
+            }
         }
         #end
     }
@@ -48,19 +51,40 @@ class WebSocketConnection {
     }
 
     public inline function send(message:String) {
-        this.ws.sendString(message);
+        try {
+            this.ws.sendString(message);
+        } catch (err) {
+            trace("Close required since faulty websocket");
+            close();
+            onClose(1001);
+        }
     }
 
     public inline function sendString(message:String) {
-        this.ws.sendString(message);
+        try {
+            this.ws.sendString(message);
+        } catch (err) {
+            trace("Close required since faulty websocket");
+            close();
+            onClose(1001);
+        }
     }
 
     public inline function sendJson(j:Dynamic) {
-        this.ws.sendString(haxe.Json.stringify(j));
+        try {
+            this.ws.sendString(haxe.Json.stringify(j));
+        } catch (err) {
+            trace("Close required since faulty websocket");
+            close();
+            onClose(1001);
+        }
     }
 
-    dynamic public function onClose(code:Int) { }
-    dynamic public function requiredReconnect() { }
+    dynamic public function destroy() {
+        this.ws = null;
+        destroyed = true;
+    }
+    dynamic public function onClose(code) { }
     dynamic public function onReady() { }
     dynamic public function onMessage(m) { }
     dynamic public function onError(err) { } //:3

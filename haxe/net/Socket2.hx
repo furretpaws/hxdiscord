@@ -7,6 +7,7 @@ class Socket2 {
     private var host:String;
     private var port:Int;
     private var debug:Bool;
+    public var isClosed:Bool;
 
     private function new(host:String, port:Int, debug:Bool = false) {
         this.host = host;
@@ -46,7 +47,7 @@ class Socket2 {
     }
 	
 	#if sys
-	static public inline function createFromExistingSocket(socket:sys.net.Socket, debug:Bool = false) {
+	static public function createFromExistingSocket(socket:sys.net.Socket, debug:Bool = false) {
 		return haxe.net.impl.SocketSys.createFromExistingSocket(socket, debug);
 	}
 	#end
