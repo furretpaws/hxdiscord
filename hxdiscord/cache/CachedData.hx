@@ -12,6 +12,7 @@ class CachedData {
     var dc:hxdiscord.DiscordClient;
     public function new(dc:hxdiscord.DiscordClient) {this.dc = dc;}
     public var guild_members:Array<hxdiscord.types.Member> = [];
+    public var guilds:Array<Dynamic> = [];
     public var roles:Array<Dynamic> = [];
     public function cacheMemberAndRoles(gid:String, uid:String) {
         var member:hxdiscord.types.Member = null;

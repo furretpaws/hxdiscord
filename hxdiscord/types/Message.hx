@@ -255,6 +255,11 @@ class Message
     {
         var hasPermission:Bool = false;
         var member:Member = null;
+        for (i in 0...client.cache.guilds.length) {
+            if (client.cache.guilds[i].owner_id == author.id) {
+                hasPermission = true;
+            }
+        }
         @:privateAccess
         for (i in 0...client.cache.guild_members.length) {
             if (client.cache.guild_members[i].user.id == this.author.id && client.cache.guild_members[i].guild_id == this.guild_id) {

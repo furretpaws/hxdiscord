@@ -35,7 +35,7 @@ class DiscordClient
     private var heartbeat_interval:Int = 0;
     private var resume_gateway_url:String = "";
 
-    private var cache:CachedData;
+    public var cache:CachedData;
 
     public var data:BotData = null;
 
@@ -187,17 +187,33 @@ class DiscordClient
                                 trace("[!] The socket has closed with the error \"" + m + "\". Re-opening...");
                         }
                     } else {
-                        if (debug)
-                            trace("[!] The socket has closed with code: " + m + ". Re-opening...");
+                        switch (m) {
+                            case 4013:
+                                throw "\r\n\n[!] You sent an invalid intent for a Gateway Intent. You may have incorrectly calculated the bitwise value.";
+                            case 4014:
+                                throw "\r\n\n[!] You sent a disallowed intent for a Gateway Intent. You may have tried to specify an intent that you have not enabled or are not approved for.";
+                            case 4004:
+                                throw "\r\n\n[!] The account token sent with your identify payload is incorrect.";
+                            case 4012:
+                                throw "\r\n\n[!] You sent an invalid version for the gateway.";
+                            case 4011:
+                                throw "\r\n\n[!] The session would have handled too many guilds - you are required to shard your connection in order to connect.";
+                            case 4010:
+                                throw "\r\n\n[!] You sent us an invalid shard when identifying.";
+                            default: 
+                                if (debug) {
+                                    trace("[!] The socket has closed with code: " + m + ". Re-opening...");
+                                }
+                        }
                     }
                     //destroying since it's not required anymore
-                    ws.destroy();
-                    ws = null;
-                    Sys.println('Waiting 2.5 seconds..');
+                    if (debug)
+                        Sys.println('Waiting 2.5 seconds..');
                     var t:Timer = new Timer(2500);
                     t.run = () -> {
                         t.stop();
                         ws.destroy();
+                        ws = null;
                         connect();
                     }
                 };
@@ -396,10 +412,25 @@ class DiscordClient
                 case 'THREAD_MEMBERS_UPDATE':
                     onThreadMembersUpdate(d);
                 case 'GUILD_CREATE':
+                    var alreadyHasTheGuild:Bool = false;
+                    for (i in 0...cache.guilds.length) {
+                        if (cache.guilds[0].id == d.id) {
+                            alreadyHasTheGuild = true;
+                        }
+                    }
+                    if (!alreadyHasTheGuild) {
+                        cache.guilds.push(d);
+                    }
                     onGuildCreate(d);
                 case 'GUILD_UPDATE':
                     onGuildUpdate(d);
                 case 'GUILD_DELETE':
+                    for (i in 0...cache.guilds.length) {
+                        if (cache.guilds[0].id == d.id) {
+                            cache.guilds.remove(cache.guilds[i]);
+                            trace("removed guild");
+                        }
+                    }
                     onGuildDelete(d);
                 case "GUILD_BAN_ADD":
                     onGuildBanAdd(d);
@@ -429,7 +460,7 @@ class DiscordClient
                             }
                         }
                     } catch (err) {
-                        
+                        trace("oopsie " + err.message);
                     }
                 case "GUILD_MEMBER_UPDATE":
                     onGuildMemberUpdate(d);
