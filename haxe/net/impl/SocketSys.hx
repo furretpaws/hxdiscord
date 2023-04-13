@@ -70,7 +70,6 @@ class SocketSys extends Socket2 {
         try {
             if (isClosed) {
                 closedProcessed++;
-                trace("oh " + closedProcessed);
             } else {
                 closedProcessed = 0;
             }
