@@ -9,6 +9,7 @@ import sys.net.Socket;
 class SocketSys extends Socket2 {
     private var impl:sys.net.Socket;
     private var sendConnect:Bool = false;
+    private var closedProcessed:Int = 0;
     private var sendError:Bool = false;
 	private var wasCloseSent:Bool = false;
     private var secure:Bool;
@@ -67,6 +68,15 @@ class SocketSys extends Socket2 {
 
     override public function process() {
         try {
+            if (isClosed) {
+                closedProcessed++;
+                trace("oh " + closedProcessed);
+            } else {
+                closedProcessed = 0;
+            }
+            if (closedProcessed > 35) { //if this works i swear to god idk what i'll do
+                onclose();
+            }
             if (sendConnect) {
                 if (debug) trace('socket.onconnect!');
                 sendConnect = false;

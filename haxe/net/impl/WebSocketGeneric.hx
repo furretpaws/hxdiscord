@@ -57,6 +57,7 @@ class WebSocketGeneric extends WebSocket {
         socketData = new BytesRW();
         socket.onclose = function() {
             _debug('socket closed');
+            trace("Ffff");
             setClosed(1005);
         };
         socket.onerror = function() {
@@ -384,7 +385,7 @@ class WebSocketGeneric extends WebSocket {
 
     override public function sendString(message:String) {
         if (readyState != Open) {
-            trace("websocket not open!");
+            //trace("websocket not open!");
             setClosed(1005);
         } else {
             sendFrame(Utf8Encoder.encode(message), Opcode.Text);
@@ -393,7 +394,7 @@ class WebSocketGeneric extends WebSocket {
 
     override public function sendBytes(message:Bytes) {
         if (readyState != Open) {
-            trace("websocket not open!");
+            //trace("websocket not open!");
             setClosed(1005);
         } else {
             sendFrame(message, Opcode.Binary);
