@@ -33,7 +33,7 @@ class WebSocketConnection {
         }
 
         #if sys
-        while (true) {
+        while (!destroyed) {
             try {
                 if (!destroyed) {
                     ws.process();
