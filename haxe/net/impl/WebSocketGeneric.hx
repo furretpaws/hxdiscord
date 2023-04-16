@@ -15,6 +15,7 @@ class WebSocketGeneric extends WebSocket {
     private var port = 80;
     public var path(default, null) = "/";
     private var secure = false;
+    public var alive:Bool = true;
     private var protocols = [];
     private var state:State = State.Handshake;
     public var debug:Bool = true;
@@ -125,7 +126,7 @@ class WebSocketGeneric extends WebSocket {
     private function handleData() {
         needHandleData = false;
 
-        while (true) {
+        while (alive) {
             if (payload == null) payload = new BytesRW();
 
             switch (state) {
@@ -159,6 +160,7 @@ class WebSocketGeneric extends WebSocket {
                         writeBytes(Bytes.ofString(prepareHttp400(e)));
                         _debug('Error in http request: $e');
                         socket.close();
+                        alive = false;
                         state = State.Closed;
                     }
                 case State.Head:
@@ -226,6 +228,7 @@ class WebSocketGeneric extends WebSocket {
                             setClosed(code);
                             try {
                                 socket.close();
+                                alive = false;
                             } catch(_:Dynamic) {}
                     }
                 default:
@@ -362,6 +365,7 @@ class WebSocketGeneric extends WebSocket {
 		if(state != State.Closed) {
 			sendFrame(Bytes.alloc(0), Opcode.Close);
 			socket.close();
+            alive = false;
 			setClosed(1000);
 		}
     }

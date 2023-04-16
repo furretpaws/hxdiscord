@@ -163,6 +163,9 @@ class DiscordClient
                         heartbeatTimer.stop();
                     }
                     heartbeatTimer = null;
+
+                    ws.destroy();
+                    ws = null;
                 
                     if (m == 4007) //session is invalid so i cannot resume
                     {
@@ -212,8 +215,6 @@ class DiscordClient
                     var t:Timer = new Timer(2500);
                     t.run = () -> {
                         t.stop();
-                        ws.destroy();
-                        ws = null;
                         connect();
                     }
                 };
@@ -241,12 +242,9 @@ class DiscordClient
                         Sys.println("[ws-hxdiscord] The WebSocket is required to close itself and reconnect due to a library issue");
                     }
                     try {
-                        ws.close(); //IT'S ALREADY CLOSED?????
+                        ws.close();
+                        ws.destroy();
                         ws = null;
-                        if (heartbeatTimer != null)
-                        {
-                            heartbeatTimer.stop();
-                        }
                     } catch (err) {
                         if (heartbeatTimer != null)
                         {
