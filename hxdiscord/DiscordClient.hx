@@ -164,6 +164,12 @@ class DiscordClient
                     }
                     heartbeatTimer = null;
 
+                    @:privateAccess
+                    for (i in 0...haxe.EntryPoint.pending.length) {
+                        @:privateAccess
+                        haxe.EntryPoint.pending.remove(haxe.EntryPoint.pending[i]);
+                    }
+
                     ws.destroy();
                     ws = null;
                 
