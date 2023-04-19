@@ -240,10 +240,13 @@ class DiscordClient
                         }
                         ws.close();
                     } catch (err) {
-                        Sys.println("[!] Catched an error from the WebSocket, please make a new GitHub issue if this problem persists\nError: " + e);
-                        Sys.println("[i] Attempting to destroy the socket..");
+                        if (showWsLogsVar) {
+                            Sys.println("[!] Catched an error from the WebSocket, please make a new GitHub issue if this problem persists\nError: " + e);
+                            Sys.println("[i] Attempting to destroy the socket..");
+                        }
                         ws.destroy();
                         ws = null;
+                        connect();
                     }
                 }
                 /*ws.requiredReconnect = () -> { //library bug
