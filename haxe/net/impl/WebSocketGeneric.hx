@@ -108,7 +108,6 @@ class WebSocketGeneric extends WebSocket {
         } catch (e:Dynamic) {
             trace(e);
             onerror(Std.string(e));
-            onclose(1005); //oopsie doopsie something happened oh no spooky
         }
     }
 
