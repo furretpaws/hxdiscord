@@ -238,7 +238,9 @@ class DiscordClient
                         if (debug) {
                             trace("Websocket gave an error. (" + e + ")");
                         }
-                        ws.close();
+                        ws.destroy();
+                        ws = null;
+                        connect();
                     } catch (err) {
                         if (showWsLogsVar) {
                             Sys.println("[!] Catched an error from the WebSocket, please make a new GitHub issue if this problem persists\nError: " + e);
