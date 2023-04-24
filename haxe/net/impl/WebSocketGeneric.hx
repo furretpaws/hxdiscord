@@ -108,6 +108,9 @@ class WebSocketGeneric extends WebSocket {
         } catch (e:Dynamic) {
             //trace(e);
             onerror(Std.string(e));
+            socket.close();
+            alive = false;
+            state = State.Closed;
         }
     }
 
@@ -152,7 +155,7 @@ class WebSocketGeneric extends WebSocket {
                     try {
                         var handshake = prepareServerHandshake();
                         _debug('Sending responce: $handshake');
-                        writeBytes(Bytes.ofString(handshake));
+                        writeBytes(Bytes.ofString(prepareServerHandshake()));
                         state = State.Head;
                         this.onopen();
                     }

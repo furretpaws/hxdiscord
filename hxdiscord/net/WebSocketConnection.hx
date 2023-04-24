@@ -7,6 +7,7 @@ class WebSocketConnection {
     var host = "";
     var ws:haxe.net.WebSocket;
     var destroyed:Bool = false;
+    var errored:Bool = false;
     public function new(host:String) {
         this.host = host;
         haxe.MainLoop.addThread(create);
@@ -33,14 +34,14 @@ class WebSocketConnection {
         }
 
         #if sys
-        while (!destroyed) {
+        while (ws.readyState != Closed) {
             try {
-                if (!destroyed) {
+                if (ws.readyState != Closed) {
                     ws.process();
                     Sys.sleep(0.1);
                 }
             } catch (err) {
-
+                onError(Std.string(err));
             }
         }
         #end

@@ -140,140 +140,129 @@ class DiscordClient
                 connect();
             }
         }
-        try {
-            if (!noConnection) {
-                if (debug)
-                    trace("Connecting");
+        if (!noConnection) {
+            if (debug)
+                trace("Connecting");
     
-                var url = Gateway.GATEWAY_URL;
+            var url = Gateway.GATEWAY_URL;
     
-                ws = new WebSocketConnection(url);
-                ws.onReady = () -> {
-                    if (showWsLogsVar) {
-                        Sys.println("[ws-hxdiscord] The WebSocket connection is ready!");
+            ws = new WebSocketConnection(url);
+            ws.onReady = () -> {
+                if (showWsLogsVar) {
+                    Sys.println("[ws-hxdiscord] The WebSocket connection is ready!");
+                }
+            }
+            ws.onMessage = this.wsm;
+            ws.onClose = (m:Dynamic) -> {
+                if (showWsLogsVar) {
+                    Sys.println("[ws-hxdiscord] The WebSocket connection has been closed. Code: " + m);
+                }
+                if (heartbeatTimer != null)
+                {
+                    heartbeatTimer.stop();
+                }
+                heartbeatTimer = null;
+
+                /*@:privateAccess
+                for (i in 0...haxe.EntryPoint.pending.length) {
+                    @:privateAccess
+                    haxe.EntryPoint.pending.remove(haxe.EntryPoint.pending[i]);
+                }*/
+
+                ws.destroy();
+                ws = null;
+            
+                if (m == 4007) //session is invalid so i cannot resume
+                {
+                    session_id = "";
+                    session = "";
+                    session_type = "";
+                    canResume = false;
+    
+                    Gateway.GATEWAY_URL = "wss://gateway.discord.gg/?v="+Gateway.API_VERSION+"&encoding=json";
+                }
+            
+                if (Std.is(m, String)) {
+                    var error:String = m.toLowerCase();
+                    if (error.contains("intent")) {
+                        throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with your intents.\nFor further information you can look at this Discord Developer pages\nhttps://discord.com/developers/docs/change-log#message-content-is-a-privileged-intent\nhttps://discord.com/developers/docs/topics/gateway-events#gateway-events";
+                    } else if (error.contains("invalid")) {
+                        throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with something you've sent to the Discord API. Please check the Discord Developer Portal documentation for more information";
+                    } else if (error.contains("sharding")) {
+                        throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with shards. If it says that shards are required then it's because the session would have handled too many guilds, you are required to shard your connection in order to connect.";
+                    } else {
+                        if (debug)
+                            trace("[!] The socket has closed with the error \"" + m + "\". Re-opening...");
+                    }
+                } else {
+                    switch (m) {
+                        case 4013:
+                            throw "\r\n\n[!] You sent an invalid intent for a Gateway Intent. You may have incorrectly calculated the bitwise value.";
+                        case 4014:
+                            throw "\r\n\n[!] You sent a disallowed intent for a Gateway Intent. You may have tried to specify an intent that you have not enabled or are not approved for.";
+                        case 4004:
+                            throw "\r\n\n[!] The account token sent with your identify payload is incorrect.";
+                        case 4012:
+                            throw "\r\n\n[!] You sent an invalid version for the gateway.";
+                        case 4011:
+                            throw "\r\n\n[!] The session would have handled too many guilds - you are required to shard your connection in order to connect.";
+                        case 4010:
+                            throw "\r\n\n[!] You sent us an invalid shard when identifying.";
+                        default: 
+                            if (debug) {
+                                trace("[!] The socket has closed with code: " + m + ". Re-opening...");
+                            }
                     }
                 }
-                ws.onMessage = this.wsm;
-                ws.onClose = (m:Dynamic) -> {
-                    if (showWsLogsVar) {
-                        Sys.println("[ws-hxdiscord] The WebSocket connection has been closed. Code: " + m);
+                //destroying since it's not required anymore
+                if (debug)
+                    Sys.println('Waiting 2.5 seconds..');
+                var t:Timer = new Timer(2500);
+                t.run = () -> {
+                    t.stop();
+                    connect();
+                }
+            };
+            ws.onError = (e) -> {
+                #if neko
+                if (e.contains("ssl@ssl_handshake")) {
+                    trace("oh no");
+                    noConnection = true;
+                }
+                #end
+                if (showWsLogsVar) {
+                    Sys.println("[ws-hxdiscord] The WebSocket has got an error. Error: " + e);
+                }
+                try {
+                    if (debug) {
+                        trace("Websocket gave an error. (" + e + ")");
                     }
+                    ws.close();
+                } catch (err) {
+                    if (showWsLogsVar) {
+                        Sys.println("[!] Catched an error from the WebSocket, please make a new GitHub issue if this problem persists\nError: " + e);
+                        Sys.println("[i] Attempting to destroy the socket..");
+                    }
+                    ws.destroy(); //This is literally the same as closing a websocket isn't it?
+                    ws = null;
+                    connect();
+                }
+            }
+            /*ws.requiredReconnect = () -> { //library bug
+                if (showWsLogsVar) {
+                    Sys.println("[ws-hxdiscord] The WebSocket is required to close itself and reconnect due to a library issue");
+                }
+                try {
+                    ws.close();
+                    ws.destroy();
+                    ws = null;
+                } catch (err) {
                     if (heartbeatTimer != null)
                     {
                         heartbeatTimer.stop();
                     }
-                    heartbeatTimer = null;
-
-                    @:privateAccess
-                    for (i in 0...haxe.EntryPoint.pending.length) {
-                        @:privateAccess
-                        haxe.EntryPoint.pending.remove(haxe.EntryPoint.pending[i]);
-                    }
-
-                    ws.destroy();
-                    ws = null;
-                
-                    if (m == 4007) //session is invalid so i cannot resume
-                    {
-                        session_id = "";
-                        session = "";
-                        session_type = "";
-                        canResume = false;
-    
-                        Gateway.GATEWAY_URL = "wss://gateway.discord.gg/?v="+Gateway.API_VERSION+"&encoding=json";
-                    }
-                
-                    if (Std.is(m, String)) {
-                        var error:String = m.toLowerCase();
-                        if (error.contains("intent")) {
-                            throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with your intents.\nFor further information you can look at this Discord Developer pages\nhttps://discord.com/developers/docs/change-log#message-content-is-a-privileged-intent\nhttps://discord.com/developers/docs/topics/gateway-events#gateway-events";
-                        } else if (error.contains("invalid")) {
-                            throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with something you've sent to the Discord API. Please check the Discord Developer Portal documentation for more information";
-                        } else if (error.contains("sharding")) {
-                            throw "\r\n\n[!] The connection has closed due to the error \"" + m + "\". There's an issue with shards. If it says that shards are required then it's because the session would have handled too many guilds, you are required to shard your connection in order to connect.";
-                        } else {
-                            if (debug)
-                                trace("[!] The socket has closed with the error \"" + m + "\". Re-opening...");
-                        }
-                    } else {
-                        switch (m) {
-                            case 4013:
-                                throw "\r\n\n[!] You sent an invalid intent for a Gateway Intent. You may have incorrectly calculated the bitwise value.";
-                            case 4014:
-                                throw "\r\n\n[!] You sent a disallowed intent for a Gateway Intent. You may have tried to specify an intent that you have not enabled or are not approved for.";
-                            case 4004:
-                                throw "\r\n\n[!] The account token sent with your identify payload is incorrect.";
-                            case 4012:
-                                throw "\r\n\n[!] You sent an invalid version for the gateway.";
-                            case 4011:
-                                throw "\r\n\n[!] The session would have handled too many guilds - you are required to shard your connection in order to connect.";
-                            case 4010:
-                                throw "\r\n\n[!] You sent us an invalid shard when identifying.";
-                            default: 
-                                if (debug) {
-                                    trace("[!] The socket has closed with code: " + m + ". Re-opening...");
-                                }
-                        }
-                    }
-                    //destroying since it's not required anymore
-                    if (debug)
-                        Sys.println('Waiting 2.5 seconds..');
-                    var t:Timer = new Timer(2500);
-                    t.run = () -> {
-                        t.stop();
-                        connect();
-                    }
-                };
-                ws.onError = (e) -> {
-                    #if neko
-                    if (e.contains("ssl@ssl_handshake")) {
-                        trace("oh no");
-                        noConnection = true;
-                    }
-                    #end
-                    if (showWsLogsVar) {
-                        Sys.println("[ws-hxdiscord] The WebSocket has got an error. Error: " + e);
-                    }
-                    try {
-                        if (debug) {
-                            trace("Websocket gave an error. (" + e + ")");
-                        }
-                        ws.destroy();
-                        ws = null;
-                        connect();
-                    } catch (err) {
-                        if (showWsLogsVar) {
-                            Sys.println("[!] Catched an error from the WebSocket, please make a new GitHub issue if this problem persists\nError: " + e);
-                            Sys.println("[i] Attempting to destroy the socket..");
-                        }
-                        ws.destroy();
-                        ws = null;
-                        connect();
-                    }
                 }
-                /*ws.requiredReconnect = () -> { //library bug
-                    if (showWsLogsVar) {
-                        Sys.println("[ws-hxdiscord] The WebSocket is required to close itself and reconnect due to a library issue");
-                    }
-                    try {
-                        ws.close();
-                        ws.destroy();
-                        ws = null;
-                    } catch (err) {
-                        if (heartbeatTimer != null)
-                        {
-                            heartbeatTimer.stop();
-                        }
-                    }
-                }*/
-            }
-        } catch (err) {
-            if (err.message == "ssl@ssl_close") {
-                return;
-            }
-            else {
-                throw err;
-            }
+            }*/
         }
     }
 
