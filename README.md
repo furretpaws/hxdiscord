@@ -10,7 +10,7 @@ hxdiscord is a Discord API Wrapper for Haxe.
 
 ## About
 
-hxdiscord is a Discord Library for Haxe. It's still in development. More thing will be added, but for now, you can make your own Discord Bot with this!
+hxdiscord is a Discord Library for Haxe. It's still in development. More things will be added, but for now, you can make your own Discord Bot with this!
 
 ## Targets
 
