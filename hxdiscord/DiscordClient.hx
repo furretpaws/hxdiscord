@@ -131,7 +131,6 @@ class DiscordClient {
         }
         ws.onmessagecreate = function(t:MessageType) {
             switch(t) {
-                //MTEwMjAyNjkyMTY4MTg5MTM0OA.GvhJVd.QAxsGOzNqq_Psgw8gP1ueeIb39qEIxsHEes5PA
                 case StrMessage(content):
                     incomingMessages(content);
                     //incomingMessages(content);
