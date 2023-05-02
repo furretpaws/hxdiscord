@@ -17,6 +17,7 @@ class Interaction
     public var name:String;
     public var member:hxdiscord.types.structTypes.InteractionS.Member;
     public var intId:String;
+    public var wasThinking:Bool = false;
     public var guild_id:String;
     public var components:Array<Dynamic>;
     public var options:Array<Dynamic>;
@@ -74,7 +75,13 @@ class Interaction
 
     public function reply(ic:hxdiscord.types.Typedefs.InteractionCallback, ?ephemeral:Bool)
     {
-        Endpoints.sendInteractionCallback(ic, intId, token, 4, ephemeral);
+        if (wasThinking) {
+            try {
+                Endpoints.editInteractionResponse(ic, token);
+            }
+        } else {
+            Endpoints.sendInteractionCallback(ic, intId, token, 4, ephemeral);
+        }
     }
 
     /**
@@ -127,8 +134,19 @@ class Interaction
         @param ic The interaction object
     **/
 
+    /**
+        Make the bot "think". This will show as "Bot is thinking..."
+    **/
+
+    public function think() {
+        Endpoints.makeInteractionThink(intId, token);
+        wasThinking = true;
+    }
+
     public function edit(ic:Typedefs.InteractionCallback)
     {
-        Endpoints.editInteractionResponse(ic, token);
+        try {
+            Endpoints.editInteractionResponse(ic, token);
+        }
     }
 }

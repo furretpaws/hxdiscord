@@ -13,6 +13,7 @@ class SocketSys extends Socket2 {
     private var sendError:Bool = false;
 	private var wasCloseSent:Bool = false;
     private var secure:Bool;
+    private var alive:Bool = true;
 
     private function new(host:String, port:Int, debug:Bool = false) super(host, port, debug);
 
@@ -58,6 +59,7 @@ class SocketSys extends Socket2 {
     override public function close() {
 		this.impl.close();
 		isClosed = true;
+        alive = false;
 		if (!wasCloseSent) {
 
 			wasCloseSent = true;
@@ -103,7 +105,7 @@ class SocketSys extends Socket2 {
 		    		var out = new BytesRW();
 		    		try {
 		    			var input = this.impl.input;
-		    			while (true) {
+		    			while (!isClosed) {
 		    				var data = Bytes.alloc(1024);
 		    				var readed = input.readBytes(data, 0, data.length);
 		    				if (readed <= 0) break;

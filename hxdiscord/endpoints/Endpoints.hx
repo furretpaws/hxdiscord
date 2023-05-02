@@ -2142,6 +2142,53 @@ class Endpoints
     }
 
     /**
+        Send the interaction callback for the thinking state!
+    **/
+
+    public static function makeInteractionThink(interactionID:String, interactionToken:String, ?ephemeral:Bool = false)
+    {
+        var r:Http;
+
+        r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/interactions/" + interactionID + "/" + interactionToken + "/callback");
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Content-Type", "application/json");
+        r.addHeader("Authorization", DiscordClient.authHeader);
+        r.setMethod("POST");
+        var data:String = "";
+        if (ephemeral) {
+            data = haxe.Json.stringify(
+                {
+                    type: 5,
+                    data: {
+                        flags: 64
+                    }
+                }
+            );
+        } else {
+            data = haxe.Json.stringify(
+                {
+                    type: 5
+                }
+            );
+        }
+        r.setPostData(data);
+        r.onData = function(_data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(_data);
+            }
+        }
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+            trace(data);
+        }
+        r.send();
+    }
+
+    /**
         Send the interaction callback for modals only!
     **/
     public static function showInteractionModal(imc:Array<hxdiscord.types.message.ActionRow>, interactionID:String, interactionToken:String, type:Int, title:String, custom_id:String)
@@ -2370,6 +2417,6 @@ class Endpoints
         { 
             trace(req.responseData); 
         }
-        return Json.parse(req.responseData.toString());
+        return Json.parse(req.responseData);
     }
 }

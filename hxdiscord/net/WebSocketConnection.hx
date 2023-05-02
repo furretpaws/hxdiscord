@@ -1,8 +1,91 @@
 package hxdiscord.net;
 
 import haxe.Timer;
+import haxe.ws.Log;
 using StringTools;
 
+#if (sys&&!nodejs)
+class WebSocketConnection {
+    var host = "";
+    var ws:haxe.ws.WebSocket;
+    var destroyed:Bool = false;
+    var errored:Bool = false;
+    public function new(host:String) {
+        trace("oh");
+        this.host = host;
+        create();
+    }
+
+    function create() {
+        sys.thread.Thread.create(()->{
+            Log.mask = Log.INFO | Log.DEBUG | Log.DATA;
+            Sys.getChar(true);
+            ws = new haxe.ws.WebSocket(host);
+            ws.onopen = function() {
+                onReady();
+            }
+            ws.onmessagecreate = function(message:haxe.ws.Types.MessageType) {
+                switch(message) {
+                    case StrMessage(content):
+                        onMessage(content);
+                    case BytesMessage(content):
+                        //no
+                }
+            }
+            ws.onclose = (code:Dynamic) -> {
+                onClose(code);
+            }
+
+            ws.onerror = (err:String) -> {
+                onError(err);
+            }
+        });
+    }
+
+    public inline function close():Void {
+        ws.close();
+    }
+
+    public inline function send(message:String) {
+        try {
+            this.ws.send(message);
+        } catch (err) {
+            trace("Close required since faulty websocket");
+            close();
+            //onClose(1001);
+        }
+    }
+
+    public inline function sendString(message:String) {
+        try {
+            this.ws.send(message);
+        } catch (err) {
+            trace("Close required since faulty websocket");
+            close();
+            //onClose(1001);
+        }
+    }
+
+    public inline function sendJson(j:Dynamic) {
+        try {
+            this.ws.send(haxe.Json.stringify(j));
+        } catch (err) {
+            trace("Close required since faulty websocket");
+            close();
+            onClose(1001);
+        }
+    }
+
+    dynamic public function destroy() {
+        this.ws = null;
+        destroyed = true;
+    }
+    dynamic public function onClose(code) { }
+    dynamic public function onReady() { }
+    dynamic public function onMessage(m:String) { }
+    dynamic public function onError(err) { } //:3
+}
+#else
 class WebSocketConnection {
     var host = "";
     var ws:haxe.net.WebSocket;
@@ -34,9 +117,9 @@ class WebSocketConnection {
         }
 
         #if sys
-        while (ws.readyState != Closed) {
+        while (!destroyed) {
             try {
-                if (ws.readyState != Closed) {
+                if (!destroyed) {
                     ws.process();
                     Sys.sleep(0.1);
                 }
@@ -57,7 +140,7 @@ class WebSocketConnection {
         } catch (err) {
             trace("Close required since faulty websocket");
             close();
-            onClose(1001);
+            //onClose(1001);
         }
     }
 
@@ -67,7 +150,7 @@ class WebSocketConnection {
         } catch (err) {
             trace("Close required since faulty websocket");
             close();
-            onClose(1001);
+            //onClose(1001);
         }
     }
 
@@ -90,3 +173,4 @@ class WebSocketConnection {
     dynamic public function onMessage(m) { }
     dynamic public function onError(err) { } //:3
 }
+#end

@@ -62,6 +62,7 @@ class WebSocketGeneric extends WebSocket {
         };
         socket.onerror = function() {
             _debug('ioerror: ');
+            setClosed(1005);
             this.onerror('error');
         };
         socket.ondata = function(data:Bytes) {
@@ -145,6 +146,7 @@ class WebSocketGeneric extends WebSocket {
                     } catch(e:Dynamic) {
                         _debug('Error during validating server handshake response header: $e');
                         onerror('Error during validating server handshake response header: ${e}');
+                        socket.close();
                         setClosed(1000);
                     }
                 case State.ServerHandshake:
@@ -163,7 +165,7 @@ class WebSocketGeneric extends WebSocket {
                         writeBytes(Bytes.ofString(prepareHttp400(e)));
                         _debug('Error in http request: $e');
                         socket.close();
-                        alive = false;
+                        setClosed(1001);
                         state = State.Closed;
                     }
                 case State.Head:
@@ -260,6 +262,7 @@ class WebSocketGeneric extends WebSocket {
     private function setClosed(code:Int) {
         if (state != State.Closed) {
             state = State.Closed;
+            alive = false;
             onclose(code);
         }
     }
@@ -368,7 +371,6 @@ class WebSocketGeneric extends WebSocket {
 		if(state != State.Closed) {
 			sendFrame(Bytes.alloc(0), Opcode.Close);
 			socket.close();
-            alive = false;
 			setClosed(1000);
 		}
     }
@@ -392,6 +394,7 @@ class WebSocketGeneric extends WebSocket {
     override public function sendString(message:String) {
         if (readyState != Open && !socket.isClosed) {
             //trace("websocket not open!");
+            socket.close();
             setClosed(1005);
         } else {
             sendFrame(Utf8Encoder.encode(message), Opcode.Text);
@@ -401,6 +404,7 @@ class WebSocketGeneric extends WebSocket {
     override public function sendBytes(message:Bytes) {
         if (readyState != Open && !socket.isClosed) {
             //trace("websocket not open!");
+            socket.close();
             setClosed(1005);
         } else {
             sendFrame(message, Opcode.Binary);
