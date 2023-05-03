@@ -107,7 +107,7 @@ class DiscordClient {
 
         cache = new CachedData(this);
 
-        haxe.EntryPoint.addThread(createWebsocket);
+        /*haxe.EntryPoint.addThread(createWebsocket);
         haxe.EntryPoint.addThread(() -> {
             while(true) {
                 if (alive) {
@@ -117,10 +117,86 @@ class DiscordClient {
                     }
                 }
             }
-        });
+        });*/
+    }
+
+    public function connect() {
+        continuew();
         #if sys
         Sys.getChar(true);
         #end
+    }
+
+    function continuew():Void {
+        sys.thread.Thread.create(()->{
+            ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
+        ws.onopen = function() {
+            /*ws.send("alice string");
+            ws.send(Bytes.ofString("alice bytes"));*/
+        }
+        ws.onmessagecreate = function(t:MessageType) {
+            switch(t) {
+                case StrMessage(content):
+                    incomingMessages(content);
+                    //incomingMessages(content);
+                    //incomingMessages(content);
+                case BytesMessage(content):
+                    //todo
+            }
+        }
+        ws.onclose = (f:Dynamic) -> {
+            if (Std.is(f, String)) {
+                var error:String = f.toLowerCase();
+                if (error.contains("intent")) {
+                    throw "\r\n\n[!] The connection has closed due to the error \"" + f + "\". There's an issue with your intents.\nFor further information you can look at this Discord Developer pages\nhttps://discord.com/developers/docs/change-log#message-content-is-a-privileged-intent\nhttps://discord.com/developers/docs/topics/gateway-events#gateway-events";
+                } else if (error.contains("invalid")) {
+                    throw "\r\n\n[!] The connection has closed due to the error \"" + f + "\". There's an issue with something you've sent to the Discord API. Please check the Discord Developer Portal documentation for more information";
+                } else if (error.contains("sharding")) {
+                    throw "\r\n\n[!] The connection has closed due to the error \"" + f + "\". There's an issue with shards. If it says that shards are required then it's because the session would have handled too many guilds, you are required to shard your connection in order to connect.";
+                } else {
+                    if (debug)
+                        trace("[!] The socket has closed with the error \"" + f + "\". Re-opening...");
+                }
+            } else {
+                switch (f) {
+                    case 4013:
+                        throw "\r\n\n[!] You sent an invalid intent for a Gateway Intent. You may have incorrectly calculated the bitwise value.";
+                    case 4014:
+                        throw "\r\n\n[!] You sent a disallowed intent for a Gateway Intent. You may have tried to specify an intent that you have not enabled or are not approved for.";
+                    case 4004:
+                        throw "\r\n\n[!] The account token sent with your identify payload is incorrect.";
+                    case 4012:
+                        throw "\r\n\n[!] You sent an invalid version for the gateway.";
+                    case 4011:
+                        throw "\r\n\n[!] The session would have handled too many guilds - you are required to shard your connection in order to connect.";
+                    case 4010:
+                        throw "\r\n\n[!] You sent us an invalid shard when identifying.";
+                    default: 
+                            if (debug) {
+                                trace("[!] The socket has closed with code: " + f + ". Re-opening...");
+                            }
+                    }
+                }
+                createWebsocket();
+                trace("closed :p");
+                alive = false;
+            }
+            while (ws.state != haxe.ws.State.Closed) { // TODO: should think about mutex
+                @:privateAccess
+                ws.process();
+                Sys.sleep(.01);
+            }
+        });
+        sys.thread.Thread.create(()->{
+            while(true) {
+                if (alive) {
+                    var diff = Date.now().getTime() - last_heartbeat.getTime();
+                    if (diff >= interval) {
+                        sendHeartbeat();
+                    }
+                }
+            }
+        });
     }
 
     function createWebsocket() {
@@ -201,7 +277,6 @@ class DiscordClient {
     }
 
     function incomingMessages(msg:String){
-        sys.thread.Thread.create(() -> {
             if (showWsLogsVar) {
                 Sys.println("[ws-hxdiscord] New message!");
             }
@@ -295,6 +370,7 @@ class DiscordClient {
                                 trace(e.message);
                             }
                         }
+                        last_heartbeat = Date.now();
                     case 'INTERACTION_CREATE':
                         onInteractionCreate(nInteraction(d, d, haxe.Json.parse(msg)));
                     case 'MESSAGE_CREATE':
@@ -440,7 +516,6 @@ class DiscordClient {
             } catch (err) {
             }
             #end
-        });
     }
 
     //FOR TESTING PURPOSES
