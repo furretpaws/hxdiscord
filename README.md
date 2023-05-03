@@ -46,6 +46,7 @@ class Main
         Bot = new DiscordClient("your token here", [Intents.ALL], false);
         Bot.onReady = onReady;
         Bot.onMessageCreate = onMessageCreate;
+        Bot.connect();
     }
 
     public static function onReady()
