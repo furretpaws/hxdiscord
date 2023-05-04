@@ -232,6 +232,7 @@ class WebSocketCommon {
             result = SocketImpl.select([_socket], null, null, 0.01);
         } catch (e:Dynamic) {
             Log.debug("Error selecting socket: " + e);
+            trace(e);
             needClose = true;
         }
 
