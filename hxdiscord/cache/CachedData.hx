@@ -11,10 +11,14 @@ import hxdiscord.endpoints.Endpoints;
 class CachedData {
     var dc:hxdiscord.DiscordClient;
     public function new(dc:hxdiscord.DiscordClient) {this.dc = dc;}
-    public var guild_members:Array<hxdiscord.types.Member> = [];
+    /*public var guild_members:Array<hxdiscord.types.Member> = [];
     public var guilds:Array<Dynamic> = [];
-    public var roles:Array<Dynamic> = [];
-    public function cacheMemberAndRoles(gid:String, uid:String) {
+    public var roles:Array<Dynamic> = [];*/
+    public var guild_members:Map<String, hxdiscord.types.Member> = new Map<String, hxdiscord.types.Member>();
+    public var guilds:Map<String, Dynamic> = new Map<String, Dynamic>();
+    public var guilds_roles:Map<String, Dynamic> = new Map<String, Dynamic>();
+    public var roles:Map<String, Dynamic> = new Map<String, Dynamic>();
+    /*public function cacheMemberAndRoles(gid:String, uid:String) {
         var member:hxdiscord.types.Member = null;
         hxdiscord.endpoints.Endpoints.getGuildMember(gid, uid, (m) -> {member = m;}, null);
         var foundRoles:Bool = false;
@@ -64,5 +68,5 @@ class CachedData {
                 }
             }
         }
-    }
+    }*/
 }

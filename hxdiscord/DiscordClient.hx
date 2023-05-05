@@ -129,13 +129,28 @@ class DiscordClient {
     }
 
     function continuew():Void {
+        #if hl
         sys.thread.Thread.create(()->{
+            while(true) {
+                if (alive) {
+                    var diff = Date.now().getTime() - last_heartbeat.getTime();
+                    if (diff >= interval) {
+                        sendHeartbeat();
+                    }
+                }
+            }
+        });
+        #end
+        #if (!hl)
+        sys.thread.Thread.create(()->{
+        #end
             createWebsocket();
             while (ws.state != haxe.ws.State.Closed ) { // TODO: should think about mutex
                 @:privateAccess
                 ws.process();
                 Sys.sleep(.01);
             }
+        #if (!hl)
         });
         sys.thread.Thread.create(()->{
             while(true) {
@@ -147,10 +162,12 @@ class DiscordClient {
                 }
             }
         });
+        #end
     }
 
     function createWebsocket() {
         //Log.mask = Log.INFO | Log.DEBUG | Log.DATA;
+        trace("opened");
         ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
         ws.onopen = function() {
             /*ws.send("alice string");
@@ -204,10 +221,11 @@ class DiscordClient {
             //trace("closed :p");
             alive = false;
         }
-        ws.onerror = (d:String) -> {
+        /*ws.onerror = (d:String) -> {
+            trace("on error " + d);
             alive = false;
             createWebsocket();
-        }
+        }*/
     }
 
     /**
@@ -315,11 +333,7 @@ class DiscordClient {
                         else {
                             authHeader = "Bot " + token;
                         }
-                        if (!readySent)
-                        {
-                            onReady();
-                            readySent = true;
-                        }
+                        onReady();
                         try {
                             accId = d.application.id;
                         } catch (e) {
@@ -343,26 +357,28 @@ class DiscordClient {
                         onThreadMemberUpdate(d);
                     case 'THREAD_MEMBERS_UPDATE':
                         onThreadMembersUpdate(d);
+                    case 'GUILD_ROLE_CREATE':
+                        cache.guilds_roles.set(d.role.id, d);
+                    case 'GUILD_ROLE_DELETE':
+                        if (cache.guilds_roles.exists(d.role.id)) {
+                            cache.guilds_roles.set(d.role.id, d);
+                        }
+                    case 'GUILD_ROLE_UPDATE':
+                        cache.guilds_roles.set(d.role.id, d);
                     case 'GUILD_CREATE':
-                        var alreadyHasTheGuild:Bool = false;
-                        for (i in 0...cache.guilds.length) {
-                            if (cache.guilds[0].id == d.id) {
-                                alreadyHasTheGuild = true;
-                            }
+                        if (!cache.guilds.exists(d.id)) {
+                            cache.guilds.set(d.id, d);
                         }
-                        if (!alreadyHasTheGuild) {
-                            cache.guilds.push(d);
+                        for (i in 0...d.roles.length) {
+                            cache.guilds_roles.set(d.roles[i].id, d.roles[i]);
                         }
+                        trace("end");
                         onGuildCreate(d);
                     case 'GUILD_UPDATE':
                         onGuildUpdate(d);
+                        cache.guilds.set(d.id, d);
                     case 'GUILD_DELETE':
-                        for (i in 0...cache.guilds.length) {
-                            if (cache.guilds[0].id == d.id) {
-                                cache.guilds.remove(cache.guilds[i]);
-                                trace("removed guild");
-                            }
-                        }
+                        cache.guilds.remove(d.id);
                         onGuildDelete(d);
                     case "GUILD_BAN_ADD":
                         onGuildBanAdd(d);
@@ -372,12 +388,13 @@ class DiscordClient {
                         onGuildAuditLogEntryCreate(d);
                     case 'GUILD_MEMBER_ADD':
                         onGuildMemberAdd(d);
+                        cache.guild_members.set(d.guild_id+d.user.id,d);
                     case "GUILD_MEMBER_REMOVE":
                         onGuildMemberRemove(d);
                         //UNcaching shit haha
                         //actually i'm doing this because i found out this was crashing the thing so yeah
                         //this is actually needed
-                        try {
+                        /*try {
                             for (i in 0...cache.guild_members.length) {
                                 if (cache.guild_members[i].guild_id == d.guild_id) {
                                     if (cache.guild_members[i].user.id == d.user.id) {
@@ -393,12 +410,44 @@ class DiscordClient {
                             }
                         } catch (err) {
                             trace("oopsie " + err.message);
+                        }*/
+                        if (cache.guild_members.exists(d.guild_id+d.user.id)) {
+                            cache.guild_members.remove(d.guild_id+d.user.id);
                         }
                     case "GUILD_MEMBER_UPDATE":
                         onGuildMemberUpdate(d);
-                        //caching shit
-                        var member:Member = null;
-                        hxdiscord.endpoints.Endpoints.getGuildMember(d.guild_id, d.user.id, (m) -> {member = m;}, null);
+                        for (x in 0...d.roles.length) {
+                            d.permissionsBitwise.push(client.cache.guilds_roles.get(d.roles[x]).permissions);
+                            //trace(cache.guilds_roles.get(d.members[i].roles[x]));
+                        }
+                        client.cache.guild_members.set(guild_id+author.id, d);
+                        var member = d;
+                        for (i in 0...member.permissionsBitwise.length) {
+                            var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(member.permissionsBitwise[i])));
+                            if (array.contains(permissionToLookFor))
+                            {
+                                hasPermission = true;
+                            }
+                        }
+                        /*var dataRoles:Dynamic = Endpoints.getRoles(d.guild_id);
+                        //caching
+                        for (i in 0...d.roles.length)
+                        {
+                            var permissionBitwise:Array<Dynamic> = [];
+                            for (x in 0...dataRoles.length)
+                            {
+                                if (d.roles[i] == dataRoles[x].id)
+                                {
+                                    permissionBitwise.push(dataRoles[x].permissions);
+                                }
+                            }
+                            Reflect.setProperty(d, "permissionBitwise", permissionBitwise);
+                        }
+                        cache.guild_members.set([d.guild_id,d.user.id],d);*/
+                        /*var member:Member = null;
+                        var gid:String = Std.string(d.guild_id);
+                        var user_id:String = Std.string(d.user.id);
+                        hxdiscord.endpoints.Endpoints.getGuildMember(gid, user_id, (m) -> {member = m;}, (e) -> trace(e));
                         var foundRoles:Bool = false;
                         var dataRoles:Dynamic = null;
                         if (cache.roles.length == 0) {
@@ -445,7 +494,7 @@ class DiscordClient {
                                     cache.guild_members.push(member);
                                 }
                             }
-                        }
+                        }*/
                     case "VOICE_SERVER_UPDATE":
                         for (i in 0...currentVoiceClients.length) {
                             @:privateAccess

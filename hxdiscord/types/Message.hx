@@ -1,4 +1,4 @@
-package hxdiscord.types;
+    package hxdiscord.types;
 
 import hxdiscord.DiscordClient;
 import hxdiscord.types.structTypes.*;
@@ -255,17 +255,16 @@ class Message
     {
         var hasPermission:Bool = false;
         var member:Member = null;
-        for (i in 0...client.cache.guilds.length) {
-            if (client.cache.guilds[i].owner_id == author.id) {
-                hasPermission = true;
-            }
+        if (client.cache.guilds.get(guild_id) == author.id) {
+            hasPermission = true;
         }
-        @:privateAccess
+        member = client.cache.guild_members.get(guild_id+author.id);
+        /*@:privateAccess
         for (i in 0...client.cache.guild_members.length) {
             if (client.cache.guild_members[i].user.id == this.author.id && client.cache.guild_members[i].guild_id == this.guild_id) {
                 member = client.cache.guild_members[i];
             }
-        }
+        }*/
         if (member != null) {
             for (i in 0...member.permissionsBitwise.length) {
                 var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(member.permissionsBitwise[i])));
@@ -276,7 +275,7 @@ class Message
             }
         } else {
             //MEMBER NOT CACHED? time to cache it then try again
-            @:privateAccess
+            /*@:privateAccess
             client.cache.cacheMemberAndRoles(guild_id, author.id);
             var member:Member = null;
             @:privateAccess
@@ -285,6 +284,21 @@ class Message
                     member = client.cache.guild_members[i];
                 }
             }
+            for (i in 0...member.permissionsBitwise.length) {
+                var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(member.permissionsBitwise[i])));
+                if (array.contains(permissionToLookFor))
+                {
+                    hasPermission = true;
+                }
+            }*/
+            var d:Member = null;
+            Endpoints.getGuildMember(guild_id, author.id, (dd) -> d = dd, null);
+            for (x in 0...d.roles.length) {
+                d.permissionsBitwise.push(client.cache.guilds_roles.get(d.roles[x]).permissions);
+                //trace(cache.guilds_roles.get(d.members[i].roles[x]));
+            }
+            client.cache.guild_members.set(guild_id+author.id, d);
+            var member = d;
             for (i in 0...member.permissionsBitwise.length) {
                 var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(member.permissionsBitwise[i])));
                 if (array.contains(permissionToLookFor))
