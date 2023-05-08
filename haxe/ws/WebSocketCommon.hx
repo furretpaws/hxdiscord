@@ -19,9 +19,9 @@ class WebSocketCommon {
     private var _lastError:Dynamic = null;
 
     public var onopen:Void->Void;
-    public var onclose:String->Void;
+    public var onclose:Void->Void;
     public var onerror:Dynamic->Void;
-    public var onmessagecreate:MessageType->Void;
+    public var onmessage:MessageType->Void;
 
     private var _buffer:Buffer = new Buffer();
 
@@ -103,7 +103,6 @@ class WebSocketCommon {
                 if (_payload == null) {
                     _payload = new Buffer();
                 }
-                //trace(OpCode);
                 _payload.writeBytes(_buffer.readBytes(_length));
 
                 switch (_opcode) {
@@ -112,16 +111,16 @@ class WebSocketCommon {
                             var messageData = _payload.readAllAvailableBytes();
                             var unmaskedMessageData = (_isMasked) ? applyMask(messageData, _mask) : messageData;
                             if (_frameIsBinary) {
-                                if (this.onmessagecreate != null) {
+                                if (this.onmessage != null) {
                                     var buffer = new Buffer();
                                     buffer.writeBytes(unmaskedMessageData);
-                                    this.onmessagecreate(BytesMessage(buffer));
+                                    this.onmessage(BytesMessage(buffer));
                                 }
                             } else {
                                 var stringPayload = Utf8Encoder.decode(unmaskedMessageData);
                                 Log.data(stringPayload, id);
-                                if (this.onmessagecreate != null) {
-                                    this.onmessagecreate(StrMessage(stringPayload));
+                                if (this.onmessage != null) {
+                                    this.onmessage(StrMessage(stringPayload));
                                 }
                             }
                             _payload = null;
@@ -153,7 +152,7 @@ class WebSocketCommon {
             } catch (e:Dynamic) { }
 
             if (onclose != null) {
-                onclose("Unknown error");
+                onclose();
             }
         }
     }
@@ -232,7 +231,6 @@ class WebSocketCommon {
             result = SocketImpl.select([_socket], null, null, 0.01);
         } catch (e:Dynamic) {
             Log.debug("Error selecting socket: " + e);
-            trace(e);
             needClose = true;
         }
 
@@ -281,8 +279,7 @@ class WebSocketCommon {
                 } catch (e:Dynamic) { }
 
                 if (onclose != null) {
-                    @:privateAccess
-                    onclose(_buffer.chunks[0].toString().substr(4));
+                    onclose();
                 }
             }
         }

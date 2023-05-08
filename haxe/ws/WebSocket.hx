@@ -241,7 +241,36 @@ class WebSocket extends WebSocketCommon {
         _socket.connect(new sys.net.Host(_host), _port);
         _socket.setBlocking(false);
 
+        #if !cs
+
+        _processThread = Thread.create(processThread);
+        _processThread.sendMessage(this);
+
+        #else
+
+        haxe.MainLoop.addThread(function() {
+            Log.debug("Thread started", this.id);
+            processLoop(this);
+            Log.debug("Thread ended", this.id);
+        });
+
+        #end
+
         sendHandshake();
+    }
+
+    private function processThread() {
+        Log.debug("Thread started", this.id);
+        var ws:WebSocket = Thread.readMessage(true);
+        processLoop(this);
+        Log.debug("Thread ended", this.id);
+    }
+
+    private function processLoop(ws:WebSocket) {
+        while (ws.state != State.Closed) { // TODO: should think about mutex
+            ws.process();
+            Sys.sleep(.01);
+        }
     }
 
     function get_additionalHeaders() {
@@ -307,7 +336,7 @@ class WebSocket extends WebSocketCommon {
         var secKey = httpResponse.headers.get(HttpHeader.SEC_WEBSOSCKET_ACCEPT);
         
         if(secKey == null) {
-            //
+            trace("This server does not implement Sec-WebSocket-Key.");
         } else {
             if (secKey != makeWSKeyResponse(_encodedKey)) {
                 if (onerror != null) {

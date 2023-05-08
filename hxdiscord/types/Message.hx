@@ -273,6 +273,9 @@ class Message
                     hasPermission = true;
                 }
             }
+            if (client.cache.guilds.get(guild_id).owner_id == author.id) {
+                hasPermission = true;
+            }
         } else {
             //MEMBER NOT CACHED? time to cache it then try again
             /*@:privateAccess
@@ -305,6 +308,9 @@ class Message
                 {
                     hasPermission = true;
                 }
+            }
+            if (client.cache.guilds.get(guild_id).owner_id == author.id) {
+                hasPermission = true;
             }
         }
         /*var hasPermission:Bool = false;

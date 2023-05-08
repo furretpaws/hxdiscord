@@ -18,6 +18,7 @@ class DiscordClient {
     public static var token:String = "";
     public static var debug:Bool;
     var ws:WebSocket;
+    var hb_timer:haxe.Timer;
     public var status:String = "online";
     private var canResume:Bool = false;
     var receivedHelloOC:Bool = false;
@@ -32,7 +33,6 @@ class DiscordClient {
     private var interval:Int;
     public var editThis:String = "";
     private var heartbeat_interval:Int = 0;
-    private var resume_gateway_url:String = "";
 
     public var cache:CachedData;
 
@@ -46,12 +46,14 @@ class DiscordClient {
     @:dox(hide)
     public var mfa_enabled = false;
     public var user:User = null;
+    var ticked:Bool = false;
     public static var accountId:String = "";
     public var accId:String = accountId;
     @:dox(hide)
     public var flags:Int = 0;
     @:dox(hide)
     public var email:Dynamic;
+    public var resume_gateway_url:String = "wss://gateway.discord.gg/?v="+Gateway.API_VERSION+"&encoding=json";
     public var discriminator:String = "";
     @:dox(hide)
     public var bot:Bool = false;
@@ -121,111 +123,28 @@ class DiscordClient {
         });*/
     }
 
+    function tick(){}
+
     public function connect() {
-        continuew();
-        #if sys
-        Sys.getChar(true);
-        #end
-    }
-
-    function continuew():Void {
-        #if hl
-        sys.thread.Thread.create(()->{
-            while(true) {
-                if (alive) {
-                    var diff = Date.now().getTime() - last_heartbeat.getTime();
-                    if (diff >= interval) {
-                        sendHeartbeat();
-                    }
-                }
-            }
-        });
-        #end
-        #if (!hl)
-        sys.thread.Thread.create(()->{
-        #end
-            createWebsocket();
-            while (ws.state != haxe.ws.State.Closed ) { // TODO: should think about mutex
-                @:privateAccess
-                ws.process();
-                Sys.sleep(.01);
-            }
-        #if (!hl)
-        });
-        sys.thread.Thread.create(()->{
-            while(true) {
-                if (alive) {
-                    var diff = Date.now().getTime() - last_heartbeat.getTime();
-                    if (diff >= interval) {
-                        sendHeartbeat();
-                    }
-                }
-            }
-        });
-        #end
-    }
-
-    function createWebsocket() {
-        //Log.mask = Log.INFO | Log.DEBUG | Log.DATA;
-        trace("opened");
-        ws = new WebSocket("wss://gateway.discord.gg/?v=10&encoding=json");
-        ws.onopen = function() {
-            /*ws.send("alice string");
-            ws.send(Bytes.ofString("alice bytes"));*/
-        }
-        ws.onmessagecreate = function(t:MessageType) {
-            switch(t) {
+        ws = new WebSocket(resume_gateway_url);
+        ws.onmessage = (daType:MessageType) -> {
+            switch (daType) {
                 case StrMessage(content):
-                    incomingMessages(content);
-                    //incomingMessages(content);
+                    haxe.EntryPoint.runInMainThread(incomingMessages.bind(content));
                 case BytesMessage(content):
-                    //todo
+                    //d
             }
         }
-        ws.onclose = (f:Dynamic) -> {
-            alive = false;
-            trace("on close");
-            if (Std.is(f, String)) {
-                var error:String = f.toLowerCase();
-                if (error.contains("intent")) {
-                    throw "\r\n\n[!] The connection has closed due to the error \"" + f + "\". There's an issue with your intents.\nFor further information you can look at this Discord Developer pages\nhttps://discord.com/developers/docs/change-log#message-content-is-a-privileged-intent\nhttps://discord.com/developers/docs/topics/gateway-events#gateway-events";
-                } else if (error.contains("invalid")) {
-                    throw "\r\n\n[!] The connection has closed due to the error \"" + f + "\". There's an issue with something you've sent to the Discord API. Please check the Discord Developer Portal documentation for more information";
-                } else if (error.contains("sharding")) {
-                    throw "\r\n\n[!] The connection has closed due to the error \"" + f + "\". There's an issue with shards. If it says that shards are required then it's because the session would have handled too many guilds, you are required to shard your connection in order to connect.";
-                } else {
-                    if (debug)
-                        trace("[!] The socket has closed with the error \"" + f + "\". Re-opening...");
-                }
-            } else {
-                switch (f) {
-                    case 4013:
-                        throw "\r\n\n[!] You sent an invalid intent for a Gateway Intent. You may have incorrectly calculated the bitwise value.";
-                    case 4014:
-                        throw "\r\n\n[!] You sent a disallowed intent for a Gateway Intent. You may have tried to specify an intent that you have not enabled or are not approved for.";
-                    case 4004:
-                        throw "\r\n\n[!] The account token sent with your identify payload is incorrect.";
-                    case 4012:
-                        throw "\r\n\n[!] You sent an invalid version for the gateway.";
-                    case 4011:
-                        throw "\r\n\n[!] The session would have handled too many guilds - you are required to shard your connection in order to connect.";
-                    case 4010:
-                        throw "\r\n\n[!] You sent us an invalid shard when identifying.";
-                    default: 
-                        if (debug) {
-                            trace("[!] The socket has closed with code: " + f + ". Re-opening...");
-                        }
-                }
-            }
-            createWebsocket();
-            //trace("closed :p");
-            alive = false;
+        ws.onclose = () -> {
+            hb_timer.stop();
+            connect();
         }
-        /*ws.onerror = (d:String) -> {
-            trace("on error " + d);
-            alive = false;
-            createWebsocket();
-        }*/
+        #if sys
+        if (!ticked) {
+            haxe.MainLoop.add(tick);
+            ticked = true;
+        }
+        #end
     }
 
     /**
@@ -252,276 +171,284 @@ class DiscordClient {
     }
 
     function incomingMessages(msg:String){
-            if (showWsLogsVar) {
-                Sys.println("[ws-hxdiscord] New message!");
+        if (showWsLogsVar) {
+            Sys.println("[ws-hxdiscord] New message!");
+        }
+        #if (!hl)
+        try {
+        #end
+            if (debug)
+            {
+                trace(msg);
             }
-            #if (!hl)
-            try {
-            #end
-                if (debug)
-                {
-                    trace(msg);
-                }
-                var json:Dynamic = haxe.Json.parse(msg);
-                var t = json.t;
-                var event = json.event;
-                var op = json.op;
-                var s = json.s;
-                var d:Dynamic = json.d;
-                switch (json.op)
-                {
-                    case 10:
-                        interval = d.heartbeat_interval;
-                        sendHeartbeat();
-                        alive = true;
-                        if (canResume) {
-                            ws.send(haxe.Json.stringify({
-                                op: 6,
-                                d: {
-                                    token: token,
-                                    session_id: session_id,
-                                    seq: sequence
-                                }
-                            }));
-                        } else {
-                            ws.send(haxe.Json.stringify({
-                                op:2,
-                                d: {
-                                    token: token,
-                                    intents: this.intentsNumber,
-                                    properties: {
-                                        os: 'customOS',
-                                        browser: 'hxdiscord',
-                                        device: 'hxdiscord'
-                                    }
-                                }
-                            }));
-                        }
-                    case 9:
-                        canResume = false;
-                        ws.close();
-                    case 0:
-                        sequence = s;
-                    case 7: //gateway needs client to reconnect
-                        ws.close();
-                }
-            
-                switch (t) {
-                    case "RESUMED":
-                        //nothing happens except the onResumed() function is called :)
-                        onResumed();
-                    case 'READY':
-                        user = new hxdiscord.types.User(this, d.user);
-                        verified = d.user.verified;
-                        avatar = d.user.avatar;
-                        mfa_enabled = d.user.mfa_enabled;
-                        accountId = d.user.id;
-                        email = d.user.email;
-                        discriminator = d.user.discriminator;
-                        username = d.user.username;
-                        flags = d.user.flags;
-                        bot = d.user.bot;
-                        session_id = d.session_id;
-                        session_type = d.session_type;
-                        #if (nodejs&&js)
-                        Gateway.GATEWAY_URL = d.resume_gateway_url + "?v=" + Gateway.API_VERSION;
-                        #end
-                        canResume = true;
-                        if (!bot) {
-                            authHeader = token;
-                        }
-                        else {
-                            authHeader = "Bot " + token;
-                        }
-                        onReady();
-                        try {
-                            accId = d.application.id;
-                        } catch (e) {
-                            if (debug) {
-                                trace(e.message);
+            var json:Dynamic = haxe.Json.parse(msg);
+            var t = json.t;
+            var event = json.event;
+            var op = json.op;
+            var s = json.s;
+            var d:Dynamic = json.d;
+            switch (json.op)
+            {
+                case 10:
+                    trace("got op 10");
+                    interval = d.heartbeat_interval;
+                    if (canResume) {
+                        ws.send(haxe.Json.stringify({op:1, d: null})); 
+                        ws.send(haxe.Json.stringify({
+                            op: 6,
+                            d: {
+                                token: token,
+                                session_id: session_id,
+                                seq: sequence
                             }
+                        }));
+                        hb_timer = new haxe.Timer(interval);
+                        hb_timer.run = () -> {
+                            ws.send(haxe.Json.stringify({op:1, d: null})); 
                         }
-                        last_heartbeat = Date.now();
-                    case 'INTERACTION_CREATE':
-                        onInteractionCreate(nInteraction(d, d, haxe.Json.parse(msg)));
-                    case 'MESSAGE_CREATE':
-                        /*var author = d.author.username;
-                        var content = d.content;
-                        if (debug)
-                        {
-                            trace(content);
-                            trace(author + ": " + content);
-                        }*/
-                        onMessageCreate(nMessage(d, d));
-                    case 'THREAD_MEMBER_UPDATE':
-                        onThreadMemberUpdate(d);
-                    case 'THREAD_MEMBERS_UPDATE':
-                        onThreadMembersUpdate(d);
-                    case 'GUILD_ROLE_CREATE':
-                        cache.guilds_roles.set(d.role.id, d);
-                    case 'GUILD_ROLE_DELETE':
-                        if (cache.guilds_roles.exists(d.role.id)) {
-                            cache.guilds_roles.set(d.role.id, d);
+                    } else {
+                        ws.send(haxe.Json.stringify({op:1, d: null})); 
+                        haxe.EntryPoint.runInMainThread(()->{
+                            hb_timer = new haxe.Timer(interval);
+                            hb_timer.run = () -> {
+                                ws.send(haxe.Json.stringify({op:1, d: null})); 
+                            }
+                        });
+                        ws.send(haxe.Json.stringify({
+                            "op": 2,
+                            "d": {
+                                    "token": token,
+                                    "properties": {
+                                        "os": "hxdiscord",
+                                        "browser": "hxdiscord",
+                                        "device": "hxdiscord"
+                                },
+                                // This intent represents 1 << 0 for GUILDS, 1 << 1 for GUILD_MEMBERS, and 1 << 2 for GUILD_BANS
+                                // This connection will only receive the events defined in those three intents
+                                "intents": 3276799
+                            }
+                        }));
+                    }
+                case 9:
+                    canResume = false;
+                    ws.close();
+                case 0:
+                    sequence = s;
+                case 7: //gateway needs client to reconnect
+                    ws.close();
+            }
+        
+            switch (t) {
+                case "RESUMED":
+                    //nothing happens except the onResumed() function is called :)
+                    onResumed();
+                case 'READY':
+                    user = new hxdiscord.types.User(this, d.user);
+                    verified = d.user.verified;
+                    avatar = d.user.avatar;
+                    mfa_enabled = d.user.mfa_enabled;
+                    accountId = d.user.id;
+                    email = d.user.email;
+                    discriminator = d.user.discriminator;
+                    username = d.user.username;
+                    flags = d.user.flags;
+                    bot = d.user.bot;
+                    session_id = d.session_id;
+                    session_type = d.session_type;
+                    #if (nodejs&&js)
+                    Gateway.GATEWAY_URL = d.resume_gateway_url + "?v=" + Gateway.API_VERSION;
+                    #end
+                    canResume = true;
+                    if (!bot) {
+                        authHeader = token;
+                    }
+                    else {
+                        authHeader = "Bot " + token;
+                    }
+                    onReady();
+                    try {
+                        accId = d.application.id;
+                    } catch (e) {
+                        if (debug) {
+                            trace(e.message);
                         }
-                    case 'GUILD_ROLE_UPDATE':
-                        cache.guilds_roles.set(d.role.id, d);
-                    case 'GUILD_CREATE':
-                        if (!cache.guilds.exists(d.id)) {
-                            cache.guilds.set(d.id, d);
-                        }
-                        for (i in 0...d.roles.length) {
-                            cache.guilds_roles.set(d.roles[i].id, d.roles[i]);
-                        }
-                        trace("end");
-                        onGuildCreate(d);
-                    case 'GUILD_UPDATE':
-                        onGuildUpdate(d);
+                    }
+                    last_heartbeat = Date.now();
+                case 'INTERACTION_CREATE':
+                    onInteractionCreate(nInteraction(d, d, haxe.Json.parse(msg)));
+                case 'MESSAGE_CREATE':
+                    /*var author = d.author.username;
+                    var content = d.content;
+                    if (debug)
+                    {
+                        trace(content);
+                        trace(author + ": " + content);
+                    }*/
+                    onMessageCreate(nMessage(d, d));
+                case 'THREAD_MEMBER_UPDATE':
+                    onThreadMemberUpdate(d);
+                case 'THREAD_MEMBERS_UPDATE':
+                    onThreadMembersUpdate(d);
+                case 'GUILD_ROLE_CREATE':
+                    cache.guilds_roles.set(d.role.id, d);
+                case 'GUILD_ROLE_DELETE':
+                    if (cache.guilds_roles.exists(d.role_id)) {
+                        cache.guilds_roles.set(d.role_id, d);
+                    }
+                case 'GUILD_ROLE_UPDATE':
+                    cache.guilds_roles.set(d.role.id, d);
+                case 'GUILD_CREATE':
+                    if (!cache.guilds.exists(d.id)) {
                         cache.guilds.set(d.id, d);
-                    case 'GUILD_DELETE':
-                        cache.guilds.remove(d.id);
-                        onGuildDelete(d);
-                    case "GUILD_BAN_ADD":
-                        onGuildBanAdd(d);
-                    case "GUILD_BAN_REMOVE":
-                        onGuildBanRemove(d);
-                    case 'GUILD_AUDIT_LOG_ENTRY_CREATE':
-                        onGuildAuditLogEntryCreate(d);
-                    case 'GUILD_MEMBER_ADD':
-                        onGuildMemberAdd(d);
-                        cache.guild_members.set(d.guild_id+d.user.id,d);
-                    case "GUILD_MEMBER_REMOVE":
-                        onGuildMemberRemove(d);
-                        //UNcaching shit haha
-                        //actually i'm doing this because i found out this was crashing the thing so yeah
-                        //this is actually needed
-                        /*try {
-                            for (i in 0...cache.guild_members.length) {
-                                if (cache.guild_members[i].guild_id == d.guild_id) {
-                                    if (cache.guild_members[i].user.id == d.user.id) {
-                                        cache.guild_members.remove(cache.guild_members[i]);
-                                        if (d.user.id == user.id)
-                                            for (i in 0...cache.roles.length) {
-                                                if (cache.roles[i][0] == d.guild_id) {
-                                                    cache.roles.remove(cache.roles[i]);
-                                                }
-                                            }
-                                    }
-                                }
-                            }
-                        } catch (err) {
-                            trace("oopsie " + err.message);
-                        }*/
-                        if (cache.guild_members.exists(d.guild_id+d.user.id)) {
-                            cache.guild_members.remove(d.guild_id+d.user.id);
-                        }
-                    case "GUILD_MEMBER_UPDATE":
-                        onGuildMemberUpdate(d);
-                        for (x in 0...d.roles.length) {
-                            d.permissionsBitwise.push(client.cache.guilds_roles.get(d.roles[x]).permissions);
-                            //trace(cache.guilds_roles.get(d.members[i].roles[x]));
-                        }
-                        client.cache.guild_members.set(guild_id+author.id, d);
-                        var member = d;
-                        for (i in 0...member.permissionsBitwise.length) {
-                            var array:Array<String> = hxdiscord.utils.Permissions.resolve(haxe.Int64.fromFloat(Std.parseFloat(member.permissionsBitwise[i])));
-                            if (array.contains(permissionToLookFor))
-                            {
-                                hasPermission = true;
-                            }
-                        }
-                        /*var dataRoles:Dynamic = Endpoints.getRoles(d.guild_id);
-                        //caching
-                        for (i in 0...d.roles.length)
-                        {
-                            var permissionBitwise:Array<Dynamic> = [];
-                            for (x in 0...dataRoles.length)
-                            {
-                                if (d.roles[i] == dataRoles[x].id)
-                                {
-                                    permissionBitwise.push(dataRoles[x].permissions);
-                                }
-                            }
-                            Reflect.setProperty(d, "permissionBitwise", permissionBitwise);
-                        }
-                        cache.guild_members.set([d.guild_id,d.user.id],d);*/
-                        /*var member:Member = null;
-                        var gid:String = Std.string(d.guild_id);
-                        var user_id:String = Std.string(d.user.id);
-                        hxdiscord.endpoints.Endpoints.getGuildMember(gid, user_id, (m) -> {member = m;}, (e) -> trace(e));
-                        var foundRoles:Bool = false;
-                        var dataRoles:Dynamic = null;
-                        if (cache.roles.length == 0) {
-                            var r:Dynamic = Endpoints.getRoles(d.guild_id);
-                            cache.roles.push([d.guild_id, r]);
-                            dataRoles = r;
-                            foundRoles = true;
-                        } else {
-                            for (i in 0...cache.roles.length) {
-                                if (cache.roles[i][0] == d.guild_id) {
-                                    dataRoles = cache.roles[i][1];
-                                    foundRoles = true;
-                                }
-                            }
-                        }
-                        if (!foundRoles) {
-                            dataRoles = Endpoints.getRoles(d.guild_id);
-                        }
-            
-                        dataRoles = haxe.Json.parse(dataRoles);
-            
-                        for (i in 0...member.roles.length)
-                        {
-                            for (x in 0...dataRoles.length)
-                            {
-                                if (member.roles[i] == dataRoles[x].id)
-                                {
-                                    member.permissionsBitwise.push(dataRoles[x].permissions);
-                                }
-                            }
-                        }
-                        if (cache.guild_members.length == 0) {
-                            cache.guild_members.push(member);
-                        } else {
-                            for (i in 0...cache.guild_members.length) {
-                                var found:Bool = false;
-                                if (cache.guild_members[i].user.id == member.user.id && cache.guild_members[i].guild_id == d.guild_id) {
-                                    found = true;
-                                }
-                                if (found) {
+                    }
+                    for (i in 0...d.roles.length) {
+                        cache.guilds_roles.set(d.roles[i].id, d.roles[i]);
+                    }
+                    onGuildCreate(d);
+                case 'GUILD_UPDATE':
+                    onGuildUpdate(d);
+                    cache.guilds.set(d.id, d);
+                case 'GUILD_DELETE':
+                    cache.guilds.remove(d.id);
+                    onGuildDelete(d);
+                case "GUILD_BAN_ADD":
+                    onGuildBanAdd(d);
+                case "GUILD_BAN_REMOVE":
+                    onGuildBanRemove(d);
+                case 'GUILD_AUDIT_LOG_ENTRY_CREATE':
+                    onGuildAuditLogEntryCreate(d);
+                case 'GUILD_MEMBER_ADD':
+                    onGuildMemberAdd(d);
+                    var member:Member = new Member(d, d.guild_id);
+                    cache.guild_members.set(d.guild_id+d.user.id,member);
+                case "GUILD_MEMBER_REMOVE":
+                    onGuildMemberRemove(d);
+                    //UNcaching shit haha
+                    //actually i'm doing this because i found out this was crashing the thing so yeah
+                    //this is actually needed
+                    /*try {
+                        for (i in 0...cache.guild_members.length) {
+                            if (cache.guild_members[i].guild_id == d.guild_id) {
+                                if (cache.guild_members[i].user.id == d.user.id) {
                                     cache.guild_members.remove(cache.guild_members[i]);
-                                    cache.guild_members.push(member);
-                                } else {
-                                    cache.guild_members.push(member);
-                                }
-                            }
-                        }*/
-                    case "VOICE_SERVER_UPDATE":
-                        for (i in 0...currentVoiceClients.length) {
-                            @:privateAccess
-                            if (currentVoiceClients[i].guild_id == d.guild_id) {
-                                currentVoiceClients[i].giveCredentials(d);
-                            }
-                        }
-                    case "VOICE_STATE_UPDATE":
-                        //deal with functions later
-                        for (i in 0...currentVoiceClients.length) {
-                            @:privateAccess
-                            if (currentVoiceClients[i].guild_id == d.guild_id) {
-                                if (d.channel_id != null && d.session_id != null) {
-                                    @:privateAccess
-                                    currentVoiceClients[i].session_id = d.session_id;
-                                }
-                                else
-                                {
-                                    currentVoiceClients.remove(currentVoiceClients[i]); //like, if there's no channel id (which means that the bot disconnected), it removes its instance?
+                                    if (d.user.id == user.id)
+                                        for (i in 0...cache.roles.length) {
+                                            if (cache.roles[i][0] == d.guild_id) {
+                                                cache.roles.remove(cache.roles[i]);
+                                            }
+                                        }
                                 }
                             }
                         }
-                }
-            #if (!hl)
-            } catch (err) {
+                    } catch (err) {
+                        trace("oopsie " + err.message);
+                    }*/
+                    if (cache.guild_members.exists(d.guild_id+d.user.id)) {
+                        cache.guild_members.remove(d.guild_id+d.user.id);
+                    }
+                case "GUILD_MEMBER_UPDATE":
+                    onGuildMemberUpdate(d);
+                    var member:Member = new Member(d, d.guild_id);
+                    for (x in 0...member.roles.length) {
+                        trace("oh " + member.roles[x]);
+                        trace(cache.guilds_roles.get(member.roles[x]).permissions);
+                        member.permissionsBitwise.push(cache.guilds_roles.get(member.roles[x]).permissions);
+                        //trace(cache.guilds_roles.get(d.members[i].roles[x]));
+                    }
+                    cache.guild_members.set(member.guild_id+member.user.id, member);
+                    /*var dataRoles:Dynamic = Endpoints.getRoles(d.guild_id);
+                    //caching
+                    for (i in 0...d.roles.length)
+                    {
+                        var permissionBitwise:Array<Dynamic> = [];
+                        for (x in 0...dataRoles.length)
+                        {
+                            if (d.roles[i] == dataRoles[x].id)
+                            {
+                                permissionBitwise.push(dataRoles[x].permissions);
+                            }
+                        }
+                        Reflect.setProperty(d, "permissionBitwise", permissionBitwise);
+                    }
+                    cache.guild_members.set([d.guild_id,d.user.id],d);*/
+                    /*var member:Member = null;
+                    var gid:String = Std.string(d.guild_id);
+                    var user_id:String = Std.string(d.user.id);
+                    hxdiscord.endpoints.Endpoints.getGuildMember(gid, user_id, (m) -> {member = m;}, (e) -> trace(e));
+                    var foundRoles:Bool = false;
+                    var dataRoles:Dynamic = null;
+                    if (cache.roles.length == 0) {
+                        var r:Dynamic = Endpoints.getRoles(d.guild_id);
+                        cache.roles.push([d.guild_id, r]);
+                        dataRoles = r;
+                        foundRoles = true;
+                    } else {
+                        for (i in 0...cache.roles.length) {
+                            if (cache.roles[i][0] == d.guild_id) {
+                                dataRoles = cache.roles[i][1];
+                                foundRoles = true;
+                            }
+                        }
+                    }
+                    if (!foundRoles) {
+                        dataRoles = Endpoints.getRoles(d.guild_id);
+                    }
+        
+                    dataRoles = haxe.Json.parse(dataRoles);
+        
+                    for (i in 0...member.roles.length)
+                    {
+                        for (x in 0...dataRoles.length)
+                        {
+                            if (member.roles[i] == dataRoles[x].id)
+                            {
+                                member.permissionsBitwise.push(dataRoles[x].permissions);
+                            }
+                        }
+                    }
+                    if (cache.guild_members.length == 0) {
+                        cache.guild_members.push(member);
+                    } else {
+                        for (i in 0...cache.guild_members.length) {
+                            var found:Bool = false;
+                            if (cache.guild_members[i].user.id == member.user.id && cache.guild_members[i].guild_id == d.guild_id) {
+                                found = true;
+                            }
+                            if (found) {
+                                cache.guild_members.remove(cache.guild_members[i]);
+                                cache.guild_members.push(member);
+                            } else {
+                                cache.guild_members.push(member);
+                            }
+                        }
+                    }*/
+                case "VOICE_SERVER_UPDATE":
+                    for (i in 0...currentVoiceClients.length) {
+                        @:privateAccess
+                        if (currentVoiceClients[i].guild_id == d.guild_id) {
+                            currentVoiceClients[i].giveCredentials(d);
+                        }
+                    }
+                case "VOICE_STATE_UPDATE":
+                    //deal with functions later
+                    for (i in 0...currentVoiceClients.length) {
+                        @:privateAccess
+                        if (currentVoiceClients[i].guild_id == d.guild_id) {
+                            if (d.channel_id != null && d.session_id != null) {
+                                @:privateAccess
+                                currentVoiceClients[i].session_id = d.session_id;
+                            }
+                            else
+                            {
+                                currentVoiceClients.remove(currentVoiceClients[i]); //like, if there's no channel id (which means that the bot disconnected), it removes its instance?
+                            }
+                        }
+                    }
             }
-            #end
+        #if (!hl)
+        } catch (err) {
+        }
+        #end
     }
 
     //FOR TESTING PURPOSES

@@ -24,7 +24,7 @@ class WebSocketConnection {
             ws.onopen = function() {
                 onReady();
             }
-            ws.onmessagecreate = function(message:haxe.ws.Types.MessageType) {
+            ws.onmessage = function(message:haxe.ws.Types.MessageType) {
                 switch(message) {
                     case StrMessage(content):
                         onMessage(content);
@@ -32,8 +32,8 @@ class WebSocketConnection {
                         //no
                 }
             }
-            ws.onclose = (code:Dynamic) -> {
-                onClose(code);
+            ws.onclose = () -> {
+                onClose(1);
             }
 
             ws.onerror = (err:String) -> {
