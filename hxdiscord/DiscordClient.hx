@@ -190,7 +190,7 @@ class DiscordClient {
             switch (json.op)
             {
                 case 10:
-                    trace("got op 10");
+                    //trace("got op 10");
                     interval = d.heartbeat_interval;
                     if (canResume) {
                         ws.send(haxe.Json.stringify({op:1, d: null})); 
@@ -350,8 +350,6 @@ class DiscordClient {
                     onGuildMemberUpdate(d);
                     var member:Member = new Member(d, d.guild_id);
                     for (x in 0...member.roles.length) {
-                        trace("oh " + member.roles[x]);
-                        trace(cache.guilds_roles.get(member.roles[x]).permissions);
                         member.permissionsBitwise.push(cache.guilds_roles.get(member.roles[x]).permissions);
                         //trace(cache.guilds_roles.get(d.members[i].roles[x]));
                     }
@@ -569,6 +567,22 @@ class DiscordClient {
         };
 
         ws.send(haxe.Json.stringify(data));
+    }
+
+    public function createVoiceConnection(guild_id:String, channel_id, ?self_mute:Bool = false, ?self_deaf:Bool = false):VoiceClient {
+        var client = new VoiceClient(guild_id, channel_id, this.user.id);
+        currentVoiceClients.push(client);
+        var data = {
+            op: 4,
+            d: {
+                guild_id: guild_id,
+                channel_id: channel_id,
+                self_mute: false,
+                self_deaf: false
+            }
+        }
+        ws.send(haxe.Json.stringify(data));
+        return client;
     }
 
     @:dox(hide)

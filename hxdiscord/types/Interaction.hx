@@ -145,7 +145,7 @@ class Interaction
 
     public function edit(ic:Typedefs.InteractionCallback)
     {
-        try {
+        try { //if it works leave it like that™️
             Endpoints.editInteractionResponse(ic, token);
         }
     }

@@ -9,7 +9,7 @@
 
 package hxdiscord;
 
-import hxdiscord.net.WebSocketConnection;
+import haxe.ws.WebSocket;
 import hxdiscord.DiscordClient;
 import sys.net.Host;
 import sys.FileSystem;
@@ -28,7 +28,7 @@ class VoiceClient {
     var guild_id:String;
     var channel_id:String;
     var session_id:String;
-    var websocket:WebSocketConnection;
+    var websocket:WebSocket;
     var hasCredentials:Bool = false;
     private var client:DiscordClient;
     var buf = haxe.io.Bytes.alloc(1024);
@@ -49,74 +49,71 @@ class VoiceClient {
         trace("Awaiting for the gateway credentials..");*/
     }
 
+    function handleShit(str:String, dyn:Dynamic) {
+        var _:String = str;
+        var d = dyn;
+        var data:Dynamic = haxe.Json.parse(_);
+        trace(_);
+        switch (data.op) {
+            case 8:
+                hb_interval = data.d.heartbeat_interval;
+                websocket.send(
+                    haxe.Json.stringify({
+                        op: 0,
+                        d: {
+                            server_id: this.guild_id,
+                            user_id: this.user_id,
+                            session_id: this.session_id,
+                            token: d.token
+                        }
+                    })
+                );
+                hb_timer = new Timer(this.hb_interval);
+                hb_timer.run = function()
+                {
+                    trace("SENT");
+                    websocket.send(haxe.Json.stringify({
+                        op: 8,
+                        d: null
+                    }));
+                }
+            case 2:
+                ip = data.d.ip;
+                port = data.d.port;
+                websocket.send(haxe.Json.stringify({
+                    op: 1,
+                    d: {
+                        protocol: "udp",
+                        data: {
+                            address: data.d.ip,
+                            port: data.d.port,
+                            mode: "xsalsa20_poly1305_lite"
+                        }
+                    }
+                }));
+            case 4:
+                
+        }
+    }
+
     public function giveCredentials(d:Dynamic) {
         if (!hasCredentials) {
             /*trace("Credentials given!");
             trace("our credentials: " + haxe.Json.stringify(d));
             trace("session id: " + session_id);*/
-            websocket = new WebSocketConnection("wss://" + d.endpoint);
-            websocket.onMessage = (_) -> {
-                var data:Dynamic = haxe.Json.parse(_);
-                trace(_);
-                switch (data.op) {
-                    case 8: //hello
-                        //here we have to send the payload thing
-                        /*trace(this.session_id);
-                        trace(this.guild_id);
-                        trace(this.user_id);
-                        trace(this.session_id);*/
-                        hb_interval = data.d.heartbeat_interval;
-                        websocket.sendJson(
-                            {
-                                op: 0,
-                                d: {
-                                    server_id: this.guild_id,
-                                    user_id: this.user_id,
-                                    session_id: this.session_id,
-                                    token: d.token
-                                }
-                            }
-                        );
-                        hb_timer = new Timer(this.hb_interval);
-                        hb_timer.run = function()
-                        {
-                            websocket.send(haxe.Json.stringify({
-                                op: 8,
-                                d: null
-                            }));
-                        }
-                        //trace("DATA SENT?");
-                    case 2:
-                        ip = data.d.ip;
-                        port = data.d.port;
-                        websocket.sendJson({
-                            op: 1,
-                            d: {
-                                protocol: "udp",
-                                data: {
-                                    address: data.d.ip,
-                                    port: data.d.port,
-                                    mode: "xsalsa20_poly1305_lite"
-                                }
-                            }
-                        });
-                    case 4:
-                        udpConnection = new UdpSocket();
-
-                        udpConnection.connect(new Host(ip), port);
-                        trace("Connected to the server");
-
-                        addr = new Address();
-                        addr.host = Std.parseInt(ip);
-                        addr.port = port;
-
+            websocket = new WebSocket("wss://" + d.endpoint);
+            websocket.onmessage = (dd:haxe.ws.Types.MessageType) -> {
+                switch(dd) {
+                    case StrMessage(content):
+                        haxe.EntryPoint.runInMainThread(handleShit.bind(content, d));
+                    case BytesMessage(content):
                 }
             }
-            websocket.onClose = (_) -> {
-                trace(_);
+            websocket.onclose = () -> {
+                trace("closed");
                 this.destroy();
             }
-            websocket.onError = (_) -> {
+            websocket.onerror = (_) -> {
                 trace("errored " + _);
                 this.destroy();
             }
@@ -131,19 +128,19 @@ class VoiceClient {
         if (!FileSystem.exists(path)) {
             trace("The path of the file you have specified does not exist.");
         } else {
-            if (!path.endsWith(".ogg")) {
-                throw "[!] WARNING [!]\nPlaying files in hxdiscord for now it's a beta thing. You can only play .ogg files for now.";
+            if (!path.endsWith(".opus")) {
+                throw "[!] WARNING [!]\nPlaying files in hxdiscord for now it's a beta thing. You can only play .opus files for now.";
             }
             else {
                 trace("a");
-                websocket.sendJson({
+                websocket.send(haxe.Json.stringify({
                     op: 5,
                     d: {
                         speaking: 5,
                         delay: 0,
                         ssrc: 1
                     }
-                });
+                }));
 
                 /*var fileBytes = File.getBytes(path);
                 var size = FileSystem.stat(path).size;
