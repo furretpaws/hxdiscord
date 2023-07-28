@@ -442,6 +442,8 @@ class DiscordClient {
                             }
                         }
                     }
+                case "PRESENCE_UPDATE":
+                    cache.presences.set(d.user.id, d);
             }
         #if (!hl)
         } catch (err) {

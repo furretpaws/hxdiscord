@@ -18,6 +18,7 @@ class CachedData {
     public var guilds:Map<String, Dynamic> = new Map<String, Dynamic>();
     public var guilds_roles:Map<String, Dynamic> = new Map<String, Dynamic>();
     public var roles:Map<String, Dynamic> = new Map<String, Dynamic>();
+    public var presences:Map<String, Dynamic> = new Map<String, Dynamic>();
     /*public function cacheMemberAndRoles(gid:String, uid:String) {
         var member:hxdiscord.types.Member = null;
         hxdiscord.endpoints.Endpoints.getGuildMember(gid, uid, (m) -> {member = m;}, null);

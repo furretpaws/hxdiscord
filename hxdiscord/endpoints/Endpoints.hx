@@ -1471,7 +1471,7 @@ class Endpoints
         @param message_id The message ID you want to start a thread from
         @param obj The request object
     **/
-    public static function startThreadFromMessage(channel_id:String, message_id:String, obj:FromMessage):Bool
+    public static function startThreadFromMessage(channel_id:String, message_id:String, obj:FromMessage):Dynamic
     {
         var s:Bool = true;
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/messages/" + message_id + "/threads");
@@ -1483,12 +1483,15 @@ class Endpoints
 
         r.setPostData(haxe.Json.stringify(obj));
 
+        var dataa:Dynamic = null;
+
         r.onData = function(data:String)
         {
             if (DiscordClient.debug)
             {
                 trace(data);
             }
+            dataa = haxe.Json.parse(data);
         }
 
         r.onError = function(error)
@@ -1499,7 +1502,7 @@ class Endpoints
         }
 
         r.send();
-        return s;
+        return dataa;
     }
 
     /**

@@ -176,7 +176,7 @@ class Message
         @param obj The FromMessage thread object
     **/
 
-    public function createThread(obj:FromMessage)
+    public function createThread(obj:FromMessage):Dynamic
     {
         Endpoints.startThreadFromMessage(channel_id, id, obj);
     }
