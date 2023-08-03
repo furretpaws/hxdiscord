@@ -23,6 +23,7 @@ class Message
     public var embeds:Array<Embed>;
     public var message_reference:MessageReference;
     public var guild_id:String;
+    public var allowed_mentions:Dynamic;
     public var content:String;
     public var embed:Embed;
     public var mention_everyone:Bool;
@@ -178,7 +179,8 @@ class Message
 
     public function createThread(obj:FromMessage):Dynamic
     {
-        Endpoints.startThreadFromMessage(channel_id, id, obj);
+        var obj = Endpoints.startThreadFromMessage(channel_id, id, obj);
+        return obj;
     }
 
     /**
@@ -342,6 +344,7 @@ class Message
     public function getMember():Member {
         var member:Member = null;
         hxdiscord.endpoints.Endpoints.getGuildMember(guild_id, author.id, (m) -> {member = m;}, null);
+        //trace(member);
         return member;
     }
 }

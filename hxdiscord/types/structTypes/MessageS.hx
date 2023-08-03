@@ -22,6 +22,7 @@ typedef MessageS = {
     @:optional var pinned:Bool;
     @:optional var webhook_id:String;
     @:optional var type:Int;
+    @:optional var allowed_mentions:Dynamic;
     /*@:optional var activity:MessageActivity;
     @:optional var application:MessageApplication;*/
 }

@@ -11,6 +11,7 @@ typedef MessageCreate = {
     @:optional var file:String;
     @:optional var message_reference:Any;
     @:optional var attachments:Array<Dynamic>;
+    @:optional var allowed_mentions:Dynamic;
 }
 
 typedef AuditLogChangeStructure = {

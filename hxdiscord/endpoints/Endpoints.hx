@@ -169,6 +169,7 @@ class Endpoints
     public static function getUser(id:String)
     {
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/users/" + id);
+        //trace("https://discord.com/api/v"+Gateway.API_VERSION+"/users/" + id);
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
         r.addHeader("Authorization", DiscordClient.authHeader);
@@ -210,6 +211,7 @@ class Endpoints
     
         r.onData = function(data:String)
         {
+            trace(data);
             guildmember = new hxdiscord.types.Member(haxe.Json.parse(data), guild_id);
             cb(guildmember);
         }

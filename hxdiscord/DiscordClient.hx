@@ -289,6 +289,8 @@ class DiscordClient {
                     onThreadMemberUpdate(d);
                 case 'THREAD_MEMBERS_UPDATE':
                     onThreadMembersUpdate(d);
+                case 'CHANNEL_CREATE':
+                    onChannelCreate(d);
                 case 'GUILD_ROLE_CREATE':
                     cache.guilds_roles.set(d.role.id, d);
                 case 'GUILD_ROLE_DELETE':
@@ -757,6 +759,15 @@ class DiscordClient {
     dynamic public function onGuildMemberUpdate(d:hxdiscord.types.structTypes.GuildMember)
     {
         
+    }
+
+    /**
+        Event hook for CHANNEL_CREATE
+    **/
+
+    dynamic public function onChannelCreate(d:hxdiscord.types.structTypes.Channel)
+    {
+
     }
 }
 

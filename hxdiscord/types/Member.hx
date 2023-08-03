@@ -23,7 +23,7 @@ class Member {
     public function new(d:hxdiscord.types.structTypes.GuildMember, gi:String) {
         this.id = d.id;
         this.nick = d.nick;
-        this.user = new User(null, Endpoints.getUser(d.id));
+        this.user = new User(null, Endpoints.getUser(d.user.id));
         this.avatar = d.avatar;
         this.roles = d.roles;
         this.joined_at = d.joined_at;

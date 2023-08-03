@@ -148,10 +148,11 @@ class Http {
     
 		req.customRequest(false, responseBytes, this.method);
 		var response = responseBytes.getBytes();
-        if (data != null || data != "") {
+        if (data == null || data == "") {
             //do nothing
         } else {
             onError(data);
+            trace(response);
         }
         onData(response.toString());
         #end
