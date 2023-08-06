@@ -347,4 +347,15 @@ class Message
         //trace(member);
         return member;
     }
+
+    /**
+        Returns few of the messages sent previously
+        @param data JSON data
+    **/
+
+    public function getChannelMessages(limit:Int):Dynamic {
+        var messagesNotParsed:String = Endpoints.getChannelMessages(channel_id, limit);
+        var data:Dynamic = haxe.Json.parse(messagesNotParsed);
+        return data;
+    }
 }

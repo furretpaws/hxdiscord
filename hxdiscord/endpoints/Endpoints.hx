@@ -634,6 +634,8 @@ class Endpoints
 
     public static function createReaction(channel_id:String, message_id:String, emoji:String)
     {
+        emoji = emoji.replace(">", "");
+        emoji = emoji.replace("<", "");
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+message_id+"/reactions/"+emoji+"/@me");
     
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
