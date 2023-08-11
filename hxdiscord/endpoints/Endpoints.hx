@@ -4,6 +4,7 @@
 
 package hxdiscord.endpoints;
 
+import hxdiscord.types.structTypes.Channel;
 import hxdiscord.types.structTypes.Thread.ForumChannel;
 import hxdiscord.types.structTypes.Thread.WithoutMessage;
 import hxdiscord.types.structTypes.Thread.FromMessage;
@@ -1106,6 +1107,35 @@ class Endpoints
         Returns a JSON representation of the invites from the channel
         @param channel_id The ID of the channel
     **/
+
+    public static function getChannel(channel_id:String):Channel
+    {
+        var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id);
+    
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", DiscordClient.authHeader);
+        r.setMethod("GET");
+        var thing:Dynamic = "";
+    
+        r.onData = function(data:String)
+        {
+            if (DiscordClient.debug)
+            {
+                trace(data);
+            }
+            thing = haxe.Json.parse(data);
+        }
+    
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+    
+        r.send();
+    
+        return thing;
+    }
 
     public static function getChannelInvites(channel_id:String)
     {
