@@ -38,6 +38,7 @@ class Message
 
     public function new(ms:MessageS, _client:DiscordClient)
     {
+        //trace(haxe.Json.stringify(ms));
         client = _client;
         //trace(ms.username);
         type = ms.type;
@@ -55,6 +56,9 @@ class Message
         mention_everyone = ms.mention_everyone;
         guildmember = ms.member;
         guild_id = ms.guild_id;
+        author = new User(_client, ms.author);
+        author.bot = ms.author.bot; //why
+        //trace(haxe.Json.stringify(author));
     }
 
     /**

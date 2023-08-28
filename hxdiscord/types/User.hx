@@ -31,6 +31,7 @@ class User
         avatar_decoration = us.avatar_decoration;
         avatar = us.avatar;
         banner = us.banner;
+        //trace(haxe.Json.stringify(us));
         bot = us.bot;
         system = us.system;
         mfa_enabled = us.mfa_enabled;

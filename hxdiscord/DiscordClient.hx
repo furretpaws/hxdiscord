@@ -624,7 +624,6 @@ class DiscordClient {
 
         var id = ms.id;
         var message = new Message(ms, this);
-        message.author = daUser;
         return message;
     }
 
