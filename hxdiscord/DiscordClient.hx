@@ -446,6 +446,7 @@ class DiscordClient {
                     }
                 case "PRESENCE_UPDATE":
                     cache.presences.set(d.user.id, d);
+                    onPresenceUpdate(d);
             }
         #if (!hl)
         } catch (err) {
@@ -767,6 +768,14 @@ class DiscordClient {
     dynamic public function onChannelCreate(d:hxdiscord.types.structTypes.Channel)
     {
 
+    }
+
+    /**
+        Event hook for PRESENCE_UPDATE
+    **/
+    dynamic public function onPresenceUpdate(d:Dynamic)
+    {
+        
     }
 }
 
