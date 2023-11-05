@@ -14,6 +14,28 @@ typedef MessageCreate = {
     @:optional var allowed_mentions:Dynamic;
 }
 
+typedef ModifyChannelPacket = {
+    name:String,
+    type:Int,
+    ?position:Int,
+    ?topic:String,
+    ?nsfw:Bool,
+    ?rate_limit_per_user:Int,
+    ?bitrate:Int,
+    ?user_limit:Int,
+    ?permission_overwrites:Array<Overwrite>,
+    ?parent_id:String,
+    ?rtc_region:String,
+    ?video_quality_mode:Int,
+    ?default_auto_archive_duration:Int,
+    ?flags:Int,
+    ?available_tags:Array<Tag>,
+    ?default_reaction_emoji:DefaultReaction,
+    ?default_thread_rate_limit_per_user:Int,
+    ?default_sort_order:Int,
+    ?default_forum_layout:Int
+}
+
 typedef AuditLogChangeStructure = {
     new_value:Dynamic,
     old_value:Dynamic,

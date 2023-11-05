@@ -17,6 +17,7 @@ class User
     public var mfa_enabled:Bool;
     public var accent_color:Int;
     public var locale:String;
+    public var username_f:String; //Stands for formatted username
     public var verified:Bool;
     public var email:String;
     public var flags:Int;
@@ -31,7 +32,6 @@ class User
         avatar_decoration = us.avatar_decoration;
         avatar = us.avatar;
         banner = us.banner;
-        //trace(haxe.Json.stringify(us));
         bot = us.bot;
         system = us.system;
         mfa_enabled = us.mfa_enabled;
@@ -42,5 +42,13 @@ class User
         flags = us.flags;
         premium_type = us.premium_type;
         public_flags = us.public_flags;
+        /**
+            Discord I fucking hate you for adding pomelo
+        **/
+        if (this.discriminator == "0") {
+            username_f = username;
+        } else {
+            username_f = '${username}#${discriminator}';
+        }
     }
 }

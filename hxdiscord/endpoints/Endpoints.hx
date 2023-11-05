@@ -1137,6 +1137,37 @@ class Endpoints
         return thing;
     }
 
+    public static function modifyChannel(channel_id:String, d:Typedefs.ModifyChannelPacket):Channel
+        {
+            var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id);
+        
+            r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+            r.addHeader("Authorization", DiscordClient.authHeader);
+            r.setMethod("PATCH");
+            r.setPostData(haxe.Json.stringify(d));
+            var thing:Dynamic = "";
+        
+            r.onData = function(data:String)
+            {
+                if (DiscordClient.debug)
+                {
+                    trace(data);
+                }
+                thing = haxe.Json.parse(data);
+            }
+        
+            r.onError = function(error)
+            {
+                trace("An error has occurred: " + error);
+                trace(r.responseData);
+            }
+        
+            r.send();
+        
+            return thing;
+        }
+    
+
     public static function getChannelInvites(channel_id:String)
     {
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id + "/invites");
