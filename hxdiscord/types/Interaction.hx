@@ -50,7 +50,7 @@ class Interaction
             ins.user.username_f = '${username}#${discriminator}';
         }**/
         member = ins.member;
-        trace(member);
+        //trace(member);
         if (ins.member.user.discriminator == "0") {
             ins.member.user.username_f = username;
         } else {
