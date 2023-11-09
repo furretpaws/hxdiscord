@@ -49,6 +49,7 @@ typedef User = {
     var public_flags:Int;
     var id:String;
     var discriminator:String;
+    var username_f:String;
     var avatar_decoration:String;
     var avatar:String;
 }
