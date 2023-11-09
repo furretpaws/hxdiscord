@@ -16,5 +16,6 @@ typedef UserS = {
     @:optional var verified:Bool;
     @:optional var email:String;
     @:optional var flags:Int;
+    @:optional var username_f:String;
     @:optional var premium_type:Int;
 }
