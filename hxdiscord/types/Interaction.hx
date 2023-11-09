@@ -41,7 +41,21 @@ class Interaction
         discriminator = ins.discriminator;
         avatar_decoration = ins.avatar_decoration;
         user = ins.user;
+        /**
+            Discord I fucking hate you for adding pomelo
+        **/
+        /**if (discriminator == "0") {
+            ins.user.username_f = username;
+        } else {
+            ins.user.username_f = '${username}#${discriminator}';
+        }**/
         member = ins.member;
+        trace(member);
+        if (ins.member.user.discriminator == "0") {
+            ins.member.user.username_f = username;
+        } else {
+            ins.member.user.username_f = '${ins.member.user.username}#${ins.member.user.discriminator}';
+        }
         avatar = ins.avatar;
         channel_id = ins.channel_id;
         guild_id = ins.guild_id;
