@@ -9,6 +9,8 @@ import hxdiscord.types.structTypes.Thread.ForumChannel;
 import hxdiscord.types.structTypes.Thread.WithoutMessage;
 import hxdiscord.types.structTypes.Thread.FromMessage;
 import hxdiscord.types.Typedefs.ModifyGuildParams;
+import hxdiscord.types.Typedefs.MessageCreate;
+import hxdiscord.types.Typedefs.ModifyChannelPacket;
 import hxdiscord.utils.Https;
 import hxdiscord.DiscordClient;
 import hxdiscord.utils.Http;
@@ -300,7 +302,7 @@ class Endpoints
         @param m The message create object
     */
 
-    public static function editMessage(channel_id:String, m_id:String, m:hxdiscord.types.Typedefs.MessageCreate)
+    public static function editMessage(channel_id:String, m_id:String, m:MessageCreate)
     {
         var req:Http = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/"+channel_id+"/messages/"+m_id);
         var responseBytes = new BytesOutput();
@@ -1137,7 +1139,7 @@ class Endpoints
         return thing;
     }
 
-    public static function modifyChannel(channel_id:String, d:Typedefs.ModifyChannelPacket):Channel
+    public static function modifyChannel(channel_id:String, d:ModifyChannelPacket):Channel
         {
             var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/channels/" + channel_id);
         
