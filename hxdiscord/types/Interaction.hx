@@ -52,7 +52,7 @@ class Interaction
         member = ins.member;
         //trace(member);
         if (ins.member.user.discriminator == "0") {
-            ins.member.user.username_f = username;
+            ins.member.user.username_f = ins.member.user.username;
         } else {
             ins.member.user.username_f = '${ins.member.user.username}#${ins.member.user.discriminator}';
         }
