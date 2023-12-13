@@ -12,6 +12,7 @@ typedef UserS = {
     @:optional var system:Bool;
     @:optional var mfa_enabled:Bool;
     @:optional var accent_color:Int;
+    @:optional var global_name:String;
     @:optional var locale:String;
     @:optional var verified:Bool;
     @:optional var email:String;
