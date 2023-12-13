@@ -22,6 +22,7 @@ class User
     public var email:String;
     public var flags:Int;
     public var premium_type:Int;
+    public var global_name:String;
 
     public function new (?client:hxdiscord.DiscordClient, us:UserS)
     {
@@ -40,6 +41,7 @@ class User
         verified = us.verified;
         email = us.email;
         flags = us.flags;
+        global_name = us.global_name;
         premium_type = us.premium_type;
         public_flags = us.public_flags;
         /**
