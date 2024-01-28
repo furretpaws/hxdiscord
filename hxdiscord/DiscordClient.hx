@@ -237,7 +237,10 @@ class DiscordClient {
                 case 7: //gateway needs client to reconnect
                     ws.close();
             }
-        
+
+            if (t != null) {
+                onEventDispatch(t, d);
+            }
             switch (t) {
                 case "RESUMED":
                     //nothing happens except the onResumed() function is called :)
@@ -284,6 +287,7 @@ class DiscordClient {
                         trace(content);
                         trace(author + ": " + content);
                     }*/
+                    //trace(d,d);
                     onMessageCreate(nMessage(d, d));
                 case 'THREAD_MEMBER_UPDATE':
                     onThreadMemberUpdate(d);
@@ -624,6 +628,7 @@ class DiscordClient {
         daUser.avatar = d.author.avatar;
 
         var id = ms.id;
+        //trace(ms);
         var message = new Message(ms, this);
         return message;
     }
@@ -776,6 +781,14 @@ class DiscordClient {
     dynamic public function onPresenceUpdate(d:Dynamic)
     {
         
+    }
+
+    /**
+        Event hook for non-coded events
+    **/
+    dynamic public function onEventDispatch(t:String, d:Dynamic)
+    {
+
     }
 }
 
