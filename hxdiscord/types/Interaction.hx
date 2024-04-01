@@ -25,6 +25,12 @@ class Interaction
     public var type:Int;
     public var token:String;
     public var data:hxdiscord.types.structTypes.InteractionS.InteractionData;
+    public var channel:Channel;
+    public var locale:String;
+    public var entitlements:Array<Dynamic>;
+    public var version:Int;
+    public var authorizing_integration_owners:Int;
+    public var context:Int;
 
     /**
         Constructor (You won't probably use this since it's useless to construct one)
@@ -35,6 +41,9 @@ class Interaction
 
     public function new(ins:InteractionS, _client:DiscordClient, parsedJSON:Dynamic)
     {
+        channel = ins.channel;
+        locale = ins.locale;
+        entitlements = ins.entitlements;
         username = ins.username;
         public_flags = ins.public_flags;
         id = ins.id;
