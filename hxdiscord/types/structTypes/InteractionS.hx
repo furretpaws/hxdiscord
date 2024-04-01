@@ -20,6 +20,12 @@ typedef InteractionS = {
     var components:Array<Dynamic>;
     var data:InteractionData;
     var token:String;
+    @:optional var channel:Channel;
+    @:optional var locale:String;
+    @:optional var entitlements:Array<Dynamic>;
+    @:optional var version:Int;
+    @:optional var authorizing_integration_owners:Int;
+    @:optional var context:Int;
 }
 
 typedef InteractionResolvedData = {
