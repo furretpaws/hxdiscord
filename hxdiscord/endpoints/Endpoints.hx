@@ -2148,7 +2148,8 @@ class Endpoints
             }
         }
         #end
-        
+
+		trace(Json.stringify(json));
 		req.setPostData(Json.stringify(json));
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
 		req.addHeader("Content-type", "application/json");
