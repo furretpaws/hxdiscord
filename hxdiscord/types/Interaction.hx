@@ -41,31 +41,25 @@ class Interaction
 
     public function new(ins:InteractionS, _client:DiscordClient, parsedJSON:Dynamic)
     {
-        trace("intermediate logging");
         channel = ins.channel;
-        trace("intermediate logging");
         locale = ins.locale;
-        trace("intermediate logging");
         entitlements = ins.entitlements;
-        trace("intermediate logging");
         version = ins.version;
-        trace("intermediate logging");
         authorizing_integration_owners = ins.authorizing_integration_owners;
-        trace("intermediate logging");
+
         context = ins.context;
-        trace("intermediate logging");
+
         username = ins.username;
-        trace("intermediate logging");
+
         public_flags = ins.public_flags;
-        trace("intermediate logging");
+
         id = ins.id;
-        trace("intermediate logging");
+
         discriminator = ins.discriminator;
-        trace("intermediate logging");
+
         avatar_decoration = ins.avatar_decoration;
-        trace("intermediate logging");
         user = ins.user;
-        trace("intermediate logging");
+
         /**
             Discord I fucking hate you for adding pomelo
         **/
@@ -75,29 +69,36 @@ class Interaction
             ins.user.username_f = '${username}#${discriminator}';
         }**/
         member = ins.member;
-        trace("intermediate logging");
+
         //trace(member);
-        trace("intermediate logging");
+        if (ins.member != null) {
+            if (ins.member.user.discriminator == "0") {
+                ins.member.user.username_f = ins.member.user.username;
+            } else {
+                ins.member.user.username_f = '${ins.member.user.username}#${ins.member.user.discriminator}';
+            }
+        }
+
         avatar = ins.avatar;
-        trace("intermediate logging");
+
         channel_id = ins.channel_id;
-        trace("intermediate logging");
+
         guild_id = ins.guild_id;
-        trace("intermediate logging");
+
         name = ins.name;
-        trace("intermediate logging");
+
         intId = ins.intId;
-        trace("intermediate logging");
+
         components = ins.components;
-        trace("intermediate logging");
+
         options = ins.options;
-        trace("intermediate logging");
+
         type = ins.type;
-        trace("intermediate logging");
+
         token = ins.token;
-        trace("intermediate logging");
+
         data = ins.data;
-        trace("intermediate logging");
+
 
         if (this.options != null)
         {
