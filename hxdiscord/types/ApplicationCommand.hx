@@ -21,6 +21,7 @@ class ApplicationCommand {
     public var default_member_permissions:String;
     public var dm_permission:Bool;
     public var default_permission:Bool = true;
+    public var integration_types:Array<Int> = [];
     public var nsfw:Bool;
     public var version:String;
 
@@ -55,6 +56,15 @@ class ApplicationCommand {
     /**
         Add an option (used in slash commands)
         @param _option The option object
+    **/
+
+    public function addIntegrationType(type:Int) { this.integration_types.push(type); }
+    /**
+        Add an integration type to the command
+        Values 0 and 1 are only available
+        0 stands for GUILD_INSTALL (Command available for Guilds)
+        1 stands for USER_INSTALL (Command available for Users aka User Apps)
+        @param type The integration type, 0 or 1, you may call this function twice if you want both of them
     **/
     public function addOption(_option:ApplicationCommandOption)
     { 
