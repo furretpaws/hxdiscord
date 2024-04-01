@@ -44,6 +44,9 @@ class Interaction
         channel = ins.channel;
         locale = ins.locale;
         entitlements = ins.entitlements;
+        version = ins.version;
+        authorizing_integration_owners = ins.authorizing_integration_owners;
+        context = ins.context;
         username = ins.username;
         public_flags = ins.public_flags;
         id = ins.id;
