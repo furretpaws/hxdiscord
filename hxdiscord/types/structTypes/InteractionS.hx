@@ -24,7 +24,7 @@ typedef InteractionS = {
     @:optional var locale:String;
     @:optional var entitlements:Array<Dynamic>;
     @:optional var version:Int;
-    @:optional var authorizing_integration_owners:Int;
+    @:optional var authorizing_integration_owners:Dynamic;
     @:optional var context:Int;
 }
 
