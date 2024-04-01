@@ -68,7 +68,7 @@ class ApplicationCommand {
         @param type The integration type, 0 or 1, you may call this function twice if you want both of them
     **/
 
-    public function addContext(type:Int) { this.integration_types.push(type); }
+    public function addContext(type:Int) { this.contexts.push(type); }
     /**
         Add an integration type to the command
         Values 0, 1 and 2 are only available
