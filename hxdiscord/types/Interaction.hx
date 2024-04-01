@@ -29,7 +29,7 @@ class Interaction
     public var locale:String;
     public var entitlements:Array<Dynamic>;
     public var version:Int;
-    public var authorizing_integration_owners:Int;
+    public var authorizing_integration_owners:Dynamic;
     public var context:Int;
 
     /**
