@@ -2148,6 +2148,13 @@ class Endpoints
             }
         }
         #end
+	for (i in 0...json.length) {
+		for (field in Reflect.fields(json[i])) {
+			if (Reflect.field(json[i], "integration_types") == null || Reflect.field(json[i], "integration_types") == []) {
+				Reflect.deleteField(json[i], "integration_types");
+			}
+		}
+	}
 		req.setPostData(Json.stringify(json));
         req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
 		req.addHeader("Content-type", "application/json");
