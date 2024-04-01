@@ -77,11 +77,6 @@ class Interaction
         member = ins.member;
         trace("intermediate logging");
         //trace(member);
-        if (ins.member.user.discriminator == "0") {
-            ins.member.user.username_f = ins.member.user.username;
-        } else {
-            ins.member.user.username_f = '${ins.member.user.username}#${ins.member.user.discriminator}';
-        }
         trace("intermediate logging");
         avatar = ins.avatar;
         trace("intermediate logging");
