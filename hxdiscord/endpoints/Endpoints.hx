@@ -169,6 +169,32 @@ class Endpoints
         Get the information about a user
         @param id The ID of the user
     **/
+
+    public static function getGuildMembers(gid:String):Dynamic {
+	    var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + gid + "/members");
+        //trace("https://discord.com/api/v"+Gateway.API_VERSION+"/users/" + id);
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", DiscordClient.authHeader);
+        r.setMethod("GET");
+
+        var dataJson:Dynamic = null;
+
+        r.onData = function(data:String)
+        {
+            dataJson = haxe.Json.parse(data);
+        }
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+        }
+
+        r.send();
+
+        return dataJson;
+    }
     public static function getUser(id:String)
     {
         var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/users/" + id);
