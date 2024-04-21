@@ -170,8 +170,8 @@ class Endpoints
         @param id The ID of the user
     **/
 
-    public static function getGuildMembers(gid:String):Dynamic {
-	    var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + gid + "/members");
+    public static function getGuildMembers(gid:String, limit:Int = 0, after:Int = 0):Dynamic {
+	    var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/guilds/" + gid + "/members?limit="+limit+"&after="+after);
         //trace("https://discord.com/api/v"+Gateway.API_VERSION+"/users/" + id);
 
         r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
