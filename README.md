@@ -32,6 +32,8 @@ https://discord.gg/gKQh5cC59w
 ## Example
 
 Here's an example of a Discord Bot, using the hxdiscord library.
+EDIT: Due to one issue being posted, I'd like to mention that ALL privileged intents must be enabled in order for this example code snippet to work.
+Enable these settings: https://prnt.sc/Xb6KToqeEOfy
 
 ```haxe
 import hxdiscord.DiscordClient;
