@@ -125,6 +125,8 @@ class Interaction
         if (wasThinking) {
             try {
                 Endpoints.editInteractionResponse(ic, token);
+            } catch (e:Dynamic) { //this is held together with ducktape -cookiaria
+                
             }
         } else {
             Endpoints.sendInteractionCallback(ic, intId, token, 4, ephemeral);
