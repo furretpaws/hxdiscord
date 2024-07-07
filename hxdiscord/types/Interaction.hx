@@ -12,7 +12,7 @@ class Interaction
     public var discriminator:String;
     public var avatar_decoration:Dynamic;
     public var avatar:String;
-    public var user:UserS;
+    public var user:Dynamic;
     public var channel_id:String;
     public var name:String;
     public var member:hxdiscord.types.structTypes.InteractionS.Member;
@@ -58,7 +58,11 @@ class Interaction
         discriminator = ins.discriminator;
 
         avatar_decoration = ins.avatar_decoration;
-        user = ins.user;
+        if (ins.user == null && ins.member != null) { // Mental health re-gained
+            user = ins.member.user;
+        } else {
+            user = ins.user;
+        }
 
         /**
             Discord I fucking hate you for adding pomelo
