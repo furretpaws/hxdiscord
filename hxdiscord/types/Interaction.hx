@@ -200,6 +200,8 @@ class Interaction
     {
         try { //if it works leave it like that™️
             Endpoints.editInteractionResponse(ic, token);
+        } catch (e:Dynamic) { //this is held together with ducktape -cookiaria
+                
         }
     }
 }
