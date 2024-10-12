@@ -6,6 +6,7 @@ package hxdiscord.endpoints;
 
 import hxdiscord.types.structTypes.Channel;
 import hxdiscord.types.structTypes.Thread.ForumChannel;
+import haxe.io.Bytes;
 import hxdiscord.types.structTypes.Thread.WithoutMessage;
 import hxdiscord.types.structTypes.Thread.FromMessage;
 import hxdiscord.types.Typedefs.ModifyGuildParams;
@@ -2468,7 +2469,8 @@ class Endpoints
         r.setMethod("POST");
 
         #if (!js)
-        r.setPostBytes(bytesOutput.getBytes());
+        var bytes:Bytes = bytesOutput.getBytes();
+        r.setPostBytes(bytes);
         #else
         r.setPostData(reqData);
         #end
@@ -2488,7 +2490,6 @@ class Endpoints
             trace(r.responseData);
             trace(haxe.Json.stringify(ic));
         }
-    
         r.send();
     }
 
@@ -2500,34 +2501,140 @@ class Endpoints
 
     public static function editInteractionResponse(ic:hxdiscord.types.Typedefs.InteractionCallback, interactionToken:String)
     {
-        var url:String = "https://discord.com/api/v"+Gateway.API_VERSION+"/webhooks/" + DiscordClient.accountId + "/" + interactionToken + "/messages/@original";
-        var req:Http = new Http(url);
-        var responseBytes = new BytesOutput();
-        var error:Bool = false;
-    
-        req.setPostData(Json.stringify(ic));
-        req.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
-        req.addHeader("Content-type", "application/json");
-        req.addHeader("Authorization", DiscordClient.authHeader);
-        req.setMethod("PATCH");
-    
-        req.onError = function(err:String) {
-            trace("An error has occurred: " + err);
-            error = true;
-        };
-        
-        req.onStatus = function(status:Int) {
+        var response:String;
+        var attachments:Bool = false;
+        if (ic.attachments != null)
+        {
+            attachments = true;
+        }
+        else
+        {
+            attachments = false;
+        }
+        var getJson = haxe.Json.parse(haxe.Json.stringify(ic));
+
+        #if (!js)
+        //generate body / now using multipart :money_mouth:
+        var bytesOutput:BytesOutput = new BytesOutput();
+        bytesOutput.writeString("--boundary");
+        bytesOutput.writeString("\n");
+        bytesOutput.writeString("Content-Disposition: form-data; name=\"payload_json\"");
+        bytesOutput.writeString("\n");
+        bytesOutput.writeString("Content-Type: application/json;");
+        bytesOutput.writeString("\n\n");
+        if (attachments)
+        {
+            var newJson:Dynamic = haxe.Json.parse(haxe.Json.stringify(ic));
+            var filename:String = "";
+            var thing = "";
+            for (i in 0...newJson.data.attachments.length)
+            {
+                thing = newJson.data.attachments[i].filename.toString();
+                var split = thing.split("/");
+                newJson.data.attachments[i].filename = split[split.length-1];
+            }
+            bytesOutput.writeString(haxe.Json.stringify(newJson));
+        }
+        else
+        {
+            bytesOutput.writeString(haxe.Json.stringify(ic));
+        }
+        if (attachments)
+        {
+            for (i in 0...ic.attachments.length)
+            {
+                bytesOutput.writeString("\n--boundary");
+                bytesOutput.writeString('\nContent-Disposition: form-data; name="files[' + i + ']"; filename="' + getJson.attachments[i].filename + '"');
+                bytesOutput.writeString('\nContent-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(getJson.attachments[i].filename));
+                bytesOutput.writeString('\n\n');
+                bytesOutput.writeFullBytes(sys.io.File.getBytes(getJson.attachments[i].filename), 0, sys.FileSystem.stat(getJson.attachments[i].filename).size);
+            }
+            bytesOutput.writeString("\n--boundary--");
+        }
+        else
+        {
+            bytesOutput.writeString("\n--boundary--");
+        }
+        #else
+        //generate body / now using multipart :money_mouth:
+        var reqData:String = "";
+        reqData += ("--boundary");
+        reqData += ("\n");
+        reqData += ("Content-Disposition: form-data; name=\"payload_json\"");
+        reqData += ("\n");
+        reqData += ("Content-Type: application/json;");
+        reqData += ("\n\n");
+        if (attachments)
+        {
+            var newJson:Dynamic = haxe.Json.parse(haxe.Json.stringify({
+                "type": type,
+                "data": ic
+            }));
+            var filename:String = "";
+            var thing = "";
+            for (i in 0...newJson.data.attachments.length)
+            {
+                thing = newJson.data.attachments[i].filename.toString();
+                var split = thing.split("/");
+                newJson.data.attachments[i].filename = split[split.length-1];
+            }
+            reqData += (haxe.Json.stringify(newJson));
+        }
+        else
+        {
+            reqData += (haxe.Json.stringify({
+                "type": type,
+                "data": ic
+            }));
+        }
+        if (attachments)
+        {
+            for (i in 0...ic.attachments.length)
+            {
+                reqData += ("\n--boundary");
+                reqData += ('\nContent-Disposition: form-data; name="files[' + i + ']"; filename="' + getJson.attachments[i].filename + '"');
+                reqData += ('\nContent-Type: ' + hxdiscord.utils.MimeResolver.getMimeType(getJson.attachments[i].filename));
+                reqData += ('\n\n');
+                reqData += (Fs.readFileSync(getJson.attachments[i].filename, {encoding: "binary"}));
+            }
+            reqData += ("\n--boundary--");
+        }
+        else
+        {
+            reqData += ("\n--boundary--");
+        }
+        #end
+
+        var r = new Http("https://discord.com/api/v"+Gateway.API_VERSION+"/webhooks/" + DiscordClient.accountId + "/" + interactionToken + "/messages/@original");
+
+        r.addHeader("User-Agent", "hxdiscord (https://github.com/FurretDev/hxdiscord)");
+        r.addHeader("Authorization", DiscordClient.authHeader);
+        r.addHeader("Content-Type", "multipart/form-data; boundary=boundary");
+
+        r.setMethod("PATCH");
+
+        #if (!js)
+        var bytes:Bytes = bytesOutput.getBytes();
+        r.setPostBytes(bytes);
+        #else
+        r.setPostData(reqData);
+        #end
+
+        r.onData = function(data:String)
+        {
             if (DiscordClient.debug)
             {
-                trace(status);
+                trace(data);
             }
-        };
-    
-        req.send();
-        if (error)
-        { 
-            trace(req.responseData); 
+            response = data;
         }
-        return Json.parse(req.responseData);
+
+        r.onError = function(error)
+        {
+            trace("An error has occurred: " + error);
+            trace(r.responseData);
+            trace(haxe.Json.stringify(ic));
+        }
+        r.send();
     }
 }
